@@ -1,2 +1,5 @@
 # repost-jvm
-Official Repost Java and Kotlin SDK. Source of truth: repost-sh/monorepo (read-only mirror).
+
+Official [Repost](https://repost.sh) SDK for Java and Kotlin.
+
+> **Read-only mirror.** Source of truth is the Repost monorepo; this repository is synced and tagged automatically on each release. Please do not open pull requests here.
