@@ -1,0 +1,26 @@
+name: JVM SDK publication approval
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: JVM SDK version without the jvm-sdk-v prefix
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  approve:
+    name: Approve the JVM SDK publication
+    environment: jvm-sdk-production
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Validate the approved release gate
+        env:
+          GATE_STATUS: ${{ vars.REPOST_JVM_RELEASE_GATE_STATUS }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          test "$GATE_STATUS" = READY
+          test "$GITHUB_REF" = "refs/tags/jvm-sdk-v$VERSION"
