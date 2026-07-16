@@ -95,9 +95,9 @@
         "allowedPublishStepIds": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "enum": ["central.publish-existing-deployment", "gradle.publish-staged-plugin", "cli.publish-staged-dist", "github.publish-complete-release"] },
-          "minItems": 4,
-          "maxItems": 4
+          "items": { "enum": ["github.publish-source-mirror", "central.publish-existing-deployment", "gradle.publish-staged-plugin", "cli.publish-staged-dist", "github.publish-complete-release"] },
+          "minItems": 5,
+          "maxItems": 5
         },
         "registryEnvironments": {
           "type": "object",

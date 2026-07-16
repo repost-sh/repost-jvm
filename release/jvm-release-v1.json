@@ -50,6 +50,7 @@
   "approval": {
     "environment": "jvm-sdk-production",
     "allowedPublishStepIds": [
+      "github.publish-source-mirror",
       "central.publish-existing-deployment",
       "gradle.publish-staged-plugin",
       "cli.publish-staged-dist",
