@@ -1,0 +1,10 @@
+public final class sh.repost.client.opentelemetry.OpenTelemetryRepostTelemetry implements sh.repost.client.RepostTelemetry {
+  public static sh.repost.client.RepostTelemetry create(io.opentelemetry.api.OpenTelemetry);
+    descriptor: (Lio/opentelemetry/api/OpenTelemetry;)Lsh/repost/client/RepostTelemetry;
+
+  public sh.repost.client.CapturedTelemetryContext captureContext();
+    descriptor: ()Lsh/repost/client/CapturedTelemetryContext;
+
+  public sh.repost.client.TelemetryOperation startOperation(sh.repost.client.CapturedTelemetryContext, sh.repost.client.TelemetryOperationStart);
+    descriptor: (Lsh/repost/client/CapturedTelemetryContext;Lsh/repost/client/TelemetryOperationStart;)Lsh/repost/client/TelemetryOperation;
+}

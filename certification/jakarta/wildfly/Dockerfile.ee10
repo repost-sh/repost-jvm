@@ -1,0 +1,12 @@
+FROM eclipse-temurin:21-jre
+ARG WILDFLY_URL
+ARG WILDFLY_SHA1
+ARG WILDFLY_DIRECTORY
+ADD ${WILDFLY_URL} /tmp/wildfly.tar.gz
+RUN echo "${WILDFLY_SHA1}  /tmp/wildfly.tar.gz" | sha1sum -c - \
+    && tar -xzf /tmp/wildfly.tar.gz -C /opt \
+    && mv "/opt/${WILDFLY_DIRECTORY}" /opt/wildfly \
+    && rm /tmp/wildfly.tar.gz
+COPY repost.war /opt/wildfly/standalone/deployments/repost.war
+EXPOSE 8080 9990
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]

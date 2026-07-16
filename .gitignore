@@ -1,0 +1,13 @@
+/.gradle/
+/.kotlin/
+/build/
+/*/.gradle/
+/*/.kotlin/
+/build-logic/build/
+/fixture-java/build/
+/fixture-kotlin/build/
+/repost-*/build/
+!/build-logic/src/main/kotlin/sh/repost/build/
+!/build-logic/src/main/kotlin/sh/repost/build/**
+!/build-logic/src/test/kotlin/sh/repost/build/
+!/build-logic/src/test/kotlin/sh/repost/build/**

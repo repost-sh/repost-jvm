@@ -1,0 +1,34 @@
+diff --git a/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/AbstractH2StreamMultiplexer.java b/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/AbstractH2StreamMultiplexer.java
+--- a/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/AbstractH2StreamMultiplexer.java
++++ b/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/AbstractH2StreamMultiplexer.java
+@@ -980,7 +980,7 @@ abstract class AbstractH2StreamMultiplexer implements Identifiable, HttpConnect
+                         for (final Iterator<H2Stream> it = streams.iterator(); it.hasNext(); ) {
+                             final H2Stream stream = it.next();
+                             final int activeStreamId = stream.getId();
+-                            if (!streams.isSameSide(activeStreamId) && activeStreamId > processedLocalStreamId) {
++                            if (streams.isSameSide(activeStreamId) && activeStreamId > processedLocalStreamId) {
+                                 stream.fail(new RequestNotExecutedException());
+                                 it.remove();
+                             }
+diff --git a/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/H2Stream.java b/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/H2Stream.java
+--- a/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/H2Stream.java
++++ b/httpcore5-h2/org/apache/hc/core5/http2/impl/nio/H2Stream.java
+@@ -30,6 +30,5 @@ package org.apache.hc.core5.http2.impl.nio;
+ import java.io.IOException;
+ import java.nio.ByteBuffer;
+-import java.nio.channels.CancelledKeyException;
+ import java.nio.charset.CharacterCodingException;
+ import java.util.List;
+ import java.util.concurrent.atomic.AtomicBoolean;
+@@ -258,9 +257,9 @@ class H2Stream {
+     boolean abort() {
+         if (cancelled.compareAndSet(false, true)) {
+             try {
+-                channel.requestOutput();
++                localResetCancelled();
+                 return true;
+-            } catch (final CancelledKeyException ignore) {
++            } catch (final IOException ignore) {
+             }
+         }
+         return false;

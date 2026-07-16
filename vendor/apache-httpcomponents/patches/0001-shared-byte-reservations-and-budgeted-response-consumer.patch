@@ -1,0 +1,415 @@
+diff --git a/httpcore5/org/apache/hc/core5/repost/RepostByteBudget.java b/httpcore5/org/apache/hc/core5/repost/RepostByteBudget.java
+new file mode 100644
+index 0000000..34ff223
+--- /dev/null
++++ b/httpcore5/org/apache/hc/core5/repost/RepostByteBudget.java
+@@ -0,0 +1,78 @@
++package org.apache.hc.core5.repost;
++
++import java.util.concurrent.atomic.AtomicBoolean;
++import java.util.concurrent.atomic.AtomicLong;
++
++/** Internal weighted byte budget shared by engine connections and operations. */
++public final class RepostByteBudget {
++    private final long capacity;
++    private final AtomicLong reserved;
++
++    public RepostByteBudget(final long capacity) {
++        if (capacity <= 0) {
++            throw new IllegalArgumentException("capacity must be positive");
++        }
++        this.capacity = capacity;
++        this.reserved = new AtomicLong();
++    }
++
++    public long capacity() {
++        return capacity;
++    }
++
++    public long reservedBytes() {
++        return reserved.get();
++    }
++
++    public Reservation tryReserve(final long bytes) {
++        if (bytes <= 0 || bytes > capacity) {
++            throw new IllegalArgumentException("reservation must be within budget capacity");
++        }
++        long current = reserved.get();
++        while (true) {
++            if (current > capacity - bytes) {
++                return null;
++            }
++            if (reserved.compareAndSet(current, current + bytes)) {
++                return new Reservation(this, bytes);
++            }
++            current = reserved.get();
++        }
++    }
++
++    private void release(final long bytes) {
++        final long remaining = reserved.addAndGet(-bytes);
++        if (remaining < 0) {
++            reserved.addAndGet(bytes);
++            throw new IllegalStateException("byte budget released more than it reserved");
++        }
++    }
++
++    /** Single-owner idempotent reservation token. */
++    public static final class Reservation implements AutoCloseable {
++        private final RepostByteBudget owner;
++        private final long bytes;
++        private final AtomicBoolean closed;
++
++        private Reservation(final RepostByteBudget owner, final long bytes) {
++            this.owner = owner;
++            this.bytes = bytes;
++            this.closed = new AtomicBoolean();
++        }
++
++        public long bytes() {
++            return bytes;
++        }
++
++        public boolean isClosed() {
++            return closed.get();
++        }
++
++        @Override
++        public void close() {
++            if (closed.compareAndSet(false, true)) {
++                owner.release(bytes);
++            }
++        }
++    }
++}
+diff --git a/httpcore5/org/apache/hc/core5/repost/RepostBudgetedBodyConsumer.java b/httpcore5/org/apache/hc/core5/repost/RepostBudgetedBodyConsumer.java
+new file mode 100644
+index 0000000..567e6ca
+--- /dev/null
++++ b/httpcore5/org/apache/hc/core5/repost/RepostBudgetedBodyConsumer.java
+@@ -0,0 +1,325 @@
++package org.apache.hc.core5.repost;
++
++import java.io.IOException;
++import java.io.InputStream;
++import java.nio.ByteBuffer;
++import java.util.Objects;
++
++/** Internal bounded response-body gate over an operation-owned byte reservation. */
++public final class RepostBudgetedBodyConsumer implements AutoCloseable {
++    public static final int MAX_BODY_BYTES = 1_048_576;
++    public static final int MAX_CHUNK_BYTES = 16_384;
++    public static final int MAX_CHUNKS = 64;
++
++    private final int limit;
++    private final ReservationRelease reservationRelease;
++    private final UpstreamControl upstream;
++    private byte[][] chunks;
++    private int consumed;
++    private boolean terminal;
++    private boolean transferred;
++    private boolean upstreamCancelled;
++    private boolean upstreamClosed;
++    private long upstreamCancelFailures;
++    private long upstreamCloseFailures;
++    private OwnedBodyInputStream completedBody;
++
++    public RepostBudgetedBodyConsumer(
++            final long limit,
++            final RepostByteBudget.Reservation reservation,
++            final UpstreamControl upstream) {
++        if (limit <= 0 || limit > MAX_BODY_BYTES) {
++            throw new IllegalArgumentException("limit must be between 1 and 1,048,576 bytes");
++        }
++        final RepostByteBudget.Reservation checkedReservation =
++                Objects.requireNonNull(reservation, "reservation");
++        if (checkedReservation.isClosed() || checkedReservation.bytes() < limit) {
++            throw new IllegalArgumentException("open reservation must cover the response limit");
++        }
++        this.reservationRelease = new ReservationRelease(checkedReservation);
++        this.limit = (int) limit;
++        this.upstream = Objects.requireNonNull(upstream, "upstream");
++        this.chunks = new byte[MAX_CHUNKS][];
++    }
++
++    public synchronized long consumedBytes() {
++        return consumed;
++    }
++
++    public synchronized boolean isTerminal() {
++        return terminal;
++    }
++
++    public synchronized long upstreamCancelFailureCount() {
++        return upstreamCancelFailures;
++    }
++
++    public synchronized long upstreamCloseFailureCount() {
++        return upstreamCloseFailures;
++    }
++
++    public long reservationCloseFailureCount() {
++        return reservationRelease.failureCount();
++    }
++
++    public synchronized void accept(final ByteBuffer source) throws IOException {
++        requireOpen();
++        try {
++            final ByteBuffer input = Objects.requireNonNull(source, "source");
++            while (input.hasRemaining()) {
++                if (consumed == limit) {
++                    final ResponseLimitExceededException exceeded =
++                            new ResponseLimitExceededException();
++                    final Error cleanupFatal = terminateBeforeTransfer(true, null);
++                    if (cleanupFatal != null) {
++                        throw cleanupFatal;
++                    }
++                    throw exceeded;
++                }
++                final int chunkIndex = consumed / MAX_CHUNK_BYTES;
++                final int chunkOffset = consumed % MAX_CHUNK_BYTES;
++                byte[] chunk = chunks[chunkIndex];
++                if (chunk == null) {
++                    chunk = new byte[Math.min(MAX_CHUNK_BYTES, limit - consumed)];
++                    chunks[chunkIndex] = chunk;
++                }
++                final int count = Math.min(
++                        Math.min(input.remaining(), limit - consumed),
++                        chunk.length - chunkOffset);
++                input.get(chunk, chunkOffset, count);
++                consumed += count;
++            }
++        } catch (final IOException failure) {
++            if (!terminal) {
++                final Error cleanupFatal = terminateBeforeTransfer(true, null);
++                if (cleanupFatal != null) {
++                    throw cleanupFatal;
++                }
++            }
++            throw failure;
++        } catch (final RuntimeException failure) {
++            final Error cleanupFatal = terminateBeforeTransfer(true, null);
++            if (cleanupFatal != null) {
++                throw cleanupFatal;
++            }
++            throw failure;
++        } catch (final Error fatal) {
++            terminateBeforeTransfer(true, fatal);
++            throw fatal;
++        }
++    }
++
++    public synchronized InputStream complete() {
++        if (completedBody != null) {
++            return completedBody;
++        }
++        requireOpen();
++        terminal = true;
++        final Error upstreamFatal = finishUpstream(false, null);
++        if (upstreamFatal != null) {
++            discardChunks();
++            throw reservationRelease.closePreserving(upstreamFatal);
++        }
++        try {
++            completedBody = new OwnedBodyInputStream(chunks, consumed, reservationRelease);
++            chunks = null;
++            transferred = true;
++            return completedBody;
++        } catch (final Error fatal) {
++            discardChunks();
++            throw reservationRelease.closePreserving(fatal);
++        }
++    }
++
++    public synchronized void abort() {
++        if (terminal || transferred) {
++            return;
++        }
++        final Error fatal = terminateBeforeTransfer(true, null);
++        if (fatal != null) {
++            throw fatal;
++        }
++    }
++
++    @Override
++    public synchronized void close() {
++        abort();
++    }
++
++    private void requireOpen() {
++        if (terminal) {
++            throw new IllegalStateException("response consumer is terminal");
++        }
++    }
++
++    private Error terminateBeforeTransfer(final boolean cancel, final Error primary) {
++        if (terminal || transferred) {
++            return primary;
++        }
++        terminal = true;
++        final Error fatal = finishUpstream(cancel, primary);
++        discardChunks();
++        return reservationRelease.closePreserving(fatal);
++    }
++
++    private Error finishUpstream(final boolean cancel, final Error primary) {
++        Error fatal = primary;
++        if (cancel && !upstreamCancelled) {
++            upstreamCancelled = true;
++            try {
++                upstream.cancel();
++            } catch (final IOException | RuntimeException ignored) {
++                upstreamCancelFailures++;
++            } catch (final Error cancelFatal) {
++                upstreamCancelFailures++;
++                fatal = firstFatal(fatal, cancelFatal);
++            }
++        }
++        if (!upstreamClosed) {
++            upstreamClosed = true;
++            try {
++                upstream.close();
++            } catch (final IOException | RuntimeException ignored) {
++                upstreamCloseFailures++;
++            } catch (final Error closeFatal) {
++                upstreamCloseFailures++;
++                fatal = firstFatal(fatal, closeFatal);
++            }
++        }
++        return fatal;
++    }
++
++    private void discardChunks() {
++        chunks = null;
++    }
++
++    private static Error firstFatal(final Error primary, final Error next) {
++        return primary == null ? next : primary;
++    }
++
++    public interface UpstreamControl {
++        void cancel() throws IOException;
++
++        void close() throws IOException;
++    }
++
++    private static final class ReservationRelease {
++        private final RepostByteBudget.Reservation reservation;
++        private long failures;
++
++        private ReservationRelease(final RepostByteBudget.Reservation reservation) {
++            this.reservation = reservation;
++        }
++
++        private synchronized Error closePreserving(final Error primary) {
++            try {
++                reservation.close();
++                return primary;
++            } catch (final RuntimeException ignored) {
++                failures++;
++                return primary;
++            } catch (final Error fatal) {
++                failures++;
++                return firstFatal(primary, fatal);
++            }
++        }
++
++        private synchronized long failureCount() {
++            return failures;
++        }
++    }
++
++    private static final class OwnedBodyInputStream extends InputStream {
++        private byte[][] chunks;
++        private final int length;
++        private final ReservationRelease reservationRelease;
++        private int position;
++        private boolean closed;
++
++        private OwnedBodyInputStream(
++                final byte[][] chunks,
++                final int length,
++                final ReservationRelease reservationRelease) {
++            this.chunks = chunks;
++            this.length = length;
++            this.reservationRelease = reservationRelease;
++        }
++
++        @Override
++        public synchronized int read() {
++            if (closed || position == length) {
++                releaseAtEnd();
++                return -1;
++            }
++            final int chunkIndex = position / MAX_CHUNK_BYTES;
++            final int chunkOffset = position % MAX_CHUNK_BYTES;
++            final int value = chunks[chunkIndex][chunkOffset] & 0xff;
++            position++;
++            releaseAtEnd();
++            return value;
++        }
++
++        @Override
++        public synchronized int read(final byte[] target, final int offset, final int count) {
++            Objects.requireNonNull(target, "target");
++            Objects.checkFromIndexSize(offset, count, target.length);
++            if (count == 0) {
++                return 0;
++            }
++            if (closed || position == length) {
++                releaseAtEnd();
++                return -1;
++            }
++            int copied = 0;
++            while (copied < count && position < length) {
++                final int chunkIndex = position / MAX_CHUNK_BYTES;
++                final int chunkOffset = position % MAX_CHUNK_BYTES;
++                final int available = Math.min(
++                        chunks[chunkIndex].length - chunkOffset,
++                        length - position);
++                final int next = Math.min(count - copied, available);
++                System.arraycopy(chunks[chunkIndex], chunkOffset, target, offset + copied, next);
++                position += next;
++                copied += next;
++            }
++            releaseAtEnd();
++            return copied;
++        }
++
++        @Override
++        public synchronized int available() {
++            return closed ? 0 : length - position;
++        }
++
++        @Override
++        public synchronized void close() {
++            if (!closed) {
++                closed = true;
++                chunks = null;
++                final Error fatal = reservationRelease.closePreserving(null);
++                if (fatal != null) {
++                    throw fatal;
++                }
++            }
++        }
++
++        private void releaseAtEnd() {
++            if (position == length && !closed) {
++                closed = true;
++                chunks = null;
++                final Error fatal = reservationRelease.closePreserving(null);
++                if (fatal != null) {
++                    throw fatal;
++                }
++            }
++        }
++    }
++
++    public static final class ResponseLimitExceededException extends IOException {
++        private static final long serialVersionUID = 1L;
++
++        private ResponseLimitExceededException() {
++            super("response body exceeds configured byte limit");
++        }
++    }
++}

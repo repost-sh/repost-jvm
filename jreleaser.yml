@@ -1,0 +1,28 @@
+project:
+  name: repost-jvm
+  description: Repost Java and Kotlin SDK
+  authors:
+    - Repost
+  inceptionYear: '2026'
+  stereotype: NONE
+  languages:
+    java:
+      groupId: sh.repost
+      artifactId: repost-jvm
+      multiProject: true
+
+release:
+  github:
+    enabled: false
+
+deploy:
+  maven:
+    mavenCentral:
+      repost:
+        active: RELEASE
+        url: https://central.sonatype.com/api/v1/publisher
+        namespace: sh.repost
+        sign: false
+        applyMavenCentralRules: false
+        stagingRepositories:
+          - build/staging-deploy

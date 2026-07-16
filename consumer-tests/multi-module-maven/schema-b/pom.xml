@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion>
+  <parent><groupId>com.acme.consumer</groupId><artifactId>repost-maven-aggregate-consumer</artifactId><version>1.0.0</version></parent>
+  <artifactId>schema-b</artifactId>
+  <dependencies><dependency><groupId>sh.repost</groupId><artifactId>repost-client</artifactId></dependency></dependencies>
+  <build><plugins><plugin><groupId>sh.repost</groupId><artifactId>repost-maven-plugin</artifactId>
+    <executions><execution><goals><goal>generate</goal></goals></execution></executions>
+    <configuration><generators><generator>javaSdk</generator></generators></configuration>
+  </plugin></plugins></build>
+</project>

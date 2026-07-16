@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://repost.sh/sdk-conformance/release/jvm-release-v1.schema.json",
+  "title": "Repost JVM release manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "state", "release", "mavenCoordinates", "gradlePlugin", "nativeEngine", "files", "receipts", "approval", "recovery"],
+  "properties": {
+    "$schema": { "const": "./jvm-release-v1.schema.json" },
+    "format": { "const": "repost-jvm-release-v1" },
+    "state": { "enum": ["preflight", "staged", "public"] },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "tag", "commit", "tree", "runtimeVersion", "pluginVersion", "engineVersion", "cliVersion", "descriptorVersion"],
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "tag": { "type": "string", "pattern": "^jvm-sdk-v[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "commit": { "$ref": "#/$defs/gitObject" },
+        "tree": { "$ref": "#/$defs/gitObject" },
+        "runtimeVersion": { "$ref": "#/$defs/version" },
+        "pluginVersion": { "$ref": "#/$defs/version" },
+        "engineVersion": { "$ref": "#/$defs/version" },
+        "cliVersion": { "$ref": "#/$defs/version" },
+        "descriptorVersion": { "const": 2 }
+      }
+    },
+    "mavenCoordinates": {
+      "type": "array",
+      "minItems": 12,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+:[0-9]+\\.[0-9]+\\.[0-9]+$" }
+    },
+    "gradlePlugin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "implementationCoordinate", "markerCoordinate"],
+      "properties": {
+        "id": { "const": "sh.repost.sdk" },
+        "version": { "$ref": "#/$defs/version" },
+        "implementationCoordinate": { "type": "string" },
+        "markerCoordinate": { "type": "string" }
+      }
+    },
+    "nativeEngine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coordinate", "classifiers", "checksumManifest", "checksumSignature"],
+      "properties": {
+        "coordinate": { "type": "string" },
+        "classifiers": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "enum": ["linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-aarch64", "windows-x86_64"] }
+        },
+        "checksumManifest": { "$ref": "#/$defs/relativePath" },
+        "checksumSignature": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "files": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "channel", "sha256", "size"],
+        "properties": {
+          "path": { "$ref": "#/$defs/relativePath" },
+          "channel": { "enum": ["maven", "gradle-plugin", "native-engine", "cli", "sbom", "provenance"] },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "size": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "receipts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval", "central", "gradlePluginPortal", "cli", "githubRelease"],
+      "properties": {
+        "approval": { "$ref": "#/$defs/relativePath" },
+        "central": { "$ref": "#/$defs/relativePath" },
+        "gradlePluginPortal": { "$ref": "#/$defs/relativePath" },
+        "cli": { "$ref": "#/$defs/relativePath" },
+        "githubRelease": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "allowedPublishStepIds", "registryEnvironments"],
+      "properties": {
+        "environment": { "const": "jvm-sdk-production" },
+        "allowedPublishStepIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["central.publish-existing-deployment", "gradle.publish-staged-plugin", "cli.publish-staged-dist", "github.publish-complete-release"] },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "registryEnvironments": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["central", "gradlePlugin", "cli"],
+          "properties": {
+            "central": { "const": "maven-central-production" },
+            "gradlePlugin": { "const": "gradle-plugin-production" },
+            "cli": { "const": "production" }
+          }
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publicCoordinateVisible", "prePublicFailureAction", "postPublicFailureAction", "gaRequiresAllChannels"],
+      "properties": {
+        "publicCoordinateVisible": { "type": "boolean" },
+        "prePublicFailureAction": { "const": "retry-same-bytes-or-new-version-if-bytes-change" },
+        "postPublicFailureAction": { "const": "retry-missing-with-same-bytes-or-patch-family" },
+        "gaRequiresAllChannels": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "gitObject": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "relativePath": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)[A-Za-z0-9._+/-]+$" }
+  }
+}

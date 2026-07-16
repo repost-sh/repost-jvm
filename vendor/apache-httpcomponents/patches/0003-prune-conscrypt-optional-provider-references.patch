@@ -1,0 +1,125 @@
+diff --git a/httpclient5/org/apache/hc/client5/http/impl/TunnelRefusedException.java b/httpclient5/org/apache/hc/client5/http/impl/TunnelRefusedException.java
+index 14ad335..429a641 100644
+--- a/httpclient5/org/apache/hc/client5/http/impl/TunnelRefusedException.java
++++ b/httpclient5/org/apache/hc/client5/http/impl/TunnelRefusedException.java
+@@ -31,7 +31,6 @@ import org.apache.hc.core5.http.HttpException;
+ import org.apache.hc.core5.http.HttpResponse;
+ import org.apache.hc.core5.http.message.BasicHttpResponse;
+ import org.apache.hc.core5.http.message.StatusLine;
+-import org.conscrypt.Internal;
+
+ /**
+  * Signals that the tunnel request was rejected by the proxy host.
+@@ -56,7 +55,6 @@ public class TunnelRefusedException extends HttpException {
+         this.response = new BasicHttpResponse(500);
+     }
+
+-    @Internal
+     public TunnelRefusedException(final HttpResponse response) {
+         super("CONNECT refused by proxy: " + new StatusLine(response));
+         this.response = response;
+diff --git a/httpclient5/org/apache/hc/client5/http/impl/async/HttpAsyncClientBuilder.java b/httpclient5/org/apache/hc/client5/http/impl/async/HttpAsyncClientBuilder.java
+index 4627dfd..a6a597e 100644
+--- a/httpclient5/org/apache/hc/client5/http/impl/async/HttpAsyncClientBuilder.java
++++ b/httpclient5/org/apache/hc/client5/http/impl/async/HttpAsyncClientBuilder.java
+@@ -1094,19 +1094,6 @@ public class HttpAsyncClientBuilder {
+                     ChainElement.RETRY.name());
+         }
+
+-        if (!contentCompressionDisabled) {
+-            if (contentDecoderMap != null && !contentDecoderMap.isEmpty()) {
+-                execChainDefinition.addFirst(
+-                        new ContentCompressionAsyncExec(contentDecoderMap),
+-                        ChainElement.COMPRESS.name());
+-            } else {
+-                execChainDefinition.addFirst(
+-                        new ContentCompressionAsyncExec(),
+-                        ChainElement.COMPRESS.name());
+-            }
+-        }
+-
+-
+         HttpRoutePlanner routePlannerCopy = this.routePlanner;
+         if (routePlannerCopy == null) {
+             SchemePortResolver schemePortResolverCopy = this.schemePortResolver;
+diff --git a/httpclient5/org/apache/hc/client5/http/impl/auth/SaslPrep.java b/httpclient5/org/apache/hc/client5/http/impl/auth/SaslPrep.java
+index 82786f6..6fc7cfa 100644
+--- a/httpclient5/org/apache/hc/client5/http/impl/auth/SaslPrep.java
++++ b/httpclient5/org/apache/hc/client5/http/impl/auth/SaslPrep.java
+@@ -36,9 +36,6 @@ import java.util.SortedMap;
+ import java.util.TreeMap;
+
+ import org.apache.hc.client5.http.impl.ScramException;
+-import org.conscrypt.Internal;
+-
+-@Internal
+ class SaslPrep {
+
+     public static final SaslPrep INSTANCE = new SaslPrep();
+diff --git a/httpclient5/org/apache/hc/client5/http/impl/nio/PoolingAsyncClientConnectionManagerBuilder.java b/httpclient5/org/apache/hc/client5/http/impl/nio/PoolingAsyncClientConnectionManagerBuilder.java
+index f6c9345..0d63f66 100644
+--- a/httpclient5/org/apache/hc/client5/http/impl/nio/PoolingAsyncClientConnectionManagerBuilder.java
++++ b/httpclient5/org/apache/hc/client5/http/impl/nio/PoolingAsyncClientConnectionManagerBuilder.java
+@@ -33,7 +33,6 @@ import org.apache.hc.client5.http.SchemePortResolver;
+ import org.apache.hc.client5.http.config.ConnectionConfig;
+ import org.apache.hc.client5.http.config.TlsConfig;
+ import org.apache.hc.client5.http.nio.AsyncClientConnectionOperator;
+-import org.apache.hc.client5.http.ssl.ConscryptClientTlsStrategy;
+ import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+ import org.apache.hc.core5.annotation.Experimental;
+ import org.apache.hc.core5.annotation.Internal;
+@@ -44,7 +43,6 @@ import org.apache.hc.core5.http.config.RegistryBuilder;
+ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+ import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+ import org.apache.hc.core5.pool.PoolReusePolicy;
+-import org.apache.hc.core5.util.ReflectionUtils;
+ import org.apache.hc.core5.util.TimeValue;
+
+ /**
+@@ -291,20 +289,10 @@ public class PoolingAsyncClientConnectionManagerBuilder {
+         final TlsStrategy tlsStrategyCopy;
+         if (tlsStrategy != null) {
+             tlsStrategyCopy = tlsStrategy;
++        } else if (systemProperties) {
++            tlsStrategyCopy = DefaultClientTlsStrategy.createSystemDefault();
+         } else {
+-            if (ReflectionUtils.determineJRELevel() <= 8 && ConscryptClientTlsStrategy.isSupported()) {
+-                if (systemProperties) {
+-                    tlsStrategyCopy = ConscryptClientTlsStrategy.getSystemDefault();
+-                } else {
+-                    tlsStrategyCopy = ConscryptClientTlsStrategy.getDefault();
+-                }
+-            } else {
+-                if (systemProperties) {
+-                    tlsStrategyCopy = DefaultClientTlsStrategy.createSystemDefault();
+-                } else {
+-                    tlsStrategyCopy = DefaultClientTlsStrategy.createDefault();
+-                }
+-            }
++            tlsStrategyCopy = DefaultClientTlsStrategy.createDefault();
+         }
+         final PoolingAsyncClientConnectionManager poolingmgr = new PoolingAsyncClientConnectionManager(
+                 createConnectionOperator(tlsStrategyCopy, schemePortResolver, dnsResolver),
+diff --git a/httpcore5/org/apache/hc/core5/reactor/ssl/SSLIOSession.java b/httpcore5/org/apache/hc/core5/reactor/ssl/SSLIOSession.java
+index fbcd7d9..0f2ff8d 100644
+--- a/httpcore5/org/apache/hc/core5/reactor/ssl/SSLIOSession.java
++++ b/httpcore5/org/apache/hc/core5/reactor/ssl/SSLIOSession.java
+@@ -352,7 +352,7 @@ public class SSLIOSession implements IOSession {
+         while (handshaking) {
+              HandshakeStatus handshakeStatus = this.sslEngine.getHandshakeStatus();
+
+-            // Work-around for what appears to be a bug in Conscrypt SSLEngine that does not
++            // Work around providers that do not
+             // transition into the handshaking state upon #closeOutbound() call but still
+             // has some handshake data stuck in its internal buffer.
+             if (handshakeStatus == HandshakeStatus.NOT_HANDSHAKING && outboundClosedCount.get() > 0) {
+@@ -727,8 +727,7 @@ public class SSLIOSession implements IOSession {
+                 try {
+                     // Catch all unchecked exceptions in case something goes wrong
+                     // in the JSSE provider. For instance
+-                    // com.android.org.conscrypt.NativeCrypto#SSL_get_shutdown can
+-                    // throw NPE at this point
++                    // a provider-native shutdown call can throw NPE at this point
+                     doHandshake(this);
+                     sendEncryptedData();
+                     updateEventMask();

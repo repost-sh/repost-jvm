@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.acme.consumer</groupId><artifactId>repost-maven-aggregate-consumer</artifactId>
+  <version>1.0.0</version><packaging>pom</packaging>
+  <modules><module>schema-a</module><module>app</module></modules>
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release><repost.version>1.0.0</repost.version>
+    <app.repost.integration>SPRING_BOOT</app.repost.integration>
+  </properties>
+  <repositories>
+    <repository><id>repost-staged</id><url>${repost.repository}</url></repository>
+    <repository><id>consumer-staged</id><url>${consumer.repository}</url></repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository><id>repost-staged</id><url>${repost.repository}</url></pluginRepository>
+  </pluginRepositories>
+  <dependencyManagement>
+    <dependencies>
+      <dependency><groupId>sh.repost</groupId><artifactId>repost-bom</artifactId>
+        <version>${repost.version}</version><type>pom</type><scope>import</scope></dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build><pluginManagement><plugins><plugin>
+    <groupId>sh.repost</groupId><artifactId>repost-maven-plugin</artifactId><version>${repost.version}</version>
+  </plugin></plugins></pluginManagement></build>
+  <profiles>
+    <profile><id>with-schema-b</id><activation><activeByDefault>true</activeByDefault></activation>
+      <modules><module>schema-b</module></modules></profile>
+  </profiles>
+</project>

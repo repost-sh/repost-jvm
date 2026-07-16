@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://repost.sh/sdk-conformance/build-plugin/generation-request-v1.schema.json",
+  "title": "Repost build-plugin generation request protocol v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "pluginVersion",
+    "engineVersion",
+    "runtimeVersion",
+    "descriptorVersion",
+    "schemaPath",
+    "generators",
+    "environmentInputs",
+    "buildIdentity",
+    "checkMode"
+  ],
+  "properties": {
+    "protocolVersion": { "const": 1 },
+    "pluginVersion": { "type": "string", "minLength": 1 },
+    "engineVersion": { "type": "string", "minLength": 1 },
+    "runtimeVersion": { "type": "string", "minLength": 1 },
+    "descriptorVersion": { "const": 2 },
+    "schemaPath": { "type": "string", "minLength": 1 },
+    "generators": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/generator" }
+    },
+    "environmentInputs": {
+      "type": "object",
+      "propertyNames": { "minLength": 1 },
+      "additionalProperties": { "type": "string" }
+    },
+    "buildIdentity": {
+      "oneOf": [
+        { "$ref": "#/$defs/mavenIdentity" },
+        { "$ref": "#/$defs/gradleIdentity" }
+      ]
+    },
+    "checkMode": { "enum": ["GENERATE", "CHECK"] }
+  },
+  "$defs": {
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generatorName",
+        "sourceOutputDirectory",
+        "resourceOutputDirectory",
+        "sourceControlDirectory",
+        "resourceControlDirectory"
+      ],
+      "properties": {
+        "generatorName": { "type": "string", "minLength": 1 },
+        "sourceOutputDirectory": { "type": "string", "minLength": 1 },
+        "resourceOutputDirectory": { "type": "string", "minLength": 1 },
+        "sourceControlDirectory": { "type": "string", "minLength": 1 },
+        "resourceControlDirectory": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mavenIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "groupId", "artifactId"],
+      "properties": {
+        "kind": { "const": "MAVEN" },
+        "groupId": { "type": "string" },
+        "artifactId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "gradleIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "group", "rootProjectName", "projectPath"],
+      "properties": {
+        "kind": { "const": "GRADLE" },
+        "group": { "type": "string" },
+        "rootProjectName": { "type": "string", "minLength": 1 },
+        "projectPath": { "type": "string", "pattern": "^:(?:[^:]+(?::[^:]+)*)?$" }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+public final class sh.repost.maven.RepostCheckMojo extends sh.repost.maven.AbstractRepostMojo {
+  public sh.repost.maven.RepostCheckMojo();
+    descriptor: ()V
+}
+
+public final class sh.repost.maven.RepostGenerateMojo extends sh.repost.maven.AbstractRepostMojo {
+  public sh.repost.maven.RepostGenerateMojo();
+    descriptor: ()V
+}
+
+public final class sh.repost.maven.RepostHelpMojo extends org.apache.maven.plugin.AbstractMojo {
+  public sh.repost.maven.RepostHelpMojo();
+    descriptor: ()V
+
+  public void execute() throws org.apache.maven.plugin.MojoExecutionException;
+    descriptor: ()V
+}

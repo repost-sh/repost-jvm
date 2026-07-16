@@ -1,0 +1,22 @@
+formatVersion	1
+case	custom-package-client-output	unit-and-consumer
+case	declared-environment-input	unit-and-consumer
+case	missing-environment-input	unit-and-consumer
+case	changed-environment-input	unit-and-consumer
+case	ambient-environment-ignored	unit-and-consumer
+case	java-kotlin-distinct-packages-types	unit-and-consumer
+case	duplicate-fqcn-no-write	unit-and-consumer
+case	multiple-clients	unit-and-consumer
+case	multi-module-no-schema-two-libraries	consumer
+case	duplicate-identities-across-artifacts	unit-and-consumer
+case	parallel-maven	consumer
+case	incremental-noop	unit-and-consumer
+case	stale-dependency-registry-cleanup	consumer
+case	failed-generation-no-partial-tree	unit-and-consumer
+case	source-position-diagnostics	unit-and-consumer
+case	windows-separators-unicode-paths	unit-and-consumer
+case	offline-cached-generation	consumer
+case	clean-consumer-no-installed-cli	consumer
+endpoint	3.9.0	.github/workflows/jvm-maven-compatibility.yml
+endpoint	3.9.16	.github/workflows/jvm-maven-compatibility.yml
+receipt	full-external-generation-consumer	Task22

@@ -1,0 +1,5 @@
+wildfly-ee10	url	https://github.com/wildfly/wildfly/releases/download/40.0.0.Final/wildfly-ee-10-40.0.0.Final.tar.gz
+wildfly-ee11	image	quay.io/wildfly/wildfly:40.0.0.Final-jdk21
+open-liberty-ee10	image	icr.io/appcafe/open-liberty:26.0.0.5-full-java21-openj9-ubi-minimal
+open-liberty-ee11	image	icr.io/appcafe/open-liberty:26.0.0.5-full-java21-openj9-ubi-minimal
+payara-ee11	image	payara/server-full:7.2026.6

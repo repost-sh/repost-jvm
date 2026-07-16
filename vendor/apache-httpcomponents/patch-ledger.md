@@ -1,0 +1,20 @@
+# Repost relocated HTTP engine patch ledger
+
+Every entry names the production invariant it owns and the adversarial proof
+that fails if the patch is removed or bypassed. The lock contains only approved,
+materialized patches; it is not a roadmap for possible engine changes.
+
+## 0001-shared-byte-reservations-and-budgeted-response-consumer.patch
+Rationale: Charge request, response, parser, stream, and connection storage before publication and retain response bytes in at most 64 owned 16,384-byte chunks without a second full-size copy.
+Adversarial proof: The same verified-source regression shows pinned stock Apache accepting the first plus-one byte while retaining a distinct full-size internal buffer and returned copy, then shows Patch 0001 rejecting at the exact source position. Caller-buffer mutation, every chunk boundary, exact-limit and first-plus-one input, producer abort, early reader close, repeated completion, ordinary/fatal upstream-hook failures, and an injected nonfatal reservation-close anomaly assert immutable ownership, nonblocking reads, raw-end transfer, exact reservation lifetime, unchanged fatal identity, and exactly-once cancel/close cleanup.
+Evidence: `patch-0001-budget.test.js` verifies and materializes the pinned stock archives, requires the stock probe's exact failure, applies the vendor-locked patch, rejects pipes/full duplicate buffers, compiles both probes with Java 11 warnings denied, and requires the patched capacity, chunk, ownership, lifecycle, and fatal-identity probe to pass.
+
+## 0003-prune-conscrypt-optional-provider-references.patch
+Rationale: Keep the relocated production source closure JDK-only by pruning the approved optional codec/Conscrypt units and the remaining compile-time branches, annotations, and source strings that reference them. Transparent Apache response decompression is structurally absent so Repost core remains the only gzip owner.
+Adversarial proof: The verified pinned stock tree fails relocation at the first retained `org.conscrypt` reference. Applying this patch removes every retained Conscrypt reference and the async compression executor branch; the exact excluded inventory remains absent and the Java 11 minimal client closure compiles without an optional provider or codec dependency.
+Evidence: `patch-0003-optional-provider.test.js` requires the exact stock relocation failure, applies the hash-pinned patch, validates the deterministic excluded inventory and prohibited namespace scan, and compiles the configured async-client probe with Java 11 warnings denied.
+
+## 0004-h2-stream-cancel-and-goaway-accounting.patch
+Rationale: Make an outbound HTTP/2 stream cancellation observable after the request half has already closed, and fail only client-local streams whose identifiers exceed a peer GOAWAY last-stream identifier. The correction directly uses the existing local CANCEL reset path from `abort` because the multiplexer excludes locally closed streams from later output production; it does not add retry or replay behavior.
+Adversarial proof: Against the verified tree with Patches 0001 and 0003 only, cancelling a held response calls `abort` after the request END_STREAM but only requests an output-production pass that cannot revisit the locally closed stream, while a GOAWAY with last-stream 1 leaves client stream 3 unresolved because the side predicate selects peer streams. The production fixture therefore times out waiting for the CANCEL reset and for stream 3 to fail. Applying Patch 0004 commits the existing local CANCEL reset during `abort` and fails the unprocessed client-local stream without replaying it or disturbing its accepted peer.
+Evidence: `patch-0004-h2-stream-lifecycle.test.js` requires both exact stock predicates before applying the hash-pinned patch and both bounded corrections afterward. `ApacheHttpTransportHttp2ProductionTest` proves the behavioral gate over TLS ALPN: cancellation produces one peer-observed CANCEL while peer and probe remain on the same session, and GOAWAY accepts stream 1, fails stream 3 without hidden replay, then permits one explicit attempt on a replacement session.

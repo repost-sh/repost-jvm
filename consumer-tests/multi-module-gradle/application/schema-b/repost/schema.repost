@@ -1,0 +1,18 @@
+generator javaSdk {
+  language = "java"
+  output = "../build/generated/sources/repost/javaSdk/java"
+  resourceOutput = "../build/generated/resources/repost/javaSdk"
+  packageName = "com.acme.consumer.schemab"
+  clientName = "SchemaBClient"
+}
+type SchemaB {
+  created
+}
+model SchemaB {
+  id String
+}
+event SchemaBCreated {
+  type @type(SchemaB.created)
+  data SchemaB
+  timestamp DateTime
+}

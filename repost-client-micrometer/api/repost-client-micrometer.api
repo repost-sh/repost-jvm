@@ -1,0 +1,7 @@
+public final class sh.repost.client.micrometer.MicrometerRepostObserver implements sh.repost.client.RepostObserver {
+  public static sh.repost.client.RepostObserver create(io.micrometer.core.instrument.MeterRegistry);
+    descriptor: (Lio/micrometer/core/instrument/MeterRegistry;)Lsh/repost/client/RepostObserver;
+
+  public void onEvent(sh.repost.client.ObserverEvent);
+    descriptor: (Lsh/repost/client/ObserverEvent;)V
+}

@@ -1,0 +1,256 @@
+public abstract class sh.repost.gradle.AbstractRepostGenerationTask extends org.gradle.api.DefaultTask implements sh.repost.gradle.GradleOwnedOutputs {
+  public abstract org.gradle.api.file.RegularFileProperty getSchemaFile();
+    descriptor: ()Lorg/gradle/api/file/RegularFileProperty;
+
+  public abstract org.gradle.api.provider.Property<sh.repost.gradle.RepostSchemaMode> getSchemaMode();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.ListProperty<java.lang.String> getGeneratorNames();
+    descriptor: ()Lorg/gradle/api/provider/ListProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getEnvironmentInputs();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.provider.Property<sh.repost.gradle.RepostIntegration> getIntegration();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.Integer> getProtocolVersion();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getPluginVersion();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getEngineVersion();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getRuntimeVersion();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.Integer> getDescriptorVersion();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.Boolean> getOffline();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.time.Duration> getExecutionTimeout();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getBuildGroup();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getBuildRootProjectName();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getBuildProjectPath();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getCheckMode();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.file.RegularFileProperty getEngineExecutable();
+    descriptor: ()Lorg/gradle/api/file/RegularFileProperty;
+
+  public abstract org.gradle.api.file.ConfigurableFileCollection getEngineArtifacts();
+    descriptor: ()Lorg/gradle/api/file/ConfigurableFileCollection;
+
+  public abstract org.gradle.api.file.ConfigurableFileCollection getDependencyRegistryArtifacts();
+    descriptor: ()Lorg/gradle/api/file/ConfigurableFileCollection;
+
+  public abstract org.gradle.api.provider.ListProperty<java.lang.String> getDependencyArtifactIdentities();
+    descriptor: ()Lorg/gradle/api/provider/ListProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getDependencyArtifactLabels();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.provider.ListProperty<java.lang.String> getDeclaredAdapterCoordinates();
+    descriptor: ()Lorg/gradle/api/provider/ListProperty;
+
+  public abstract org.gradle.api.file.ConfigurableFileCollection getSourceOutputDirectories();
+    descriptor: ()Lorg/gradle/api/file/ConfigurableFileCollection;
+
+  public abstract org.gradle.api.file.ConfigurableFileCollection getResourceOutputDirectories();
+    descriptor: ()Lorg/gradle/api/file/ConfigurableFileCollection;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getSourceOutputPathsByGenerator();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getResourceOutputPathsByGenerator();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getProjectDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getAggregateSourceOutputDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getAggregateResourceOutputDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getLocalStateDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getEngineCacheDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public final void executeGeneration();
+    descriptor: ()V
+}
+
+public abstract class sh.repost.gradle.RepostGenerateCheckTask extends sh.repost.gradle.AbstractRepostGenerationTask {
+  public sh.repost.gradle.RepostGenerateCheckTask();
+    descriptor: ()V
+
+  public abstract org.gradle.api.file.DirectoryProperty getCheckAgainst();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public abstract class sh.repost.gradle.RepostGenerateTask extends sh.repost.gradle.AbstractRepostGenerationTask {
+  public sh.repost.gradle.RepostGenerateTask();
+    descriptor: ()V
+}
+
+public abstract class sh.repost.gradle.RepostGeneratorSpec implements org.gradle.api.Named {
+  public sh.repost.gradle.RepostGeneratorSpec(java.lang.String);
+    descriptor: (Ljava/lang/String;)V
+
+  public final java.lang.String getName();
+    descriptor: ()Ljava/lang/String;
+
+  public abstract org.gradle.api.provider.Property<java.lang.Boolean> getEnabled();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.file.DirectoryProperty getSourceOutputDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getResourceOutputDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public final class sh.repost.gradle.RepostIntegration extends java.lang.Enum<sh.repost.gradle.RepostIntegration> {
+  public static final sh.repost.gradle.RepostIntegration AUTO;
+    descriptor: Lsh/repost/gradle/RepostIntegration;
+  public static final sh.repost.gradle.RepostIntegration NONE;
+    descriptor: Lsh/repost/gradle/RepostIntegration;
+  public static final sh.repost.gradle.RepostIntegration SPRING_BOOT;
+    descriptor: Lsh/repost/gradle/RepostIntegration;
+  public static final sh.repost.gradle.RepostIntegration CDI;
+    descriptor: Lsh/repost/gradle/RepostIntegration;
+  public static sh.repost.gradle.RepostIntegration[] values();
+    descriptor: ()[Lsh/repost/gradle/RepostIntegration;
+
+  public static sh.repost.gradle.RepostIntegration valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/gradle/RepostIntegration;
+}
+
+public final class sh.repost.gradle.RepostSchemaMode extends java.lang.Enum<sh.repost.gradle.RepostSchemaMode> {
+  public static final sh.repost.gradle.RepostSchemaMode GENERATE;
+    descriptor: Lsh/repost/gradle/RepostSchemaMode;
+  public static final sh.repost.gradle.RepostSchemaMode AGGREGATE_ONLY;
+    descriptor: Lsh/repost/gradle/RepostSchemaMode;
+  public static sh.repost.gradle.RepostSchemaMode[] values();
+    descriptor: ()[Lsh/repost/gradle/RepostSchemaMode;
+
+  public static sh.repost.gradle.RepostSchemaMode valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/gradle/RepostSchemaMode;
+}
+
+public abstract class sh.repost.gradle.RepostSdkExtension {
+  public sh.repost.gradle.RepostSdkExtension(org.gradle.api.model.ObjectFactory, org.gradle.api.file.ProjectLayout);
+    descriptor: (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/file/ProjectLayout;)V
+
+  public abstract org.gradle.api.provider.Property<sh.repost.gradle.RepostSchemaMode> getSchemaMode();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.file.RegularFileProperty getSchemaFile();
+    descriptor: ()Lorg/gradle/api/file/RegularFileProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getEnvironmentInputs();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.provider.Property<sh.repost.gradle.RepostIntegration> getIntegration();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getEngineVersion();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.time.Duration> getExecutionTimeout();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.file.DirectoryProperty getCheckAgainst();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public final org.gradle.api.NamedDomainObjectContainer<sh.repost.gradle.RepostGeneratorSpec> getGenerators();
+    descriptor: ()Lorg/gradle/api/NamedDomainObjectContainer;
+}
+
+public final class sh.repost.gradle.RepostSdkPlugin implements org.gradle.api.Plugin<org.gradle.api.Project> {
+  public sh.repost.gradle.RepostSdkPlugin();
+    descriptor: ()V
+
+  public void apply(org.gradle.api.Project);
+    descriptor: (Lorg/gradle/api/Project;)V
+
+  public void apply(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)V
+}
+
+public abstract class sh.repost.gradle.RepostValidateOutputOwnershipTask extends org.gradle.api.DefaultTask implements sh.repost.gradle.GradleOwnedOutputs {
+  public sh.repost.gradle.RepostValidateOutputOwnershipTask();
+    descriptor: ()V
+
+  public abstract org.gradle.api.provider.Property<sh.repost.gradle.RepostSchemaMode> getSchemaMode();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.ListProperty<java.lang.String> getGeneratorNames();
+    descriptor: ()Lorg/gradle/api/provider/ListProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getSourceOutputPathsByGenerator();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getResourceOutputPathsByGenerator();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getProjectDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getAggregateSourceOutputDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.file.DirectoryProperty getAggregateResourceOutputDirectory();
+    descriptor: ()Lorg/gradle/api/file/DirectoryProperty;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getBuildGroup();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getBuildRootProjectName();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public abstract org.gradle.api.provider.Property<java.lang.String> getBuildProjectPath();
+    descriptor: ()Lorg/gradle/api/provider/Property;
+
+  public final void validateOwnership();
+    descriptor: ()V
+}
+
+public abstract class sh.repost.gradle.RepostVerifyGeneratedOutputsTask extends org.gradle.api.DefaultTask {
+  public sh.repost.gradle.RepostVerifyGeneratedOutputsTask();
+    descriptor: ()V
+
+  public abstract org.gradle.api.provider.ListProperty<java.lang.String> getGeneratorNames();
+    descriptor: ()Lorg/gradle/api/provider/ListProperty;
+
+  public abstract org.gradle.api.file.ConfigurableFileCollection getSourceOutputDirectories();
+    descriptor: ()Lorg/gradle/api/file/ConfigurableFileCollection;
+
+  public abstract org.gradle.api.file.ConfigurableFileCollection getResourceOutputDirectories();
+    descriptor: ()Lorg/gradle/api/file/ConfigurableFileCollection;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getSourceOutputPathsByGenerator();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public abstract org.gradle.api.provider.MapProperty<java.lang.String, java.lang.String> getResourceOutputPathsByGenerator();
+    descriptor: ()Lorg/gradle/api/provider/MapProperty;
+
+  public final void verifyGeneratedOutputs();
+    descriptor: ()V
+}

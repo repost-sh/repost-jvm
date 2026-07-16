@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <name>Repost Maven Plugin</name>
+  <description>Generates and checks Repost Java and Kotlin SDK sources.</description>
+  <groupId>sh.repost</groupId>
+  <artifactId>repost-maven-plugin</artifactId>
+  <version>1.0.0</version>
+  <goalPrefix>repost</goalPrefix>
+  <isolatedRealm>false</isolatedRealm>
+  <inheritedByDefault>true</inheritedByDefault>
+  <requiredJavaVersion>11</requiredJavaVersion>
+  <requiredMavenVersion>3.9.0</requiredMavenVersion>
+  <mojos>
+    <mojo>
+      <goal>check</goal>
+      <description>Checks deterministic Repost SDK generation without registering temporary roots.</description>
+      <requiresDependencyResolution>compile</requiresDependencyResolution>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>verify</phase>
+      <implementation>sh.repost.maven.RepostCheckMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <threadSafe>true</threadSafe>
+      <parameters>
+        <parameter>
+          <name>repositorySession</name>
+          <type>org.eclipse.aether.RepositorySystemSession</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current Maven repository session.</description>
+        </parameter>
+        <parameter>
+          <name>remoteRepositories</name>
+          <type>java.util.List</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current project repositories.</description>
+        </parameter>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current Maven project.</description>
+        </parameter>
+        <parameter>
+          <name>schemaFile</name>
+          <type>java.io.File</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The Repost schema file.</description>
+        </parameter>
+        <parameter>
+          <name>generators</name>
+          <type>java.util.List</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The JVM generators to execute.</description>
+        </parameter>
+        <parameter>
+          <name>environmentInputs</name>
+          <type>java.util.Map</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Declared NAME values supplied to env(NAME); ambient process environment is ignored.</description>
+        </parameter>
+        <parameter>
+          <name>engineVersion</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The native generation engine version.</description>
+        </parameter>
+        <parameter>
+          <name>executionTimeout</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The positive ISO-8601 generation timeout.</description>
+        </parameter>
+        <parameter>
+          <name>schemaMode</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Selects GENERATE or AGGREGATE_ONLY dependency-registry behavior.</description>
+        </parameter>
+        <parameter>
+          <name>integration</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Selects AUTO, NONE, SPRING_BOOT, or CDI from declared Maven dependencies.</description>
+        </parameter>
+        <parameter>
+          <name>checkAgainst</name>
+          <type>java.io.File</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Marked checked-in output root compared without mutation.</description>
+        </parameter>
+        <parameter>
+          <name>sourceOutputDirectory</name>
+          <type>java.util.Map</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Per-generator source output overrides.</description>
+        </parameter>
+        <parameter>
+          <name>resourceOutputDirectory</name>
+          <type>java.util.Map</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Per-generator resource output overrides.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <repositorySession implementation="org.eclipse.aether.RepositorySystemSession" default-value="${repositorySystemSession}"/>
+        <remoteRepositories implementation="java.util.List" default-value="${project.remoteProjectRepositories}"/>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <schemaFile implementation="java.io.File" default-value="${project.basedir}/repost/schema.repost">${repost.schemaFile}</schemaFile>
+        <generators implementation="java.util.List">${repost.generators}</generators>
+        <environmentInputs implementation="java.util.Map">${repost.environmentInputs}</environmentInputs>
+        <engineVersion implementation="java.lang.String" default-value="0.9.0">${repost.engineVersion}</engineVersion>
+        <executionTimeout implementation="java.lang.String" default-value="PT5M">${repost.executionTimeout}</executionTimeout>
+        <schemaMode implementation="java.lang.String" default-value="GENERATE">${repost.schemaMode}</schemaMode>
+        <integration implementation="java.lang.String" default-value="AUTO">${repost.integration}</integration>
+        <checkAgainst implementation="java.io.File">${repost.checkAgainst}</checkAgainst>
+        <sourceOutputDirectory implementation="java.util.Map"/>
+        <resourceOutputDirectory implementation="java.util.Map"/>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.eclipse.aether.RepositorySystem</role>
+          <field-name>repositorySystem</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
+    <mojo>
+      <goal>generate</goal>
+      <description>Generates Repost Java and Kotlin SDK sources and resources.</description>
+      <requiresDependencyResolution>compile</requiresDependencyResolution>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>true</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <phase>generate-sources</phase>
+      <implementation>sh.repost.maven.RepostGenerateMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <threadSafe>true</threadSafe>
+      <parameters>
+        <parameter>
+          <name>repositorySession</name>
+          <type>org.eclipse.aether.RepositorySystemSession</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current Maven repository session.</description>
+        </parameter>
+        <parameter>
+          <name>remoteRepositories</name>
+          <type>java.util.List</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current project repositories.</description>
+        </parameter>
+        <parameter>
+          <name>project</name>
+          <type>org.apache.maven.project.MavenProject</type>
+          <required>true</required>
+          <editable>false</editable>
+          <description>The current Maven project.</description>
+        </parameter>
+        <parameter>
+          <name>schemaFile</name>
+          <type>java.io.File</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The Repost schema file.</description>
+        </parameter>
+        <parameter>
+          <name>generators</name>
+          <type>java.util.List</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The JVM generators to execute.</description>
+        </parameter>
+        <parameter>
+          <name>environmentInputs</name>
+          <type>java.util.Map</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Declared NAME values supplied to env(NAME); ambient process environment is ignored.</description>
+        </parameter>
+        <parameter>
+          <name>engineVersion</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The native generation engine version.</description>
+        </parameter>
+        <parameter>
+          <name>executionTimeout</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>The positive ISO-8601 generation timeout.</description>
+        </parameter>
+        <parameter>
+          <name>schemaMode</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Selects GENERATE or AGGREGATE_ONLY dependency-registry behavior.</description>
+        </parameter>
+        <parameter>
+          <name>integration</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Selects AUTO, NONE, SPRING_BOOT, or CDI from declared Maven dependencies.</description>
+        </parameter>
+        <parameter>
+          <name>checkAgainst</name>
+          <type>java.io.File</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Marked checked-in output root compared without mutation.</description>
+        </parameter>
+        <parameter>
+          <name>sourceOutputDirectory</name>
+          <type>java.util.Map</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Per-generator source output overrides.</description>
+        </parameter>
+        <parameter>
+          <name>resourceOutputDirectory</name>
+          <type>java.util.Map</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Per-generator resource output overrides.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <repositorySession implementation="org.eclipse.aether.RepositorySystemSession" default-value="${repositorySystemSession}"/>
+        <remoteRepositories implementation="java.util.List" default-value="${project.remoteProjectRepositories}"/>
+        <project implementation="org.apache.maven.project.MavenProject" default-value="${project}"/>
+        <schemaFile implementation="java.io.File" default-value="${project.basedir}/repost/schema.repost">${repost.schemaFile}</schemaFile>
+        <generators implementation="java.util.List">${repost.generators}</generators>
+        <environmentInputs implementation="java.util.Map">${repost.environmentInputs}</environmentInputs>
+        <engineVersion implementation="java.lang.String" default-value="0.9.0">${repost.engineVersion}</engineVersion>
+        <executionTimeout implementation="java.lang.String" default-value="PT5M">${repost.executionTimeout}</executionTimeout>
+        <schemaMode implementation="java.lang.String" default-value="GENERATE">${repost.schemaMode}</schemaMode>
+        <integration implementation="java.lang.String" default-value="AUTO">${repost.integration}</integration>
+        <checkAgainst implementation="java.io.File">${repost.checkAgainst}</checkAgainst>
+        <sourceOutputDirectory implementation="java.util.Map"/>
+        <resourceOutputDirectory implementation="java.util.Map"/>
+      </configuration>
+      <requirements>
+        <requirement>
+          <role>org.eclipse.aether.RepositorySystem</role>
+          <field-name>repositorySystem</field-name>
+        </requirement>
+      </requirements>
+    </mojo>
+    <mojo>
+      <goal>help</goal>
+      <description>Prints Repost Maven generation defaults, dependency guidance, and ownership semantics.</description>
+      <requiresDependencyResolution>none</requiresDependencyResolution>
+      <requiresDirectInvocation>false</requiresDirectInvocation>
+      <requiresProject>false</requiresProject>
+      <requiresReports>false</requiresReports>
+      <aggregator>false</aggregator>
+      <requiresOnline>false</requiresOnline>
+      <inheritedByDefault>true</inheritedByDefault>
+      <implementation>sh.repost.maven.RepostHelpMojo</implementation>
+      <language>java</language>
+      <instantiationStrategy>per-lookup</instantiationStrategy>
+      <executionStrategy>once-per-session</executionStrategy>
+      <threadSafe>true</threadSafe>
+      <parameters>
+        <parameter>
+          <name>detail</name>
+          <type>boolean</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Prints the complete configuration and ownership contract.</description>
+        </parameter>
+        <parameter>
+          <name>goal</name>
+          <type>java.lang.String</type>
+          <required>false</required>
+          <editable>true</editable>
+          <description>Limits detailed help to generate or check.</description>
+        </parameter>
+      </parameters>
+      <configuration>
+        <detail implementation="boolean" default-value="false">${detail}</detail>
+        <goal implementation="java.lang.String">${goal}</goal>
+      </configuration>
+    </mojo>
+  </mojos>
+  <dependencies/>
+</plugin>

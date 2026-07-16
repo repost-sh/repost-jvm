@@ -1,0 +1,17 @@
+pluginManagement {
+    def staged = providers.gradleProperty("stagedRepository").get()
+    repositories {
+        maven { url = uri(staged); content { includeGroupByRegex("sh\\.repost.*") } }
+        gradlePluginPortal { content { excludeGroupByRegex("sh\\.repost.*") } }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven { url = uri(providers.gradleProperty("stagedRepository").get()); content { includeGroup("sh.repost") } }
+        mavenCentral { content { excludeGroup("sh.repost") } }
+    }
+}
+
+rootProject.name = "repost-micronaut-core-certification"

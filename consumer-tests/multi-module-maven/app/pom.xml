@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion>
+  <parent><groupId>com.acme.consumer</groupId><artifactId>repost-maven-aggregate-consumer</artifactId><version>1.0.0</version></parent>
+  <artifactId>app</artifactId>
+  <dependencies>
+    <dependency><groupId>com.acme.consumer</groupId><artifactId>schema-a</artifactId><version>1.0.0</version></dependency>
+    <dependency><groupId>com.acme.consumer</groupId><artifactId>external-clients</artifactId><version>1.0.0</version></dependency>
+  </dependencies>
+  <build><plugins><plugin><groupId>sh.repost</groupId><artifactId>repost-maven-plugin</artifactId>
+    <executions><execution><goals><goal>generate</goal></goals></execution></executions>
+    <configuration><schemaMode>AGGREGATE_ONLY</schemaMode><integration>${app.repost.integration}</integration></configuration>
+  </plugin></plugins></build>
+  <profiles>
+    <profile><id>with-schema-b</id><activation><activeByDefault>true</activeByDefault></activation>
+      <dependencies><dependency><groupId>com.acme.consumer</groupId><artifactId>schema-b</artifactId><version>1.0.0</version></dependency></dependencies>
+    </profile>
+    <profile><id>spring</id><activation><property><name>app.repost.integration</name><value>SPRING_BOOT</value></property></activation>
+      <dependencies>
+        <dependency><groupId>sh.repost</groupId><artifactId>repost-client-spring-boot-starter</artifactId></dependency>
+        <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-autoconfigure</artifactId><version>4.0.7</version></dependency>
+      </dependencies>
+    </profile>
+    <profile><id>cdi</id><activation><property><name>app.repost.integration</name><value>CDI</value></property></activation>
+      <dependencies>
+        <dependency><groupId>sh.repost</groupId><artifactId>repost-client-cdi</artifactId></dependency>
+        <dependency><groupId>jakarta.enterprise</groupId><artifactId>jakarta.enterprise.cdi-api</artifactId><version>4.0.1</version><scope>provided</scope></dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+</project>

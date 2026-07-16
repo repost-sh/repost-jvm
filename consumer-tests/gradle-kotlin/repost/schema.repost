@@ -1,0 +1,19 @@
+generator kotlinSdk {
+  language       = "kotlin"
+  output         = "../build/generated/sources/repost/kotlinSdk/kotlin"
+  resourceOutput = "../build/generated/resources/repost/kotlinSdk"
+  packageName    = "com.acme.consumer.generated"
+  clientName     = "RepostClient"
+}
+
+type Order {
+  created
+}
+model Order {
+  id String
+}
+event OrderCreated {
+  type @type(Order.created)
+  data Order
+  timestamp DateTime
+}

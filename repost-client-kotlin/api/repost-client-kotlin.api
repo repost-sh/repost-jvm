@@ -1,0 +1,58 @@
+public final class sh/repost/client/kotlin/CompletionStageAwaitKt {
+	public static final fun awaitRepost (Lsh/repost/client/SendOperation;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class sh/repost/client/kotlin/RepostClientConfig {
+	public fun <init> ()V
+	public final fun build ()Lsh/repost/client/ClientOptions;
+	public final fun getApiKey ()Ljava/lang/String;
+	public final fun getAttemptTimeout ()Ljava/time/Duration;
+	public final fun getBaseUri ()Ljava/lang/String;
+	public final fun getConnectTimeout ()Ljava/time/Duration;
+	public final fun getDefaultValueGenerators ()Lsh/repost/client/DefaultValueGenerators;
+	public final fun getExecutor ()Ljava/util/concurrent/ExecutorService;
+	public final fun getHttpTransportOptions ()Lsh/repost/client/HttpTransportOptions;
+	public final fun getIdempotencyKeyGenerator ()Lsh/repost/client/IdempotencyKeyGenerator;
+	public final fun getMaxAttempts ()Ljava/lang/Integer;
+	public final fun getMaxBufferedBytes ()Ljava/lang/Long;
+	public final fun getMaxInFlightOperations ()Ljava/lang/Integer;
+	public final fun getMonotonicClock ()Lsh/repost/client/MonotonicClock;
+	public final fun getObserver ()Lsh/repost/client/RepostObserver;
+	public final fun getObserverExecutor ()Ljava/util/concurrent/ExecutorService;
+	public final fun getOperationTimeout ()Ljava/time/Duration;
+	public final fun getRetryBaseDelay ()Ljava/time/Duration;
+	public final fun getRetryEntropy ()Lsh/repost/client/RetryEntropy;
+	public final fun getRetryMaxDelay ()Ljava/time/Duration;
+	public final fun getScheduler ()Ljava/util/concurrent/ScheduledExecutorService;
+	public final fun getTelemetry ()Lsh/repost/client/RepostTelemetry;
+	public final fun getTransport ()Lsh/repost/client/Transport;
+	public final fun getUserAgentSuffix ()Ljava/lang/String;
+	public final fun getWallClock ()Lsh/repost/client/WallClock;
+	public final fun setApiKey (Ljava/lang/String;)V
+	public final fun setAttemptTimeout (Ljava/time/Duration;)V
+	public final fun setBaseUri (Ljava/lang/String;)V
+	public final fun setConnectTimeout (Ljava/time/Duration;)V
+	public final fun setDefaultValueGenerators (Lsh/repost/client/DefaultValueGenerators;)V
+	public final fun setExecutor (Ljava/util/concurrent/ExecutorService;)V
+	public final fun setHttpTransportOptions (Lsh/repost/client/HttpTransportOptions;)V
+	public final fun setIdempotencyKeyGenerator (Lsh/repost/client/IdempotencyKeyGenerator;)V
+	public final fun setMaxAttempts (Ljava/lang/Integer;)V
+	public final fun setMaxBufferedBytes (Ljava/lang/Long;)V
+	public final fun setMaxInFlightOperations (Ljava/lang/Integer;)V
+	public final fun setMonotonicClock (Lsh/repost/client/MonotonicClock;)V
+	public final fun setObserver (Lsh/repost/client/RepostObserver;)V
+	public final fun setObserverExecutor (Ljava/util/concurrent/ExecutorService;)V
+	public final fun setOperationTimeout (Ljava/time/Duration;)V
+	public final fun setRetryBaseDelay (Ljava/time/Duration;)V
+	public final fun setRetryEntropy (Lsh/repost/client/RetryEntropy;)V
+	public final fun setRetryMaxDelay (Ljava/time/Duration;)V
+	public final fun setScheduler (Ljava/util/concurrent/ScheduledExecutorService;)V
+	public final fun setTelemetry (Lsh/repost/client/RepostTelemetry;)V
+	public final fun setTransport (Lsh/repost/client/Transport;)V
+	public final fun setUserAgentSuffix (Ljava/lang/String;)V
+	public final fun setWallClock (Lsh/repost/client/WallClock;)V
+}
+
+public abstract interface annotation class sh/repost/client/kotlin/RepostDsl : java/lang/annotation/Annotation {
+}
+

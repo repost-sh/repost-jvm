@@ -1,0 +1,84 @@
+public final class sh.repost.client.spring.RepostClientAutoConfiguration {
+  public sh.repost.client.spring.RepostClientAutoConfiguration();
+    descriptor: ()V
+}
+
+public final class sh.repost.client.spring.RepostClientProperties {
+  public sh.repost.client.spring.RepostClientProperties(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, sh.repost.client.spring.RepostClientProperties$Observability);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lsh/repost/client/spring/RepostClientProperties$Observability;)V
+
+  public boolean isEnabled();
+    descriptor: ()Z
+
+  public java.lang.String getApiKey();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getBaseUri();
+    descriptor: ()Ljava/lang/String;
+
+  public java.time.Duration getConnectTimeout();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.time.Duration getAttemptTimeout();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.time.Duration getOperationTimeout();
+    descriptor: ()Ljava/time/Duration;
+
+  public int getMaxAttempts();
+    descriptor: ()I
+
+  public int getMaxInFlight();
+    descriptor: ()I
+
+  public long getMaxBufferedBytes();
+    descriptor: ()J
+
+  public java.time.Duration getRetryBaseDelay();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.time.Duration getRetryMaxDelay();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.lang.String getUserAgentSuffix();
+    descriptor: ()Ljava/lang/String;
+
+  public sh.repost.client.spring.RepostClientProperties$Observability getObservability();
+    descriptor: ()Lsh/repost/client/spring/RepostClientProperties$Observability;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.spring.RepostClientProperties$Observability {
+  public sh.repost.client.spring.RepostClientProperties$Observability(java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;)V
+
+  public java.lang.Boolean getMicrometerEnabled();
+    descriptor: ()Ljava/lang/Boolean;
+
+  public java.lang.Boolean getOpentelemetryEnabled();
+    descriptor: ()Ljava/lang/Boolean;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.spring.RepostRuntimeHealthIndicator implements org.springframework.boot.health.contributor.HealthIndicator {
+  public sh.repost.client.spring.RepostRuntimeHealthIndicator(sh.repost.client.RepostRuntime);
+    descriptor: (Lsh/repost/client/RepostRuntime;)V
+
+  public org.springframework.boot.health.contributor.Health health();
+    descriptor: ()Lorg/springframework/boot/health/contributor/Health;
+}
+
+public final class sh.repost.client.spring.RepostRuntimeMetrics implements io.micrometer.core.instrument.binder.MeterBinder,java.lang.AutoCloseable {
+  public sh.repost.client.spring.RepostRuntimeMetrics(sh.repost.client.RepostRuntime);
+    descriptor: (Lsh/repost/client/RepostRuntime;)V
+
+  public synchronized void bindTo(io.micrometer.core.instrument.MeterRegistry);
+    descriptor: (Lio/micrometer/core/instrument/MeterRegistry;)V
+
+  public synchronized void close();
+    descriptor: ()V
+}

@@ -1,0 +1,7 @@
+<server>
+  <featureManager>
+    <feature>@EE_FEATURE@</feature>
+    <feature>mpConfig-3.1</feature>
+  </featureManager>
+  <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="9443"/>
+</server>

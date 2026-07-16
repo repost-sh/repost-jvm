@@ -1,0 +1,60 @@
+{
+  "properties": [
+    {
+      "name": "repost.client.enabled",
+      "description": "Whether Repost runtime auto-configuration is enabled. Accepts exactly lowercase true or false."
+    },
+    {
+      "name": "repost.client.api-key",
+      "description": "Optional fixed Repost API key. Prefer a secret-backed ApiKeyProvider for rotating credentials."
+    },
+    {
+      "name": "repost.client.base-uri",
+      "description": "Raw ASCII Repost base URI. Falls back to REPOST_API_URL and then https://api.repost.sh."
+    },
+    {
+      "name": "repost.client.connect-timeout",
+      "description": "Connection timeout using a positive integer followed by ms, s, or m."
+    },
+    {
+      "name": "repost.client.attempt-timeout",
+      "description": "Per-attempt timeout using a positive integer followed by ms, s, or m."
+    },
+    {
+      "name": "repost.client.operation-timeout",
+      "description": "Whole-operation timeout using a positive integer followed by ms, s, or m."
+    },
+    {
+      "name": "repost.client.max-attempts",
+      "description": "Maximum total attempts from 1 through 10."
+    },
+    {
+      "name": "repost.client.max-in-flight",
+      "description": "Maximum admitted operations from 1 through 65536."
+    },
+    {
+      "name": "repost.client.max-buffered-bytes",
+      "description": "Shared byte budget from 4MiB through 1GiB using B, KiB, MiB, or GiB."
+    },
+    {
+      "name": "repost.client.retry-base-delay",
+      "description": "Initial retry delay using a positive integer followed by ms, s, or m."
+    },
+    {
+      "name": "repost.client.retry-max-delay",
+      "description": "Maximum retry delay using a positive integer followed by ms, s, or m."
+    },
+    {
+      "name": "repost.client.user-agent-suffix",
+      "description": "Optional printable ASCII user-agent suffix."
+    },
+    {
+      "name": "repost.client.observability.micrometer-enabled",
+      "description": "Micrometer auto-wiring switch. Omit for automatic detection or use exactly lowercase true or false."
+    },
+    {
+      "name": "repost.client.observability.opentelemetry-enabled",
+      "description": "OpenTelemetry auto-wiring switch. Omit for automatic detection or use exactly lowercase true or false."
+    }
+  ]
+}

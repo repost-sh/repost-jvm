@@ -1,0 +1,3 @@
+ARG SERVER_IMAGE
+FROM ${SERVER_IMAGE}
+COPY repost.war $DEPLOY_DIR/repost.war

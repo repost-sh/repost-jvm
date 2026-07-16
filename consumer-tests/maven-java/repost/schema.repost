@@ -1,0 +1,19 @@
+generator javaSdk {
+  language       = "java"
+  output         = "../target/generated-sources/repost"
+  resourceOutput = "../target/generated-resources/repost"
+  packageName    = "com.acme.consumer.generated"
+  clientName     = "RepostClient"
+}
+
+type Order {
+  created
+}
+model Order {
+  id String
+}
+event OrderCreated {
+  type @type(Order.created)
+  data Order
+  timestamp DateTime
+}

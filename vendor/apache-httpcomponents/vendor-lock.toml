@@ -1,0 +1,52 @@
+# This file is the executable source-provenance projection of
+# sdk/jvm/certification/transport/jvm-engine-contract.js. Patch hashes replace the
+# explicit planned state only after the corresponding patch exists.
+format = "repost-http-engine-vendor-lock-v1"
+engine_id = "repost-relocated-http-async-a-prime-v1"
+relocation_prefix = "sh.repost.internal.apache"
+production_state = "materialized"
+
+[[source]]
+module = "httpclient5"
+version = "5.6.2"
+archive = "https://repo1.maven.org/maven2/org/apache/httpcomponents/client5/httpclient5/5.6.2/httpclient5-5.6.2-sources.jar"
+sha256 = "389eba8e7a77f6024eba164c43b2aaaad1bff17f3d1e3ddc2e1b5281d0b29811"
+
+[[source]]
+module = "httpcore5"
+version = "5.4.3"
+archive = "https://repo1.maven.org/maven2/org/apache/httpcomponents/core5/httpcore5/5.4.3/httpcore5-5.4.3-sources.jar"
+sha256 = "1039d1c7d5f09d48fdd684b8268abfd7206648e9939930cccfe88b6b0d36c741"
+
+[[source]]
+module = "httpcore5-h2"
+version = "5.4.3"
+archive = "https://repo1.maven.org/maven2/org/apache/httpcomponents/core5/httpcore5-h2/5.4.3/httpcore5-h2-5.4.3-sources.jar"
+sha256 = "ca7bc36ef8d56f17fb5455596d9dd38b80f8eb8931f8e4e167868356458625fa"
+
+[[source]]
+module = "slf4j-api"
+version = "1.7.36"
+archive = "https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36-sources.jar"
+sha256 = "15bc04357a3725b7a5153f132db71379f95e83b7b8590a86cc6d4ad77bfc150a"
+
+[[source]]
+module = "slf4j-nop"
+version = "1.7.36"
+archive = "https://repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.7.36/slf4j-nop-1.7.36-sources.jar"
+sha256 = "b86491d9a8bbc35fe6a6ecf267fc5168399496f5aeffae608ed0ca99736838e9"
+
+[[patch]]
+file = "0001-shared-byte-reservations-and-budgeted-response-consumer.patch"
+state = "materialized"
+sha256 = "ecd77fc14d12030ab5a29cb472ad2eae7cf29c1d7f5909165709cafc76ff1cef"
+
+[[patch]]
+file = "0003-prune-conscrypt-optional-provider-references.patch"
+state = "materialized"
+sha256 = "09c916e61eaf5d5748ad4eb92f5305eaddb619a4780a43534d45e4f466c7e655"
+
+[[patch]]
+file = "0004-h2-stream-cancel-and-goaway-accounting.patch"
+state = "materialized"
+sha256 = "5040f519d89810cc9c2f22baa3391b0aae9e103f105e10c66cf2e413464bccf5"

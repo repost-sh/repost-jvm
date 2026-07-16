@@ -1,0 +1,19 @@
+# This is a Gradle generated file for dependency locking.
+# Manual edits can break the build and are not advised.
+# This file is expected to be part of source control.
+com.github.siom79.japicmp:japicmp:0.24.1=japicmpTool
+com.google.errorprone:error_prone_annotations:2.36.0=japicmpTool
+com.google.guava:failureaccess:1.0.3=japicmpTool
+com.google.guava:guava:33.4.8-jre=japicmpTool
+com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava=japicmpTool
+com.google.j2objc:j2objc-annotations:3.0.0=japicmpTool
+com.sun.istack:istack-commons-runtime:3.0.8=japicmpTool
+com.sun.xml.fastinfoset:FastInfoset:1.2.16=japicmpTool
+jakarta.activation:jakarta.activation-api:1.2.1=japicmpTool
+jakarta.xml.bind:jakarta.xml.bind-api:2.3.2=japicmpTool
+org.glassfish.jaxb:jaxb-runtime:2.3.2=japicmpTool
+org.glassfish.jaxb:txw2:2.3.2=japicmpTool
+org.javassist:javassist:3.30.2-GA=japicmpTool
+org.jspecify:jspecify:1.0.0=japicmpTool
+org.jvnet.staxex:stax-ex:1.8.1=japicmpTool
+empty=

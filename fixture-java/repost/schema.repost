@@ -1,0 +1,35 @@
+generator javaSdk {
+  language       = "java"
+  output         = "../generated/java"
+  resourceOutput = "../generated/java-resources"
+  packageName    = "com.repost.live.java"
+  clientName     = "JavaRepostClient"
+}
+
+generator kotlinSdk {
+  language       = "kotlin"
+  output         = "../generated/kotlin"
+  resourceOutput = "../generated/kotlin-resources"
+  packageName    = "com.repost.live.kotlin"
+  clientName     = "KotlinRepostClient"
+}
+
+type Book {
+  created
+}
+
+model Author {
+  name String
+}
+
+model Book {
+  title    String
+  authors  Author[]
+  subtitle String?
+}
+
+event BookCreated {
+  type      @type(Book.created)
+  data      Book
+  timestamp DateTime
+}

@@ -1,0 +1,38 @@
+public final class sh.repost.client.cdi.RepostCdiExtension implements jakarta.enterprise.inject.build.compatible.spi.BuildCompatibleExtension {
+  public sh.repost.client.cdi.RepostCdiExtension();
+    descriptor: ()V
+
+  public void observeRuntime(jakarta.enterprise.inject.build.compatible.spi.BeanInfo);
+    descriptor: (Ljakarta/enterprise/inject/build/compatible/spi/BeanInfo;)V
+
+  public void observeApiKeyProvider(jakarta.enterprise.inject.build.compatible.spi.BeanInfo);
+    descriptor: (Ljakarta/enterprise/inject/build/compatible/spi/BeanInfo;)V
+
+  public void observeClientOptionsCustomizer(jakarta.enterprise.inject.build.compatible.spi.BeanInfo);
+    descriptor: (Ljakarta/enterprise/inject/build/compatible/spi/BeanInfo;)V
+
+  public void synthesize(jakarta.enterprise.inject.build.compatible.spi.SyntheticComponents, jakarta.enterprise.inject.build.compatible.spi.Messages);
+    descriptor: (Ljakarta/enterprise/inject/build/compatible/spi/SyntheticComponents;Ljakarta/enterprise/inject/build/compatible/spi/Messages;)V
+}
+
+public final class sh.repost.client.cdi.RepostRuntimeCreator implements jakarta.enterprise.inject.build.compatible.spi.SyntheticBeanCreator<sh.repost.client.RepostRuntime> {
+  public sh.repost.client.cdi.RepostRuntimeCreator();
+    descriptor: ()V
+
+  public sh.repost.client.RepostRuntime create(jakarta.enterprise.inject.Instance<java.lang.Object>, jakarta.enterprise.inject.build.compatible.spi.Parameters);
+    descriptor: (Ljakarta/enterprise/inject/Instance;Ljakarta/enterprise/inject/build/compatible/spi/Parameters;)Lsh/repost/client/RepostRuntime;
+
+  public java.lang.Object create(jakarta.enterprise.inject.Instance, jakarta.enterprise.inject.build.compatible.spi.Parameters);
+    descriptor: (Ljakarta/enterprise/inject/Instance;Ljakarta/enterprise/inject/build/compatible/spi/Parameters;)Ljava/lang/Object;
+}
+
+public final class sh.repost.client.cdi.RepostRuntimeDisposer implements jakarta.enterprise.inject.build.compatible.spi.SyntheticBeanDisposer<sh.repost.client.RepostRuntime> {
+  public sh.repost.client.cdi.RepostRuntimeDisposer();
+    descriptor: ()V
+
+  public void dispose(sh.repost.client.RepostRuntime, jakarta.enterprise.inject.Instance<java.lang.Object>, jakarta.enterprise.inject.build.compatible.spi.Parameters);
+    descriptor: (Lsh/repost/client/RepostRuntime;Ljakarta/enterprise/inject/Instance;Ljakarta/enterprise/inject/build/compatible/spi/Parameters;)V
+
+  public void dispose(java.lang.Object, jakarta.enterprise.inject.Instance, jakarta.enterprise.inject.build.compatible.spi.Parameters);
+    descriptor: (Ljava/lang/Object;Ljakarta/enterprise/inject/Instance;Ljakarta/enterprise/inject/build/compatible/spi/Parameters;)V
+}

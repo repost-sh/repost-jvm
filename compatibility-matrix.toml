@@ -1,0 +1,100 @@
+schema_version = 1
+owner = "sdk-jvm"
+
+[support_policy]
+status = "planned"
+starts_on = "2026-07-14"
+eol_source = "upstream"
+eol_status = "unannounced"
+eol_review_due_on = "2026-08-13"
+
+[family]
+group = "sh.repost"
+runtime_version = "1.0.0"
+engine_version = "0.9.0"
+descriptor_version = 2
+
+[java]
+support_status = "planned"
+support_owner = "sdk-jvm-java"
+eol_status = "unannounced"
+build_jdk = 21
+core_release = 11
+integration_release = 17
+supported_features = [11, 17, 21, 25]
+# Security-update pins are advanced only by a dedicated dependency PR.
+security_update_pins = ["11.0.31", "17.0.19", "21.0.11", "25.0.3"]
+
+[kotlin]
+support_status = "planned"
+support_owner = "sdk-jvm-kotlin"
+eol_status = "unannounced"
+language_api = "2.1"
+baseline = "2.1.21"
+current = "2.4.0"
+
+[build_tools]
+support_status = "planned"
+support_owner = "sdk-jvm-build"
+eol_status = "unannounced"
+gradle_wrapper = "8.12.1"
+gradle_current_8 = "8.14.5"
+gradle_current_9 = "9.6.0"
+gradle_kotlin_current = "9.5.0"
+maven_minimum = "3.9.0"
+maven_minimum_sha512 = "1ea149f4e48bc7b34d554aef86f948eca7df4e7874e30caf449f3708e4f8487c71a5e5c072a05f17c60406176ebeeaf56b5f895090c7346f8238e2da06cf6ecd"
+maven_current = "3.9.16"
+maven_current_sha512 = "831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6"
+
+[[paired_kotlin_gradle]]
+kotlin = "2.1.21"
+gradle = "8.12.1"
+
+[[paired_kotlin_gradle]]
+kotlin = "2.4.0"
+gradle = "9.5.0"
+
+[frameworks.spring_boot]
+versions = ["4.0.7", "4.1.0"]
+jdks = [17, 21, 25]
+owner = "repost-client-spring-boot-starter"
+support_status = "planned"
+eol_status = "unannounced"
+
+[frameworks.jakarta]
+wildfly = ["40.0.0.Final-ee10", "40.0.0.Final-ee11"]
+open_liberty = ["26.0.0.5-ee10", "26.0.0.5-ee11"]
+payara = ["7.2026.6-ee11"]
+owner = "repost-client-cdi"
+support_status = "planned"
+eol_status = "unannounced"
+
+[compatibility_smokes.quarkus]
+version = "3.37.2"
+jdk = 21
+mode = "framework-neutral-core"
+owner = "sdk-jvm-certification"
+support_status = "planned"
+eol_status = "unannounced"
+
+[compatibility_smokes.micronaut]
+version = "5.0.0"
+jdk = 25
+mode = "framework-neutral-core"
+owner = "sdk-jvm-certification"
+support_status = "planned"
+eol_status = "unannounced"
+
+[certified]
+ktor = ["3.5.1"]
+vertx = ["4.5.29", "5.1.4"]
+owner = "sdk-jvm-certification"
+support_status = "planned"
+eol_status = "unannounced"
+
+[native_image]
+graalvm = ["25.0.3"]
+scope = "framework-neutral-core"
+owner = "repost-client"
+support_status = "planned"
+eol_status = "upstream"

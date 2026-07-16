@@ -1,0 +1,68 @@
+[versions]
+runtime = "1.0.0"
+engine = "0.9.0"
+build-jdk = "21"
+java-core = "11"
+java-integration = "17"
+kotlin = "2.1.21"
+kotlin-language = "2.1"
+kotlin-current = "2.4.0"
+kotlinx-coroutines = "1.10.2"
+jackson = "2.21.2"
+jspecify = "1.0.0"
+jetbrains-annotations = "23.0.0"
+junit = "5.13.4"
+dokka = "2.2.0"
+kotlin-abi-validator = "0.18.1"
+cyclonedx = "3.2.4"
+dependency-check = "12.2.2"
+japicmp = "0.24.1"
+japicmp-plugin = "0.4.6"
+jreleaser = "1.25.0"
+gradle-plugin-publish = "2.1.1"
+maven = "3.9.16"
+maven-resolver = "1.9.27"
+maven-plugin-tools = "3.15.2"
+slf4j = "1.7.36"
+micrometer = "1.16.5"
+opentelemetry = "1.62.0"
+jakarta-cdi = "4.0.1"
+microprofile-config = "3.1"
+spring-boot-40 = "4.0.7"
+spring-boot-41 = "4.1.0"
+
+[libraries]
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
+kotlin-tooling-core = { module = "org.jetbrains.kotlin:kotlin-tooling-core", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+japicmp = { module = "com.github.siom79.japicmp:japicmp", version.ref = "japicmp" }
+maven-core = { module = "org.apache.maven:maven-core", version.ref = "maven" }
+maven-model = { module = "org.apache.maven:maven-model", version.ref = "maven" }
+maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "maven" }
+maven-resolver-api = { module = "org.apache.maven.resolver:maven-resolver-api", version.ref = "maven-resolver" }
+maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version.ref = "maven-plugin-tools" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "micrometer" }
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry" }
+opentelemetry-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version.ref = "opentelemetry" }
+opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry" }
+jakarta-cdi-api = { module = "jakarta.enterprise:jakarta.enterprise.cdi-api", version.ref = "jakarta-cdi" }
+microprofile-config-api = { module = "org.eclipse.microprofile.config:microprofile-config-api", version.ref = "microprofile-config" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kotlin-abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlin-abi-validator" }
+cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
+dependency-check = { id = "org.owasp.dependencycheck", version.ref = "dependency-check" }
+japicmp = { id = "me.champeau.gradle.japicmp", version.ref = "japicmp-plugin" }
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
+gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }

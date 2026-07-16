@@ -1,0 +1,18 @@
+generator javaSdk {
+  language = "java"
+  output = "../build/generated/sources/repost/javaSdk/java"
+  resourceOutput = "../build/generated/resources/repost/javaSdk"
+  packageName = "com.acme.consumer.external"
+  clientName = "ExternalClient"
+}
+type External {
+  created
+}
+model External {
+  id String
+}
+event ExternalCreated {
+  type @type(External.created)
+  data External
+  timestamp DateTime
+}

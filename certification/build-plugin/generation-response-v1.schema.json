@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://repost.sh/sdk-conformance/build-plugin/generation-response-v1.schema.json",
+  "title": "Repost build-plugin generation response protocol v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "engineVersion",
+    "runtimeVersion",
+    "descriptorVersion",
+    "generators",
+    "diagnostics"
+  ],
+  "properties": {
+    "protocolVersion": { "const": 1 },
+    "engineVersion": { "type": "string", "minLength": 1 },
+    "runtimeVersion": { "type": "string", "minLength": 1 },
+    "descriptorVersion": { "const": 2 },
+    "generators": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/generatorResult" }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/diagnostic" }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "generatorResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generatorName",
+        "generatorId",
+        "sourceRoot",
+        "resourceRoot",
+        "sourceTreeHash",
+        "resourceTreeHash"
+      ],
+      "properties": {
+        "generatorName": { "type": "string", "minLength": 1 },
+        "generatorId": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+        "sourceRoot": { "type": "string", "minLength": 1 },
+        "resourceRoot": { "type": "string", "minLength": 1 },
+        "sourceTreeHash": { "$ref": "#/$defs/sha256" },
+        "resourceTreeHash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "code", "message"],
+      "properties": {
+        "severity": { "enum": ["ERROR", "WARNING", "INFO"] },
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string" },
+        "source": { "$ref": "#/$defs/sourceSpan" }
+      }
+    },
+    "sourceSpan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "startByte", "endByte"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "startByte": { "type": "integer", "minimum": 0 },
+        "endByte": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

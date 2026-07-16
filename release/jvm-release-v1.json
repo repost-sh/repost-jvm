@@ -1,0 +1,70 @@
+{
+  "$schema": "./jvm-release-v1.schema.json",
+  "format": "repost-jvm-release-v1",
+  "state": "preflight",
+  "release": {
+    "version": "1.0.0",
+    "tag": "jvm-sdk-v1.0.0",
+    "commit": "0000000000000000000000000000000000000000",
+    "tree": "0000000000000000000000000000000000000000",
+    "runtimeVersion": "1.0.0",
+    "pluginVersion": "1.0.0",
+    "engineVersion": "0.9.0",
+    "cliVersion": "0.9.0",
+    "descriptorVersion": 2
+  },
+  "mavenCoordinates": [
+    "sh.repost:repost-bom:1.0.0",
+    "sh.repost:repost-client:1.0.0",
+    "sh.repost:repost-client-cdi:1.0.0",
+    "sh.repost:repost-client-kotlin:1.0.0",
+    "sh.repost:repost-client-micrometer:1.0.0",
+    "sh.repost:repost-client-opentelemetry:1.0.0",
+    "sh.repost:repost-client-spring-boot-starter:1.0.0",
+    "sh.repost:repost-client-test:1.0.0",
+    "sh.repost:repost-gradle-plugin:1.0.0",
+    "sh.repost:repost-maven-plugin:1.0.0",
+    "sh.repost:repost-schema-engine:0.9.0",
+    "sh.repost.sdk:sh.repost.sdk.gradle.plugin:1.0.0"
+  ],
+  "gradlePlugin": {
+    "id": "sh.repost.sdk",
+    "version": "1.0.0",
+    "implementationCoordinate": "sh.repost:repost-gradle-plugin:1.0.0",
+    "markerCoordinate": "sh.repost.sdk:sh.repost.sdk.gradle.plugin:1.0.0"
+  },
+  "nativeEngine": {
+    "coordinate": "sh.repost:repost-schema-engine:0.9.0",
+    "classifiers": ["linux-aarch64", "linux-x86_64", "macos-aarch64", "macos-x86_64", "windows-x86_64"],
+    "checksumManifest": "maven/sh/repost/repost-schema-engine/0.9.0/repost-schema-engine-0.9.0-checksums.json",
+    "checksumSignature": "maven/sh/repost/repost-schema-engine/0.9.0/repost-schema-engine-0.9.0-checksums.sig"
+  },
+  "files": [],
+  "receipts": {
+    "approval": "receipts/approval.json",
+    "central": "receipts/central.json",
+    "gradlePluginPortal": "receipts/gradle-plugin-portal.json",
+    "cli": "receipts/cli.json",
+    "githubRelease": "receipts/github-release.json"
+  },
+  "approval": {
+    "environment": "jvm-sdk-production",
+    "allowedPublishStepIds": [
+      "central.publish-existing-deployment",
+      "gradle.publish-staged-plugin",
+      "cli.publish-staged-dist",
+      "github.publish-complete-release"
+    ],
+    "registryEnvironments": {
+      "central": "maven-central-production",
+      "gradlePlugin": "gradle-plugin-production",
+      "cli": "production"
+    }
+  },
+  "recovery": {
+    "publicCoordinateVisible": false,
+    "prePublicFailureAction": "retry-same-bytes-or-new-version-if-bytes-change",
+    "postPublicFailureAction": "retry-missing-with-same-bytes-or-patch-family",
+    "gaRequiresAllChannels": true
+  }
+}

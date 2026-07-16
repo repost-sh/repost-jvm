@@ -1,0 +1,4 @@
+repost:
+  client:
+    api-key: yaml-key
+    connect-timeout: 17s

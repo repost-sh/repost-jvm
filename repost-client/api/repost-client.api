@@ -1,0 +1,1409 @@
+public interface sh.repost.client.ApiKeyProvider {
+  public abstract java.lang.String getApiKey();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.AttemptSummary {
+  public int getAttemptNumber();
+    descriptor: ()I
+
+  public java.time.Duration getDuration();
+    descriptor: ()Ljava/time/Duration;
+
+  public sh.repost.client.ObserverOutcome getOutcome();
+    descriptor: ()Lsh/repost/client/ObserverOutcome;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public sh.repost.client.HttpStatusClass getHttpStatusClass();
+    descriptor: ()Lsh/repost/client/HttpStatusClass;
+}
+
+public interface sh.repost.client.CapturedTelemetryContext {
+}
+
+public final class sh.repost.client.ClientOptionKey extends java.lang.Enum<sh.repost.client.ClientOptionKey> {
+  public static final sh.repost.client.ClientOptionKey API_KEY;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey API_KEY_PROVIDER;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey BASE_URI;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey CONNECT_TIMEOUT;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey ATTEMPT_TIMEOUT;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey OPERATION_TIMEOUT;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey MAX_ATTEMPTS;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey MAX_IN_FLIGHT_OPERATIONS;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey MAX_BUFFERED_BYTES;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey RETRY_BASE_DELAY;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey RETRY_MAX_DELAY;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey HTTP_TRANSPORT_OPTIONS;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey TRANSPORT;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey EXECUTOR;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey SCHEDULER;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey OBSERVER;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey OBSERVER_EXECUTOR;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey TELEMETRY;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey DEFAULT_VALUE_GENERATORS;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey IDEMPOTENCY_KEY_GENERATOR;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey MONOTONIC_CLOCK;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey WALL_CLOCK;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey RETRY_ENTROPY;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static final sh.repost.client.ClientOptionKey USER_AGENT_SUFFIX;
+    descriptor: Lsh/repost/client/ClientOptionKey;
+  public static sh.repost.client.ClientOptionKey[] values();
+    descriptor: ()[Lsh/repost/client/ClientOptionKey;
+
+  public static sh.repost.client.ClientOptionKey valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ClientOptionKey;
+}
+
+public final class sh.repost.client.ClientOptions {
+  public static sh.repost.client.ClientOptions$Builder builder();
+    descriptor: ()Lsh/repost/client/ClientOptions$Builder;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.ClientOptions$Builder {
+  public sh.repost.client.ClientOptions$Builder apiKey(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder apiKeyProvider(sh.repost.client.ApiKeyProvider);
+    descriptor: (Lsh/repost/client/ApiKeyProvider;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder baseUri(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder connectTimeout(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder attemptTimeout(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder operationTimeout(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder maxAttempts(int);
+    descriptor: (I)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder maxInFlightOperations(int);
+    descriptor: (I)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder maxBufferedBytes(long);
+    descriptor: (J)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder retryBaseDelay(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder retryMaxDelay(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder httpTransportOptions(sh.repost.client.HttpTransportOptions);
+    descriptor: (Lsh/repost/client/HttpTransportOptions;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder transport(sh.repost.client.Transport);
+    descriptor: (Lsh/repost/client/Transport;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder executor(java.util.concurrent.ExecutorService);
+    descriptor: (Ljava/util/concurrent/ExecutorService;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder scheduler(java.util.concurrent.ScheduledExecutorService);
+    descriptor: (Ljava/util/concurrent/ScheduledExecutorService;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder observer(sh.repost.client.RepostObserver);
+    descriptor: (Lsh/repost/client/RepostObserver;)Lsh/repost/client/ClientOptions$Builder;
+
+  public boolean hasObserver();
+    descriptor: ()Z
+
+  public sh.repost.client.ClientOptions$Builder observerExecutor(java.util.concurrent.ExecutorService);
+    descriptor: (Ljava/util/concurrent/ExecutorService;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder telemetry(sh.repost.client.RepostTelemetry);
+    descriptor: (Lsh/repost/client/RepostTelemetry;)Lsh/repost/client/ClientOptions$Builder;
+
+  public boolean hasTelemetry();
+    descriptor: ()Z
+
+  public sh.repost.client.ClientOptions$Builder defaultValueGenerators(sh.repost.client.DefaultValueGenerators);
+    descriptor: (Lsh/repost/client/DefaultValueGenerators;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder idempotencyKeyGenerator(sh.repost.client.IdempotencyKeyGenerator);
+    descriptor: (Lsh/repost/client/IdempotencyKeyGenerator;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder monotonicClock(sh.repost.client.MonotonicClock);
+    descriptor: (Lsh/repost/client/MonotonicClock;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder wallClock(sh.repost.client.WallClock);
+    descriptor: (Lsh/repost/client/WallClock;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder retryEntropy(sh.repost.client.RetryEntropy);
+    descriptor: (Lsh/repost/client/RetryEntropy;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions$Builder userAgentSuffix(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ClientOptions$Builder;
+
+  public sh.repost.client.ClientOptions build();
+    descriptor: ()Lsh/repost/client/ClientOptions;
+}
+
+public interface sh.repost.client.ClientOptionsCustomizer {
+  public abstract void customize(sh.repost.client.ClientOptions$Builder);
+    descriptor: (Lsh/repost/client/ClientOptions$Builder;)V
+}
+
+public final class sh.repost.client.ConfigurationIssue {
+  public static sh.repost.client.ConfigurationIssue of(sh.repost.client.ConfigurationIssueCode, java.util.List<sh.repost.client.ClientOptionKey>);
+    descriptor: (Lsh/repost/client/ConfigurationIssueCode;Ljava/util/List;)Lsh/repost/client/ConfigurationIssue;
+
+  public sh.repost.client.ConfigurationIssueCode getCode();
+    descriptor: ()Lsh/repost/client/ConfigurationIssueCode;
+
+  public java.util.List<sh.repost.client.ClientOptionKey> getOptionKeys();
+    descriptor: ()Ljava/util/List;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.ConfigurationIssueCode extends java.lang.Enum<sh.repost.client.ConfigurationIssueCode> {
+  public static final sh.repost.client.ConfigurationIssueCode MISSING;
+    descriptor: Lsh/repost/client/ConfigurationIssueCode;
+  public static final sh.repost.client.ConfigurationIssueCode CONFLICT;
+    descriptor: Lsh/repost/client/ConfigurationIssueCode;
+  public static final sh.repost.client.ConfigurationIssueCode INVALID_VALUE;
+    descriptor: Lsh/repost/client/ConfigurationIssueCode;
+  public static final sh.repost.client.ConfigurationIssueCode OUT_OF_RANGE;
+    descriptor: Lsh/repost/client/ConfigurationIssueCode;
+  public static final sh.repost.client.ConfigurationIssueCode UNSUPPORTED;
+    descriptor: Lsh/repost/client/ConfigurationIssueCode;
+  public static final sh.repost.client.ConfigurationIssueCode RESOURCE_MISMATCH;
+    descriptor: Lsh/repost/client/ConfigurationIssueCode;
+  public static sh.repost.client.ConfigurationIssueCode[] values();
+    descriptor: ()[Lsh/repost/client/ConfigurationIssueCode;
+
+  public static sh.repost.client.ConfigurationIssueCode valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ConfigurationIssueCode;
+}
+
+public interface sh.repost.client.DefaultValueGenerators {
+  public static sh.repost.client.DefaultValueGenerators fixed(java.time.Instant, java.lang.String, java.lang.String);
+    descriptor: (Ljava/time/Instant;Ljava/lang/String;Ljava/lang/String;)Lsh/repost/client/DefaultValueGenerators;
+
+  public abstract java.time.Instant now();
+    descriptor: ()Ljava/time/Instant;
+
+  public abstract java.lang.String uuid();
+    descriptor: ()Ljava/lang/String;
+
+  public abstract java.lang.String cuid();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.DeliveryState extends java.lang.Enum<sh.repost.client.DeliveryState> {
+  public static final sh.repost.client.DeliveryState NOT_SENT;
+    descriptor: Lsh/repost/client/DeliveryState;
+  public static final sh.repost.client.DeliveryState POSSIBLY_SENT;
+    descriptor: Lsh/repost/client/DeliveryState;
+  public static final sh.repost.client.DeliveryState ACCEPTED;
+    descriptor: Lsh/repost/client/DeliveryState;
+  public static final sh.repost.client.DeliveryState REJECTED;
+    descriptor: Lsh/repost/client/DeliveryState;
+  public static final sh.repost.client.DeliveryState CANCELLED_UNKNOWN;
+    descriptor: Lsh/repost/client/DeliveryState;
+  public static sh.repost.client.DeliveryState[] values();
+    descriptor: ()[Lsh/repost/client/DeliveryState;
+
+  public static sh.repost.client.DeliveryState valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/DeliveryState;
+}
+
+public interface sh.repost.client.DnsResolver {
+  public abstract java.util.List<java.net.InetAddress> resolve(java.lang.String) throws java.net.UnknownHostException;
+    descriptor: (Ljava/lang/String;)Ljava/util/List;
+}
+
+public interface sh.repost.client.GeneratedRepostClientFactory<T> {
+  public abstract java.lang.Class<T> clientType();
+    descriptor: ()Ljava/lang/Class;
+
+  public abstract T create(sh.repost.client.RepostRuntime);
+    descriptor: (Lsh/repost/client/RepostRuntime;)Ljava/lang/Object;
+}
+
+public interface sh.repost.client.GeneratedRepostClientRegistry {
+  public abstract java.util.List<sh.repost.client.GeneratedRepostClientFactory<?>> factories();
+    descriptor: ()Ljava/util/List;
+}
+
+public final class sh.repost.client.HttpProxyOptions {
+  public static sh.repost.client.HttpProxyOptions$Builder builder();
+    descriptor: ()Lsh/repost/client/HttpProxyOptions$Builder;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.HttpProxyOptions$Builder {
+  public sh.repost.client.HttpProxyOptions$Builder uri(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/HttpProxyOptions$Builder;
+
+  public sh.repost.client.HttpProxyOptions$Builder credentialsProvider(sh.repost.client.ProxyCredentialsProvider);
+    descriptor: (Lsh/repost/client/ProxyCredentialsProvider;)Lsh/repost/client/HttpProxyOptions$Builder;
+
+  public sh.repost.client.HttpProxyOptions build();
+    descriptor: ()Lsh/repost/client/HttpProxyOptions;
+}
+
+public final class sh.repost.client.HttpStatusClass extends java.lang.Enum<sh.repost.client.HttpStatusClass> {
+  public static final sh.repost.client.HttpStatusClass NONE;
+    descriptor: Lsh/repost/client/HttpStatusClass;
+  public static final sh.repost.client.HttpStatusClass SUCCESS;
+    descriptor: Lsh/repost/client/HttpStatusClass;
+  public static final sh.repost.client.HttpStatusClass REDIRECTION;
+    descriptor: Lsh/repost/client/HttpStatusClass;
+  public static final sh.repost.client.HttpStatusClass CLIENT_ERROR;
+    descriptor: Lsh/repost/client/HttpStatusClass;
+  public static final sh.repost.client.HttpStatusClass SERVER_ERROR;
+    descriptor: Lsh/repost/client/HttpStatusClass;
+  public static sh.repost.client.HttpStatusClass[] values();
+    descriptor: ()[Lsh/repost/client/HttpStatusClass;
+
+  public static sh.repost.client.HttpStatusClass valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/HttpStatusClass;
+}
+
+public final class sh.repost.client.HttpTransportOptions {
+  public static sh.repost.client.HttpTransportOptions defaults();
+    descriptor: ()Lsh/repost/client/HttpTransportOptions;
+
+  public static sh.repost.client.HttpTransportOptions$Builder builder();
+    descriptor: ()Lsh/repost/client/HttpTransportOptions$Builder;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.HttpTransportOptions$Builder {
+  public sh.repost.client.HttpTransportOptions$Builder proxy(sh.repost.client.HttpProxyOptions);
+    descriptor: (Lsh/repost/client/HttpProxyOptions;)Lsh/repost/client/HttpTransportOptions$Builder;
+
+  public sh.repost.client.HttpTransportOptions$Builder sslContext(javax.net.ssl.SSLContext);
+    descriptor: (Ljavax/net/ssl/SSLContext;)Lsh/repost/client/HttpTransportOptions$Builder;
+
+  public sh.repost.client.HttpTransportOptions$Builder tlsProtocols(java.util.List<java.lang.String>);
+    descriptor: (Ljava/util/List;)Lsh/repost/client/HttpTransportOptions$Builder;
+
+  public sh.repost.client.HttpTransportOptions$Builder tlsCipherSuites(java.util.List<java.lang.String>);
+    descriptor: (Ljava/util/List;)Lsh/repost/client/HttpTransportOptions$Builder;
+
+  public sh.repost.client.HttpTransportOptions$Builder dnsResolver(sh.repost.client.DnsResolver);
+    descriptor: (Lsh/repost/client/DnsResolver;)Lsh/repost/client/HttpTransportOptions$Builder;
+
+  public sh.repost.client.HttpTransportOptions build();
+    descriptor: ()Lsh/repost/client/HttpTransportOptions;
+}
+
+public interface sh.repost.client.IdempotencyKeyGenerator {
+  public abstract java.lang.String generate();
+    descriptor: ()Ljava/lang/String;
+}
+
+public interface sh.repost.client.MonotonicClock {
+  public abstract long nanoTime();
+    descriptor: ()J
+}
+
+public final class sh.repost.client.ObserverEvent {
+  public static final int SCHEMA_VERSION = 1;
+    descriptor: I
+  public int getSchemaVersion();
+    descriptor: ()I
+
+  public sh.repost.client.ObserverEventKind getKind();
+    descriptor: ()Lsh/repost/client/ObserverEventKind;
+
+  public java.lang.String getOperationId();
+    descriptor: ()Ljava/lang/String;
+
+  public java.time.Instant getTimestamp();
+    descriptor: ()Ljava/time/Instant;
+
+  public java.lang.Integer getAttemptNumber();
+    descriptor: ()Ljava/lang/Integer;
+
+  public java.time.Duration getDuration();
+    descriptor: ()Ljava/time/Duration;
+
+  public sh.repost.client.ObserverOutcome getOutcome();
+    descriptor: ()Lsh/repost/client/ObserverOutcome;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public sh.repost.client.HttpStatusClass getHttpStatusClass();
+    descriptor: ()Lsh/repost/client/HttpStatusClass;
+
+  public java.time.Duration getRetryDelay();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.time.Instant getOperationStartedAt();
+    descriptor: ()Ljava/time/Instant;
+
+  public java.time.Instant getOperationEndedAt();
+    descriptor: ()Ljava/time/Instant;
+
+  public java.util.List<sh.repost.client.AttemptSummary> getAttemptSummaries();
+    descriptor: ()Ljava/util/List;
+}
+
+public final class sh.repost.client.ObserverEventKind extends java.lang.Enum<sh.repost.client.ObserverEventKind> {
+  public static final sh.repost.client.ObserverEventKind OPERATION_START;
+    descriptor: Lsh/repost/client/ObserverEventKind;
+  public static final sh.repost.client.ObserverEventKind ATTEMPT_START;
+    descriptor: Lsh/repost/client/ObserverEventKind;
+  public static final sh.repost.client.ObserverEventKind ATTEMPT_END;
+    descriptor: Lsh/repost/client/ObserverEventKind;
+  public static final sh.repost.client.ObserverEventKind RETRY_DELAY;
+    descriptor: Lsh/repost/client/ObserverEventKind;
+  public static final sh.repost.client.ObserverEventKind OPERATION_CANCEL;
+    descriptor: Lsh/repost/client/ObserverEventKind;
+  public static final sh.repost.client.ObserverEventKind OPERATION_END;
+    descriptor: Lsh/repost/client/ObserverEventKind;
+  public static sh.repost.client.ObserverEventKind[] values();
+    descriptor: ()[Lsh/repost/client/ObserverEventKind;
+
+  public static sh.repost.client.ObserverEventKind valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ObserverEventKind;
+}
+
+public final class sh.repost.client.ObserverOutcome extends java.lang.Enum<sh.repost.client.ObserverOutcome> {
+  public static final sh.repost.client.ObserverOutcome ACCEPTED;
+    descriptor: Lsh/repost/client/ObserverOutcome;
+  public static final sh.repost.client.ObserverOutcome RETRYABLE_FAILURE;
+    descriptor: Lsh/repost/client/ObserverOutcome;
+  public static final sh.repost.client.ObserverOutcome REJECTED;
+    descriptor: Lsh/repost/client/ObserverOutcome;
+  public static final sh.repost.client.ObserverOutcome FAILED;
+    descriptor: Lsh/repost/client/ObserverOutcome;
+  public static final sh.repost.client.ObserverOutcome CANCELLED;
+    descriptor: Lsh/repost/client/ObserverOutcome;
+  public static final sh.repost.client.ObserverOutcome CLOSED;
+    descriptor: Lsh/repost/client/ObserverOutcome;
+  public static sh.repost.client.ObserverOutcome[] values();
+    descriptor: ()[Lsh/repost/client/ObserverOutcome;
+
+  public static sh.repost.client.ObserverOutcome valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ObserverOutcome;
+}
+
+public interface sh.repost.client.ProxyCredentialsProvider {
+  public abstract java.net.PasswordAuthentication getCredentials();
+    descriptor: ()Ljava/net/PasswordAuthentication;
+}
+
+public final class sh.repost.client.RepostCauseCategory extends java.lang.Enum<sh.repost.client.RepostCauseCategory> {
+  public static final sh.repost.client.RepostCauseCategory API_KEY_PROVIDER;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory DEFAULT_GENERATOR;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory IDEMPOTENCY_GENERATOR;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory RETRY_ENTROPY;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory DNS_RESOLVER;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory PROXY_CREDENTIAL_PROVIDER;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory TLS_PROVIDER;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory CUSTOM_TRANSPORT;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory RESPONSE_BODY;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory OBSERVER;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory HTTP_RUNTIME;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory TRANSPORT_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory SCHEDULER_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory OPERATION_EXECUTOR_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory DNS_EXECUTOR_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory PROXY_CREDENTIAL_EXECUTOR_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory TLS_EXECUTOR_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory TERMINAL_SETTLEMENT_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory OBSERVER_CLOSE;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static final sh.repost.client.RepostCauseCategory UNKNOWN;
+    descriptor: Lsh/repost/client/RepostCauseCategory;
+  public static sh.repost.client.RepostCauseCategory[] values();
+    descriptor: ()[Lsh/repost/client/RepostCauseCategory;
+
+  public static sh.repost.client.RepostCauseCategory valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/RepostCauseCategory;
+}
+
+public final class sh.repost.client.RepostErrorCode extends java.lang.Enum<sh.repost.client.RepostErrorCode> {
+  public static final sh.repost.client.RepostErrorCode CONFIGURATION;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode CLOSED;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode VALIDATION;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode SERIALIZATION;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode REQUEST_TOO_LARGE;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode DNS;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode CONNECT;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode PROXY;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode TLS;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode IO;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode ATTEMPT_TIMEOUT;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode OPERATION_DEADLINE;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode CANCELLED;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode OVERLOADED;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode RATE_LIMITED;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode HTTP_REJECTED;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode SERVER_FAILURE;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode RESPONSE_TOO_LARGE;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode RESPONSE_PROTOCOL;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static final sh.repost.client.RepostErrorCode DESCRIPTOR_VERSION;
+    descriptor: Lsh/repost/client/RepostErrorCode;
+  public static sh.repost.client.RepostErrorCode[] values();
+    descriptor: ()[Lsh/repost/client/RepostErrorCode;
+
+  public static sh.repost.client.RepostErrorCode valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/RepostErrorCode;
+}
+
+public final class sh.repost.client.RepostErrorDetails {
+  public static final int MAX_ISSUES = 32;
+    descriptor: I
+  public static final int MAX_ISSUE_COUNT = 2147483647;
+    descriptor: I
+  public static final int MAX_ISSUE_PATH_UTF8_BYTES = 1024;
+    descriptor: I
+  public static final int MAX_TOTAL_ISSUE_PATH_UTF8_BYTES = 16384;
+    descriptor: I
+  public static sh.repost.client.RepostErrorDetails$Builder builder(sh.repost.client.RepostErrorCode, sh.repost.client.DeliveryState);
+    descriptor: (Lsh/repost/client/RepostErrorCode;Lsh/repost/client/DeliveryState;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.RepostFailureReason getFailureReason();
+    descriptor: ()Lsh/repost/client/RepostFailureReason;
+
+  public sh.repost.client.RepostCauseCategory getCauseCategory();
+    descriptor: ()Lsh/repost/client/RepostCauseCategory;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public java.lang.String getOperationId();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getIdempotencyKey();
+    descriptor: ()Ljava/lang/String;
+
+  public int getAttemptCount();
+    descriptor: ()I
+
+  public java.lang.Integer getHttpStatus();
+    descriptor: ()Ljava/lang/Integer;
+
+  public boolean isRetryable();
+    descriptor: ()Z
+
+  public long getCompressedBytes();
+    descriptor: ()J
+
+  public long getDecompressedBytes();
+    descriptor: ()J
+
+  public int getResponseHeaderFields();
+    descriptor: ()I
+
+  public long getResponseHeaderBytes();
+    descriptor: ()J
+
+  public boolean isTruncated();
+    descriptor: ()Z
+
+  public int getCloseFailureCount();
+    descriptor: ()I
+
+  public java.util.List<sh.repost.client.RepostCauseCategory> getCloseFailureCategories();
+    descriptor: ()Ljava/util/List;
+
+  public java.util.List<sh.repost.client.ValidationIssue> getValidationIssues();
+    descriptor: ()Ljava/util/List;
+
+  public java.util.List<sh.repost.client.ConfigurationIssue> getConfigurationIssues();
+    descriptor: ()Ljava/util/List;
+
+  public int getIssueCount();
+    descriptor: ()I
+
+  public boolean isIssuesTruncated();
+    descriptor: ()Z
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.RepostErrorDetails$Builder {
+  public sh.repost.client.RepostErrorDetails$Builder operationId(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder idempotencyKey(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder attemptCount(int);
+    descriptor: (I)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder httpStatus(java.lang.Integer);
+    descriptor: (Ljava/lang/Integer;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder retryable(boolean);
+    descriptor: (Z)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder compressedBytes(long);
+    descriptor: (J)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder decompressedBytes(long);
+    descriptor: (J)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder responseHeaderFields(int);
+    descriptor: (I)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder responseHeaderBytes(long);
+    descriptor: (J)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder truncated(boolean);
+    descriptor: (Z)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder failureReason(sh.repost.client.RepostFailureReason);
+    descriptor: (Lsh/repost/client/RepostFailureReason;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder causeCategory(sh.repost.client.RepostCauseCategory);
+    descriptor: (Lsh/repost/client/RepostCauseCategory;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder closeFailures(java.util.List<sh.repost.client.RepostCauseCategory>);
+    descriptor: (Ljava/util/List;)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder validationIssues(java.util.List<sh.repost.client.ValidationIssue>, int, boolean);
+    descriptor: (Ljava/util/List;IZ)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails$Builder configurationIssues(java.util.List<sh.repost.client.ConfigurationIssue>, int, boolean);
+    descriptor: (Ljava/util/List;IZ)Lsh/repost/client/RepostErrorDetails$Builder;
+
+  public sh.repost.client.RepostErrorDetails build();
+    descriptor: ()Lsh/repost/client/RepostErrorDetails;
+}
+
+public final class sh.repost.client.RepostFailureReason extends java.lang.Enum<sh.repost.client.RepostFailureReason> {
+  public static final sh.repost.client.RepostFailureReason DNS_NOT_FOUND;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason DNS_TIMEOUT;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason CONNECT_REFUSED;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason CONNECT_TIMEOUT;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason CONNECTION_RESET;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason CONNECTION_CLOSED;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason TLS_UNTRUSTED;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason TLS_CERTIFICATE_EXPIRED;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason TLS_CERTIFICATE_NOT_YET_VALID;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason TLS_HOSTNAME_MISMATCH;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason TLS_NEGOTIATION;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason PROXY_AUTH_REQUIRED;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason PROXY_CONNECT_FAILED;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static final sh.repost.client.RepostFailureReason UNKNOWN;
+    descriptor: Lsh/repost/client/RepostFailureReason;
+  public static sh.repost.client.RepostFailureReason[] values();
+    descriptor: ()[Lsh/repost/client/RepostFailureReason;
+
+  public static sh.repost.client.RepostFailureReason valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/RepostFailureReason;
+
+  public java.lang.String getRemediationKey();
+    descriptor: ()Ljava/lang/String;
+}
+
+public interface sh.repost.client.RepostModel {
+  public abstract boolean __repostIsPresent(int);
+    descriptor: (I)Z
+
+  public abstract java.lang.Object __repostValue(int);
+    descriptor: (I)Ljava/lang/Object;
+}
+
+public interface sh.repost.client.RepostObserver {
+  public abstract void onEvent(sh.repost.client.ObserverEvent);
+    descriptor: (Lsh/repost/client/ObserverEvent;)V
+}
+
+public final class sh.repost.client.RepostRuntime implements java.lang.AutoCloseable {
+  public static sh.repost.client.RepostRuntime create();
+    descriptor: ()Lsh/repost/client/RepostRuntime;
+
+  public static sh.repost.client.RepostRuntime create(sh.repost.client.ClientOptions);
+    descriptor: (Lsh/repost/client/ClientOptions;)Lsh/repost/client/RepostRuntime;
+
+  public sh.repost.client.SendResult send(sh.repost.client.descriptor.SchemaDescriptor, sh.repost.client.descriptor.EventDescriptor, java.lang.String, sh.repost.client.RepostModel, sh.repost.client.SendOptions);
+    descriptor: (Lsh/repost/client/descriptor/SchemaDescriptor;Lsh/repost/client/descriptor/EventDescriptor;Ljava/lang/String;Lsh/repost/client/RepostModel;Lsh/repost/client/SendOptions;)Lsh/repost/client/SendResult;
+
+  public sh.repost.client.SendOperation sendAsync(sh.repost.client.descriptor.SchemaDescriptor, sh.repost.client.descriptor.EventDescriptor, java.lang.String, sh.repost.client.RepostModel, sh.repost.client.SendOptions);
+    descriptor: (Lsh/repost/client/descriptor/SchemaDescriptor;Lsh/repost/client/descriptor/EventDescriptor;Ljava/lang/String;Lsh/repost/client/RepostModel;Lsh/repost/client/SendOptions;)Lsh/repost/client/SendOperation;
+
+  public sh.repost.client.RuntimeDiagnostics diagnostics();
+    descriptor: ()Lsh/repost/client/RuntimeDiagnostics;
+
+  public boolean isClosed();
+    descriptor: ()Z
+
+  public java.util.concurrent.CompletionStage<java.lang.Void> closeCompletion();
+    descriptor: ()Ljava/util/concurrent/CompletionStage;
+
+  public void close();
+    descriptor: ()V
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public interface sh.repost.client.RepostTelemetry {
+  public abstract sh.repost.client.CapturedTelemetryContext captureContext();
+    descriptor: ()Lsh/repost/client/CapturedTelemetryContext;
+
+  public abstract sh.repost.client.TelemetryOperation startOperation(sh.repost.client.CapturedTelemetryContext, sh.repost.client.TelemetryOperationStart);
+    descriptor: (Lsh/repost/client/CapturedTelemetryContext;Lsh/repost/client/TelemetryOperationStart;)Lsh/repost/client/TelemetryOperation;
+}
+
+public final class sh.repost.client.RepostValues {
+  public static final int MAX_SNAPSHOT_DEPTH = 100;
+    descriptor: I
+  public static final int MAX_SNAPSHOT_NODES = 524288;
+    descriptor: I
+  public static final int MAX_SNAPSHOT_UTF8_BYTES = 1048576;
+    descriptor: I
+  public static java.lang.Object snapshotJson(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Ljava/lang/Object;
+
+  public static <T> java.util.List<T> snapshotList(java.util.Collection<? extends T>);
+    descriptor: (Ljava/util/Collection;)Ljava/util/List;
+
+  public static <T> java.util.List<T> snapshotList(T[]);
+    descriptor: ([Ljava/lang/Object;)Ljava/util/List;
+
+  public static boolean fieldsEqual(sh.repost.client.RepostModel, sh.repost.client.RepostModel, int);
+    descriptor: (Lsh/repost/client/RepostModel;Lsh/repost/client/RepostModel;I)Z
+
+  public static int fieldsHashCode(sh.repost.client.RepostModel, int);
+    descriptor: (Lsh/repost/client/RepostModel;I)I
+
+  public static java.lang.String redactedToString(java.lang.String, sh.repost.client.RepostModel, java.lang.String[]);
+    descriptor: (Ljava/lang/String;Lsh/repost/client/RepostModel;[Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class sh.repost.client.RequestCommitState extends java.lang.Enum<sh.repost.client.RequestCommitState> {
+  public static final sh.repost.client.RequestCommitState NOT_COMMITTED;
+    descriptor: Lsh/repost/client/RequestCommitState;
+  public static final sh.repost.client.RequestCommitState COMMITTED;
+    descriptor: Lsh/repost/client/RequestCommitState;
+  public static final sh.repost.client.RequestCommitState UNKNOWN;
+    descriptor: Lsh/repost/client/RequestCommitState;
+  public static sh.repost.client.RequestCommitState[] values();
+    descriptor: ()[Lsh/repost/client/RequestCommitState;
+
+  public static sh.repost.client.RequestCommitState valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/RequestCommitState;
+}
+
+public interface sh.repost.client.RetryEntropy {
+  public abstract long nextLong(long);
+    descriptor: (J)J
+}
+
+public final class sh.repost.client.RuntimeDiagnostics {
+  public static final long MAX_COUNTER_VALUE = 9007199254740991l;
+    descriptor: J
+  public int getInFlightOperations();
+    descriptor: ()I
+
+  public long getBufferedBytes();
+    descriptor: ()J
+
+  public long getConcurrencyOverloadRejections();
+    descriptor: ()J
+
+  public long getRequestByteOverloadRejections();
+    descriptor: ()J
+
+  public long getResponseByteOverloadRejections();
+    descriptor: ()J
+
+  public long getResponseHeaderLimitFailures();
+    descriptor: ()J
+
+  public long getExecutorOverloadRejections();
+    descriptor: ()J
+
+  public long getSchedulerOverloadRejections();
+    descriptor: ()J
+
+  public long getResponseCloseFailures();
+    descriptor: ()J
+
+  public long getDroppedObserverEvents();
+    descriptor: ()J
+
+  public long getObserverFailures();
+    descriptor: ()J
+
+  public long getTelemetryFailures();
+    descriptor: ()J
+
+  public boolean isClosed();
+    descriptor: ()Z
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public interface sh.repost.client.SendOperation extends java.util.concurrent.CompletionStage<sh.repost.client.SendResult>, java.util.concurrent.Future<sh.repost.client.SendResult> {
+  public abstract java.util.concurrent.CompletionStage<sh.repost.client.SendOutcome> outcome();
+    descriptor: ()Ljava/util/concurrent/CompletionStage;
+}
+
+public final class sh.repost.client.SendOptions {
+  public static sh.repost.client.SendOptions$Builder builder();
+    descriptor: ()Lsh/repost/client/SendOptions$Builder;
+
+  public static sh.repost.client.SendOptions defaults();
+    descriptor: ()Lsh/repost/client/SendOptions;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.SendOptions$Builder {
+  public sh.repost.client.SendOptions$Builder idempotencyKey(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/SendOptions$Builder;
+
+  public sh.repost.client.SendOptions build();
+    descriptor: ()Lsh/repost/client/SendOptions;
+}
+
+public final class sh.repost.client.SendOutcome {
+  public boolean isAccepted();
+    descriptor: ()Z
+
+  public java.lang.String getOperationId();
+    descriptor: ()Ljava/lang/String;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.RepostFailureReason getFailureReason();
+    descriptor: ()Lsh/repost/client/RepostFailureReason;
+
+  public sh.repost.client.RepostCauseCategory getCauseCategory();
+    descriptor: ()Lsh/repost/client/RepostCauseCategory;
+
+  public int getAttemptCount();
+    descriptor: ()I
+
+  public java.lang.String getIdempotencyKey();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.Integer getHttpStatus();
+    descriptor: ()Ljava/lang/Integer;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.SendResult {
+  public static sh.repost.client.SendResult$Builder builder();
+    descriptor: ()Lsh/repost/client/SendResult$Builder;
+
+  public java.lang.String getId();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getType();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getCustomerId();
+    descriptor: ()Ljava/lang/String;
+
+  public java.time.Instant getTimestamp();
+    descriptor: ()Ljava/time/Instant;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.SendResult$Builder {
+  public sh.repost.client.SendResult$Builder id(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/SendResult$Builder;
+
+  public sh.repost.client.SendResult$Builder type(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/SendResult$Builder;
+
+  public sh.repost.client.SendResult$Builder customerId(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/SendResult$Builder;
+
+  public sh.repost.client.SendResult$Builder timestamp(java.time.Instant);
+    descriptor: (Ljava/time/Instant;)Lsh/repost/client/SendResult$Builder;
+
+  public sh.repost.client.SendResult build();
+    descriptor: ()Lsh/repost/client/SendResult;
+}
+
+public interface sh.repost.client.TelemetryAttempt {
+  public abstract sh.repost.client.TelemetryScope makeCurrent();
+    descriptor: ()Lsh/repost/client/TelemetryScope;
+
+  public abstract void end(sh.repost.client.TelemetryAttemptEnd);
+    descriptor: (Lsh/repost/client/TelemetryAttemptEnd;)V
+}
+
+public final class sh.repost.client.TelemetryAttemptEnd {
+  public int getAttemptNumber();
+    descriptor: ()I
+
+  public java.time.Duration getDuration();
+    descriptor: ()Ljava/time/Duration;
+
+  public sh.repost.client.ObserverOutcome getOutcome();
+    descriptor: ()Lsh/repost/client/ObserverOutcome;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.RepostFailureReason getFailureReason();
+    descriptor: ()Lsh/repost/client/RepostFailureReason;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public sh.repost.client.HttpStatusClass getHttpStatusClass();
+    descriptor: ()Lsh/repost/client/HttpStatusClass;
+}
+
+public final class sh.repost.client.TelemetryAttemptStart {
+  public int getAttemptNumber();
+    descriptor: ()I
+
+  public java.time.Instant getStartedAt();
+    descriptor: ()Ljava/time/Instant;
+}
+
+public interface sh.repost.client.TelemetryOperation {
+  public abstract sh.repost.client.TelemetryScope makeCurrent();
+    descriptor: ()Lsh/repost/client/TelemetryScope;
+
+  public abstract sh.repost.client.TelemetryAttempt startAttempt(sh.repost.client.TelemetryAttemptStart);
+    descriptor: (Lsh/repost/client/TelemetryAttemptStart;)Lsh/repost/client/TelemetryAttempt;
+
+  public abstract void end(sh.repost.client.TelemetryOperationEnd);
+    descriptor: (Lsh/repost/client/TelemetryOperationEnd;)V
+}
+
+public final class sh.repost.client.TelemetryOperationEnd {
+  public java.time.Duration getDuration();
+    descriptor: ()Ljava/time/Duration;
+
+  public sh.repost.client.ObserverOutcome getOutcome();
+    descriptor: ()Lsh/repost/client/ObserverOutcome;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.RepostFailureReason getFailureReason();
+    descriptor: ()Lsh/repost/client/RepostFailureReason;
+
+  public sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public sh.repost.client.HttpStatusClass getHttpStatusClass();
+    descriptor: ()Lsh/repost/client/HttpStatusClass;
+
+  public int getAttemptCount();
+    descriptor: ()I
+}
+
+public final class sh.repost.client.TelemetryOperationStart {
+  public java.time.Instant getStartedAt();
+    descriptor: ()Ljava/time/Instant;
+}
+
+public interface sh.repost.client.TelemetryScope extends java.lang.AutoCloseable {
+  public abstract void close();
+    descriptor: ()V
+}
+
+public interface sh.repost.client.Transport {
+  public abstract java.util.concurrent.CompletionStage<sh.repost.client.TransportResponse> execute(sh.repost.client.TransportRequest);
+    descriptor: (Lsh/repost/client/TransportRequest;)Ljava/util/concurrent/CompletionStage;
+}
+
+public final class sh.repost.client.TransportFailure extends java.lang.RuntimeException {
+  public static sh.repost.client.TransportFailure of(sh.repost.client.RepostErrorCode, sh.repost.client.RequestCommitState);
+    descriptor: (Lsh/repost/client/RepostErrorCode;Lsh/repost/client/RequestCommitState;)Lsh/repost/client/TransportFailure;
+
+  public static sh.repost.client.TransportFailure of(sh.repost.client.RepostErrorCode, sh.repost.client.RequestCommitState, sh.repost.client.RepostFailureReason);
+    descriptor: (Lsh/repost/client/RepostErrorCode;Lsh/repost/client/RequestCommitState;Lsh/repost/client/RepostFailureReason;)Lsh/repost/client/TransportFailure;
+
+  public sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public sh.repost.client.RequestCommitState getCommitState();
+    descriptor: ()Lsh/repost/client/RequestCommitState;
+
+  public sh.repost.client.RepostFailureReason getFailureReason();
+    descriptor: ()Lsh/repost/client/RepostFailureReason;
+
+  public sh.repost.client.RepostCauseCategory getCauseCategory();
+    descriptor: ()Lsh/repost/client/RepostCauseCategory;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.TransportHeaderField {
+  public static sh.repost.client.TransportHeaderField of(java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;)Lsh/repost/client/TransportHeaderField;
+
+  public java.lang.String getName();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getValue();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.TransportRequest {
+  public java.net.URI getUri();
+    descriptor: ()Ljava/net/URI;
+
+  public java.util.List<sh.repost.client.TransportHeaderField> getHeaderFields();
+    descriptor: ()Ljava/util/List;
+
+  public java.nio.ByteBuffer getBody();
+    descriptor: ()Ljava/nio/ByteBuffer;
+
+  public int getAttemptNumber();
+    descriptor: ()I
+
+  public java.time.Duration getConnectTimeout();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.time.Duration getAttemptTimeout();
+    descriptor: ()Ljava/time/Duration;
+}
+
+public final class sh.repost.client.TransportResponse implements java.lang.AutoCloseable {
+  public static sh.repost.client.TransportResponse of(int, java.util.List<sh.repost.client.TransportHeaderField>, java.io.InputStream);
+    descriptor: (ILjava/util/List;Ljava/io/InputStream;)Lsh/repost/client/TransportResponse;
+
+  public int getStatusCode();
+    descriptor: ()I
+
+  public java.util.List<sh.repost.client.TransportHeaderField> getHeaderFields();
+    descriptor: ()Ljava/util/List;
+
+  public java.io.InputStream getBody();
+    descriptor: ()Ljava/io/InputStream;
+
+  public void close();
+    descriptor: ()V
+}
+
+public final class sh.repost.client.ValidationIssue {
+  public static sh.repost.client.ValidationIssue of(sh.repost.client.ValidationIssueCode, java.lang.String);
+    descriptor: (Lsh/repost/client/ValidationIssueCode;Ljava/lang/String;)Lsh/repost/client/ValidationIssue;
+
+  public sh.repost.client.ValidationIssueCode getCode();
+    descriptor: ()Lsh/repost/client/ValidationIssueCode;
+
+  public java.lang.String getPath();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.ValidationIssueCode extends java.lang.Enum<sh.repost.client.ValidationIssueCode> {
+  public static final sh.repost.client.ValidationIssueCode REQUIRED;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode NULL_NOT_ALLOWED;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode TYPE_MISMATCH;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode OUT_OF_RANGE;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode NON_FINITE;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode INVALID_DATETIME;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode INVALID_ENUM;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode INVALID_JSON;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode INVALID_UNICODE;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode COLLECTION_LIMIT;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static final sh.repost.client.ValidationIssueCode CYCLE;
+    descriptor: Lsh/repost/client/ValidationIssueCode;
+  public static sh.repost.client.ValidationIssueCode[] values();
+    descriptor: ()[Lsh/repost/client/ValidationIssueCode;
+
+  public static sh.repost.client.ValidationIssueCode valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/ValidationIssueCode;
+}
+
+public interface sh.repost.client.WallClock {
+  public abstract java.time.Instant now();
+    descriptor: ()Ljava/time/Instant;
+}
+
+public final class sh.repost.client.descriptor.DefaultSpec {
+  public static sh.repost.client.descriptor.DefaultSpec literal(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Lsh/repost/client/descriptor/DefaultSpec;
+
+  public static sh.repost.client.descriptor.DefaultSpec now();
+    descriptor: ()Lsh/repost/client/descriptor/DefaultSpec;
+
+  public static sh.repost.client.descriptor.DefaultSpec uuid();
+    descriptor: ()Lsh/repost/client/descriptor/DefaultSpec;
+
+  public static sh.repost.client.descriptor.DefaultSpec cuid();
+    descriptor: ()Lsh/repost/client/descriptor/DefaultSpec;
+
+  public sh.repost.client.descriptor.DefaultSpec$Kind getKind();
+    descriptor: ()Lsh/repost/client/descriptor/DefaultSpec$Kind;
+
+  public java.lang.Object getLiteralValue();
+    descriptor: ()Ljava/lang/Object;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.descriptor.DefaultSpec$Kind extends java.lang.Enum<sh.repost.client.descriptor.DefaultSpec$Kind> {
+  public static final sh.repost.client.descriptor.DefaultSpec$Kind LITERAL;
+    descriptor: Lsh/repost/client/descriptor/DefaultSpec$Kind;
+  public static final sh.repost.client.descriptor.DefaultSpec$Kind NOW;
+    descriptor: Lsh/repost/client/descriptor/DefaultSpec$Kind;
+  public static final sh.repost.client.descriptor.DefaultSpec$Kind UUID;
+    descriptor: Lsh/repost/client/descriptor/DefaultSpec$Kind;
+  public static final sh.repost.client.descriptor.DefaultSpec$Kind CUID;
+    descriptor: Lsh/repost/client/descriptor/DefaultSpec$Kind;
+  public static sh.repost.client.descriptor.DefaultSpec$Kind[] values();
+    descriptor: ()[Lsh/repost/client/descriptor/DefaultSpec$Kind;
+
+  public static sh.repost.client.descriptor.DefaultSpec$Kind valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/descriptor/DefaultSpec$Kind;
+}
+
+public final class sh.repost.client.descriptor.EventDescriptor {
+  public static sh.repost.client.descriptor.EventDescriptor of(java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;)Lsh/repost/client/descriptor/EventDescriptor;
+
+  public java.lang.String getType();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getModelId();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.descriptor.FieldDescriptor {
+  public static sh.repost.client.descriptor.FieldDescriptor$Builder builder(int, java.lang.String, java.lang.String, sh.repost.client.descriptor.ScalarKind);
+    descriptor: (ILjava/lang/String;Ljava/lang/String;Lsh/repost/client/descriptor/ScalarKind;)Lsh/repost/client/descriptor/FieldDescriptor$Builder;
+
+  public int getFieldIndex();
+    descriptor: ()I
+
+  public java.lang.String getSchemaName();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String getWireName();
+    descriptor: ()Ljava/lang/String;
+
+  public sh.repost.client.descriptor.ScalarKind getScalarKind();
+    descriptor: ()Lsh/repost/client/descriptor/ScalarKind;
+
+  public java.lang.String getDescriptorId();
+    descriptor: ()Ljava/lang/String;
+
+  public boolean isRequiredInInput();
+    descriptor: ()Z
+
+  public boolean isNullableInInput();
+    descriptor: ()Z
+
+  public boolean isList();
+    descriptor: ()Z
+
+  public sh.repost.client.descriptor.DefaultSpec getDefaultSpec();
+    descriptor: ()Lsh/repost/client/descriptor/DefaultSpec;
+}
+
+public final class sh.repost.client.descriptor.FieldDescriptor$Builder {
+  public sh.repost.client.descriptor.FieldDescriptor$Builder descriptorId(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/descriptor/FieldDescriptor$Builder;
+
+  public sh.repost.client.descriptor.FieldDescriptor$Builder requiredInInput(boolean);
+    descriptor: (Z)Lsh/repost/client/descriptor/FieldDescriptor$Builder;
+
+  public sh.repost.client.descriptor.FieldDescriptor$Builder nullableInInput(boolean);
+    descriptor: (Z)Lsh/repost/client/descriptor/FieldDescriptor$Builder;
+
+  public sh.repost.client.descriptor.FieldDescriptor$Builder list(boolean);
+    descriptor: (Z)Lsh/repost/client/descriptor/FieldDescriptor$Builder;
+
+  public sh.repost.client.descriptor.FieldDescriptor$Builder defaultSpec(sh.repost.client.descriptor.DefaultSpec);
+    descriptor: (Lsh/repost/client/descriptor/DefaultSpec;)Lsh/repost/client/descriptor/FieldDescriptor$Builder;
+
+  public sh.repost.client.descriptor.FieldDescriptor build();
+    descriptor: ()Lsh/repost/client/descriptor/FieldDescriptor;
+}
+
+public final class sh.repost.client.descriptor.ModelDescriptor {
+  public static sh.repost.client.descriptor.ModelDescriptor of(java.lang.String, java.util.List<sh.repost.client.descriptor.FieldDescriptor>);
+    descriptor: (Ljava/lang/String;Ljava/util/List;)Lsh/repost/client/descriptor/ModelDescriptor;
+
+  public java.lang.String getId();
+    descriptor: ()Ljava/lang/String;
+
+  public java.util.List<sh.repost.client.descriptor.FieldDescriptor> getFields();
+    descriptor: ()Ljava/util/List;
+}
+
+public final class sh.repost.client.descriptor.ScalarKind extends java.lang.Enum<sh.repost.client.descriptor.ScalarKind> {
+  public static final sh.repost.client.descriptor.ScalarKind STRING;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind BOOLEAN;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind INT64;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind FLOAT64;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind DATETIME;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind JSON;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind ENUM;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static final sh.repost.client.descriptor.ScalarKind MODEL;
+    descriptor: Lsh/repost/client/descriptor/ScalarKind;
+  public static sh.repost.client.descriptor.ScalarKind[] values();
+    descriptor: ()[Lsh/repost/client/descriptor/ScalarKind;
+
+  public static sh.repost.client.descriptor.ScalarKind valueOf(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/descriptor/ScalarKind;
+}
+
+public final class sh.repost.client.descriptor.SchemaDescriptor {
+  public static final int SUPPORTED_FORMAT_VERSION = 2;
+    descriptor: I
+  public static sh.repost.client.descriptor.SchemaDescriptor$Builder builder(int);
+    descriptor: (I)Lsh/repost/client/descriptor/SchemaDescriptor$Builder;
+
+  public int getDescriptorFormatVersion();
+    descriptor: ()I
+
+  public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>> getEnums();
+    descriptor: ()Ljava/util/Map;
+
+  public java.util.Map<java.lang.String, sh.repost.client.descriptor.ModelDescriptor> getModels();
+    descriptor: ()Ljava/util/Map;
+
+  public java.util.Map<java.lang.String, java.util.Map<java.lang.String, sh.repost.client.descriptor.EventDescriptor>> getWebhooks();
+    descriptor: ()Ljava/util/Map;
+}
+
+public final class sh.repost.client.descriptor.SchemaDescriptor$Builder {
+  public sh.repost.client.descriptor.SchemaDescriptor$Builder addEnum(java.lang.String, java.util.Map<java.lang.String, java.lang.String>);
+    descriptor: (Ljava/lang/String;Ljava/util/Map;)Lsh/repost/client/descriptor/SchemaDescriptor$Builder;
+
+  public sh.repost.client.descriptor.SchemaDescriptor$Builder addModel(sh.repost.client.descriptor.ModelDescriptor);
+    descriptor: (Lsh/repost/client/descriptor/ModelDescriptor;)Lsh/repost/client/descriptor/SchemaDescriptor$Builder;
+
+  public sh.repost.client.descriptor.SchemaDescriptor$Builder addEvent(java.lang.String, java.lang.String, sh.repost.client.descriptor.EventDescriptor);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;Lsh/repost/client/descriptor/EventDescriptor;)Lsh/repost/client/descriptor/SchemaDescriptor$Builder;
+
+  public sh.repost.client.descriptor.SchemaDescriptor build();
+    descriptor: ()Lsh/repost/client/descriptor/SchemaDescriptor;
+}
+
+public final class sh.repost.client.error.RepostConfigurationException extends sh.repost.client.error.RepostException {
+  public sh.repost.client.error.RepostConfigurationException(sh.repost.client.RepostErrorDetails);
+    descriptor: (Lsh/repost/client/RepostErrorDetails;)V
+}
+
+public final class sh.repost.client.error.RepostDescriptorVersionException extends sh.repost.client.error.RepostException {
+  public sh.repost.client.error.RepostDescriptorVersionException(sh.repost.client.RepostErrorDetails);
+    descriptor: (Lsh/repost/client/RepostErrorDetails;)V
+}
+
+public abstract class sh.repost.client.error.RepostException extends java.lang.RuntimeException {
+  public final sh.repost.client.RepostErrorCode getErrorCode();
+    descriptor: ()Lsh/repost/client/RepostErrorCode;
+
+  public final sh.repost.client.RepostFailureReason getFailureReason();
+    descriptor: ()Lsh/repost/client/RepostFailureReason;
+
+  public final sh.repost.client.RepostCauseCategory getCauseCategory();
+    descriptor: ()Lsh/repost/client/RepostCauseCategory;
+
+  public final sh.repost.client.DeliveryState getDeliveryState();
+    descriptor: ()Lsh/repost/client/DeliveryState;
+
+  public final java.lang.String getOperationId();
+    descriptor: ()Ljava/lang/String;
+
+  public final java.lang.String getIdempotencyKey();
+    descriptor: ()Ljava/lang/String;
+
+  public final int getAttemptCount();
+    descriptor: ()I
+
+  public final java.lang.Integer getHttpStatus();
+    descriptor: ()Ljava/lang/Integer;
+
+  public final boolean isRetryable();
+    descriptor: ()Z
+
+  public final long getCompressedBytes();
+    descriptor: ()J
+
+  public final long getDecompressedBytes();
+    descriptor: ()J
+
+  public final int getResponseHeaderFields();
+    descriptor: ()I
+
+  public final long getResponseHeaderBytes();
+    descriptor: ()J
+
+  public final boolean isTruncated();
+    descriptor: ()Z
+
+  public final int getCloseFailureCount();
+    descriptor: ()I
+
+  public final java.util.List<sh.repost.client.RepostCauseCategory> getCloseFailureCategories();
+    descriptor: ()Ljava/util/List;
+
+  public final java.util.List<sh.repost.client.ValidationIssue> getValidationIssues();
+    descriptor: ()Ljava/util/List;
+
+  public final java.util.List<sh.repost.client.ConfigurationIssue> getConfigurationIssues();
+    descriptor: ()Ljava/util/List;
+
+  public final int getIssueCount();
+    descriptor: ()I
+
+  public final boolean isIssuesTruncated();
+    descriptor: ()Z
+
+  public final java.lang.String getMessage();
+    descriptor: ()Ljava/lang/String;
+
+  public final java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.error.RepostPublishException extends sh.repost.client.error.RepostException {
+  public sh.repost.client.error.RepostPublishException(sh.repost.client.RepostErrorDetails);
+    descriptor: (Lsh/repost/client/RepostErrorDetails;)V
+}
+
+public final class sh.repost.client.error.RepostSerializationException extends sh.repost.client.error.RepostException {
+  public sh.repost.client.error.RepostSerializationException(sh.repost.client.RepostErrorDetails);
+    descriptor: (Lsh/repost/client/RepostErrorDetails;)V
+}
+
+public final class sh.repost.client.error.RepostTransportException extends sh.repost.client.error.RepostException {
+  public sh.repost.client.error.RepostTransportException(sh.repost.client.RepostErrorDetails);
+    descriptor: (Lsh/repost/client/RepostErrorDetails;)V
+}
+
+public final class sh.repost.client.error.RepostValidationException extends sh.repost.client.error.RepostException {
+  public sh.repost.client.error.RepostValidationException(sh.repost.client.RepostErrorDetails);
+    descriptor: (Lsh/repost/client/RepostErrorDetails;)V
+}

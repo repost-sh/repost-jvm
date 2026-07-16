@@ -1,0 +1,474 @@
+public final class sh.repost.client.test.BlockingInputStream extends java.io.InputStream {
+  public sh.repost.client.test.BlockingInputStream();
+    descriptor: ()V
+
+  public int read() throws java.io.IOException;
+    descriptor: ()I
+
+  public void close();
+    descriptor: ()V
+
+  public boolean awaitReadStarted(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Z
+
+  public int getCloseCount();
+    descriptor: ()I
+}
+
+public final class sh.repost.client.test.ConcurrencyBarrier {
+  public sh.repost.client.test.ConcurrencyBarrier();
+    descriptor: ()V
+
+  public java.util.concurrent.CompletionStage<java.lang.Void> arrive();
+    descriptor: ()Ljava/util/concurrent/CompletionStage;
+
+  public boolean releaseOne();
+    descriptor: ()Z
+
+  public int releaseAll();
+    descriptor: ()I
+
+  public int getWaitingCount();
+    descriptor: ()I
+}
+
+public final class sh.repost.client.test.DeterministicRetryEntropy implements sh.repost.client.RetryEntropy {
+  public static sh.repost.client.test.DeterministicRetryEntropy sequence(long...);
+    descriptor: ([J)Lsh/repost/client/test/DeterministicRetryEntropy;
+
+  public static sh.repost.client.RetryEntropy failing(java.lang.RuntimeException);
+    descriptor: (Ljava/lang/RuntimeException;)Lsh/repost/client/RetryEntropy;
+
+  public long nextLong(long);
+    descriptor: (J)J
+}
+
+public final class sh.repost.client.test.FailingInputStream extends java.io.InputStream {
+  public sh.repost.client.test.FailingInputStream(byte[], java.io.IOException);
+    descriptor: ([BLjava/io/IOException;)V
+
+  public synchronized int read() throws java.io.IOException;
+    descriptor: ()I
+
+  public void close();
+    descriptor: ()V
+
+  public int getCloseCount();
+    descriptor: ()I
+}
+
+public final class sh.repost.client.test.LazyHeaderFields extends java.util.AbstractList<sh.repost.client.TransportHeaderField> {
+  public static sh.repost.client.test.LazyHeaderFields of(java.util.List<sh.repost.client.TransportHeaderField>, int, sh.repost.client.TransportHeaderField);
+    descriptor: (Ljava/util/List;ILsh/repost/client/TransportHeaderField;)Lsh/repost/client/test/LazyHeaderFields;
+
+  public sh.repost.client.TransportHeaderField get(int);
+    descriptor: (I)Lsh/repost/client/TransportHeaderField;
+
+  public int size();
+    descriptor: ()I
+
+  public int getAccessCount();
+    descriptor: ()I
+
+  public int getHighestAccessedIndex();
+    descriptor: ()I
+
+  public java.lang.Object get(int);
+    descriptor: (I)Ljava/lang/Object;
+}
+
+public final class sh.repost.client.test.ManualExecutor extends java.util.concurrent.AbstractExecutorService {
+  public sh.repost.client.test.ManualExecutor();
+    descriptor: ()V
+
+  public synchronized void execute(java.lang.Runnable);
+    descriptor: (Ljava/lang/Runnable;)V
+
+  public boolean runNext();
+    descriptor: ()Z
+
+  public int runAll();
+    descriptor: ()I
+
+  public synchronized int getPendingTaskCount();
+    descriptor: ()I
+
+  public synchronized void shutdown();
+    descriptor: ()V
+
+  public synchronized java.util.List<java.lang.Runnable> shutdownNow();
+    descriptor: ()Ljava/util/List;
+
+  public synchronized boolean isShutdown();
+    descriptor: ()Z
+
+  public synchronized boolean isTerminated();
+    descriptor: ()Z
+
+  public boolean awaitTermination(long, java.util.concurrent.TimeUnit);
+    descriptor: (JLjava/util/concurrent/TimeUnit;)Z
+}
+
+public final class sh.repost.client.test.ManualMonotonicClock implements sh.repost.client.MonotonicClock {
+  public sh.repost.client.test.ManualMonotonicClock(long);
+    descriptor: (J)V
+
+  public void advance(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)V
+
+  public long nanoTime();
+    descriptor: ()J
+}
+
+public final class sh.repost.client.test.ManualScheduler extends java.util.concurrent.AbstractExecutorService implements java.util.concurrent.ScheduledExecutorService {
+  public sh.repost.client.test.ManualScheduler();
+    descriptor: ()V
+
+  public int advanceBy(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)I
+
+  public int runDueTasks();
+    descriptor: ()I
+
+  public synchronized int getPendingTaskCount();
+    descriptor: ()I
+
+  public synchronized long getCurrentTimeNanos();
+    descriptor: ()J
+
+  public void execute(java.lang.Runnable);
+    descriptor: (Ljava/lang/Runnable;)V
+
+  public java.util.concurrent.ScheduledFuture<?> schedule(java.lang.Runnable, long, java.util.concurrent.TimeUnit);
+    descriptor: (Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;
+
+  public <V> java.util.concurrent.ScheduledFuture<V> schedule(java.util.concurrent.Callable<V>, long, java.util.concurrent.TimeUnit);
+    descriptor: (Ljava/util/concurrent/Callable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;
+
+  public java.util.concurrent.ScheduledFuture<?> scheduleAtFixedRate(java.lang.Runnable, long, long, java.util.concurrent.TimeUnit);
+    descriptor: (Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;
+
+  public java.util.concurrent.ScheduledFuture<?> scheduleWithFixedDelay(java.lang.Runnable, long, long, java.util.concurrent.TimeUnit);
+    descriptor: (Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;
+
+  public synchronized void shutdown();
+    descriptor: ()V
+
+  public synchronized java.util.List<java.lang.Runnable> shutdownNow();
+    descriptor: ()Ljava/util/List;
+
+  public synchronized boolean isShutdown();
+    descriptor: ()Z
+
+  public synchronized boolean isTerminated();
+    descriptor: ()Z
+
+  public boolean awaitTermination(long, java.util.concurrent.TimeUnit);
+    descriptor: (JLjava/util/concurrent/TimeUnit;)Z
+}
+
+public final class sh.repost.client.test.ManualWallClock implements sh.repost.client.WallClock {
+  public sh.repost.client.test.ManualWallClock(java.time.Instant);
+    descriptor: (Ljava/time/Instant;)V
+
+  public void advance(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)V
+
+  public java.time.Instant now();
+    descriptor: ()Ljava/time/Instant;
+}
+
+public final class sh.repost.client.test.NoNetworkGuard {
+  public sh.repost.client.test.NoNetworkGuard();
+    descriptor: ()V
+
+  public sh.repost.client.Transport transport();
+    descriptor: ()Lsh/repost/client/Transport;
+
+  public int getAttemptCount();
+    descriptor: ()I
+
+  public void assertNoAccess();
+    descriptor: ()V
+}
+
+public final class sh.repost.client.test.NoNetworkGuard$NetworkAccessAttempt extends java.lang.AssertionError {
+}
+
+public final class sh.repost.client.test.RecordedRequest {
+  public java.net.URI getUri();
+    descriptor: ()Ljava/net/URI;
+
+  public java.util.List<sh.repost.client.TransportHeaderField> getHeaderFields();
+    descriptor: ()Ljava/util/List;
+
+  public byte[] getBodyBytes();
+    descriptor: ()[B
+
+  public int getAttemptNumber();
+    descriptor: ()I
+
+  public java.time.Duration getConnectTimeout();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.time.Duration getAttemptTimeout();
+    descriptor: ()Ljava/time/Duration;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.test.RecordingObserver implements sh.repost.client.RepostObserver {
+  public sh.repost.client.test.RecordingObserver();
+    descriptor: ()V
+
+  public void onEvent(sh.repost.client.ObserverEvent);
+    descriptor: (Lsh/repost/client/ObserverEvent;)V
+
+  public java.util.List<sh.repost.client.ObserverEvent> getEvents();
+    descriptor: ()Ljava/util/List;
+
+  public sh.repost.client.ObserverEvent awaitNext(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/ObserverEvent;
+
+  public void clear();
+    descriptor: ()V
+}
+
+public final class sh.repost.client.test.RuntimeTestHarness implements java.lang.AutoCloseable {
+  public static sh.repost.client.test.RuntimeTestHarness$Builder builder(sh.repost.client.descriptor.SchemaDescriptor, sh.repost.client.descriptor.EventDescriptor);
+    descriptor: (Lsh/repost/client/descriptor/SchemaDescriptor;Lsh/repost/client/descriptor/EventDescriptor;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.SendOperation sendEmpty();
+    descriptor: ()Lsh/repost/client/SendOperation;
+
+  public sh.repost.client.SendOperation send(sh.repost.client.RepostModel, sh.repost.client.SendOptions);
+    descriptor: (Lsh/repost/client/RepostModel;Lsh/repost/client/SendOptions;)Lsh/repost/client/SendOperation;
+
+  public sh.repost.client.SendOperation getLastOperation();
+    descriptor: ()Lsh/repost/client/SendOperation;
+
+  public java.util.List<sh.repost.client.test.RecordedRequest> getCapturedRequests();
+    descriptor: ()Ljava/util/List;
+
+  public sh.repost.client.test.NoNetworkGuard getNoNetworkGuard();
+    descriptor: ()Lsh/repost/client/test/NoNetworkGuard;
+
+  public sh.repost.client.RepostRuntime getRuntime();
+    descriptor: ()Lsh/repost/client/RepostRuntime;
+
+  public void close();
+    descriptor: ()V
+}
+
+public final class sh.repost.client.test.RuntimeTestHarness$Builder {
+  public sh.repost.client.test.RuntimeTestHarness$Builder customerId(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder apiKey(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder apiKeyProvider(sh.repost.client.ApiKeyProvider);
+    descriptor: (Lsh/repost/client/ApiKeyProvider;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder baseUri(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder transport(sh.repost.client.Transport);
+    descriptor: (Lsh/repost/client/Transport;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder maxAttempts(int);
+    descriptor: (I)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder operationTimeout(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder retryBaseDelay(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder retryMaxDelay(java.time.Duration);
+    descriptor: (Ljava/time/Duration;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder defaultValueGenerators(sh.repost.client.DefaultValueGenerators);
+    descriptor: (Lsh/repost/client/DefaultValueGenerators;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder idempotencyKeyGenerator(sh.repost.client.IdempotencyKeyGenerator);
+    descriptor: (Lsh/repost/client/IdempotencyKeyGenerator;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder monotonicClock(sh.repost.client.MonotonicClock);
+    descriptor: (Lsh/repost/client/MonotonicClock;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder wallClock(sh.repost.client.WallClock);
+    descriptor: (Lsh/repost/client/WallClock;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder retryEntropy(sh.repost.client.RetryEntropy);
+    descriptor: (Lsh/repost/client/RetryEntropy;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder executor(java.util.concurrent.ExecutorService);
+    descriptor: (Ljava/util/concurrent/ExecutorService;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder scheduler(java.util.concurrent.ScheduledExecutorService);
+    descriptor: (Ljava/util/concurrent/ScheduledExecutorService;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder observer(sh.repost.client.RepostObserver);
+    descriptor: (Lsh/repost/client/RepostObserver;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder observerExecutor(java.util.concurrent.ExecutorService);
+    descriptor: (Ljava/util/concurrent/ExecutorService;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness$Builder telemetry(sh.repost.client.RepostTelemetry);
+    descriptor: (Lsh/repost/client/RepostTelemetry;)Lsh/repost/client/test/RuntimeTestHarness$Builder;
+
+  public sh.repost.client.test.RuntimeTestHarness build();
+    descriptor: ()Lsh/repost/client/test/RuntimeTestHarness;
+}
+
+public final class sh.repost.client.test.StubTransport implements sh.repost.client.Transport {
+  public sh.repost.client.test.StubTransport();
+    descriptor: ()V
+
+  public sh.repost.client.test.StubTransport enqueueResponse(int, java.lang.String);
+    descriptor: (ILjava/lang/String;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueResponse(int, java.util.List<sh.repost.client.TransportHeaderField>, byte[]);
+    descriptor: (ILjava/util/List;[B)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueFactoryResponse(int, java.util.List<sh.repost.client.TransportHeaderField>, java.io.InputStream);
+    descriptor: (ILjava/util/List;Ljava/io/InputStream;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueAsyncFactoryResponse(int, java.util.List<sh.repost.client.TransportHeaderField>, java.io.InputStream);
+    descriptor: (ILjava/util/List;Ljava/io/InputStream;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueNullHeadersFactoryResponse(int, java.io.InputStream);
+    descriptor: (ILjava/io/InputStream;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueAsyncNullHeadersFactoryResponse(int, java.io.InputStream);
+    descriptor: (ILjava/io/InputStream;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueFailure(sh.repost.client.TransportFailure);
+    descriptor: (Lsh/repost/client/TransportFailure;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueStage(java.util.concurrent.CompletionStage<sh.repost.client.TransportResponse>);
+    descriptor: (Ljava/util/concurrent/CompletionStage;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueSynchronousFailure(java.lang.RuntimeException);
+    descriptor: (Ljava/lang/RuntimeException;)Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueNullStage();
+    descriptor: ()Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueNullResponse();
+    descriptor: ()Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport enqueueCancelledResponse();
+    descriptor: ()Lsh/repost/client/test/StubTransport;
+
+  public sh.repost.client.test.StubTransport$ControlledResponse enqueuePending();
+    descriptor: ()Lsh/repost/client/test/StubTransport$ControlledResponse;
+
+  public java.util.List<sh.repost.client.test.RecordedRequest> getRequests();
+    descriptor: ()Ljava/util/List;
+
+  public boolean awaitRequestCount(int, java.time.Duration);
+    descriptor: (ILjava/time/Duration;)Z
+
+  public java.util.concurrent.CompletionStage<sh.repost.client.TransportResponse> execute(sh.repost.client.TransportRequest);
+    descriptor: (Lsh/repost/client/TransportRequest;)Ljava/util/concurrent/CompletionStage;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.test.StubTransport$ControlledResponse {
+  public boolean completeResponse(int, java.util.List<sh.repost.client.TransportHeaderField>, byte[]);
+    descriptor: (ILjava/util/List;[B)Z
+
+  public boolean completeFailure(sh.repost.client.TransportFailure);
+    descriptor: (Lsh/repost/client/TransportFailure;)Z
+
+  public boolean completeNull();
+    descriptor: ()Z
+
+  public boolean cancel(boolean);
+    descriptor: (Z)Z
+
+  public boolean isDone();
+    descriptor: ()Z
+
+  public boolean isCancelled();
+    descriptor: ()Z
+}
+
+public final class sh.repost.client.test.TestApiKeyProvider implements sh.repost.client.ApiKeyProvider {
+  public static sh.repost.client.test.TestApiKeyProvider rotating(java.lang.String...);
+    descriptor: ([Ljava/lang/String;)Lsh/repost/client/test/TestApiKeyProvider;
+
+  public static sh.repost.client.test.TestApiKeyProvider failing(java.lang.RuntimeException);
+    descriptor: (Ljava/lang/RuntimeException;)Lsh/repost/client/test/TestApiKeyProvider;
+
+  public java.lang.String getApiKey();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.test.TestDefaultValueGenerators implements sh.repost.client.DefaultValueGenerators {
+  public static sh.repost.client.test.TestDefaultValueGenerators fixed(java.time.Instant, java.lang.String, java.lang.String);
+    descriptor: (Ljava/time/Instant;Ljava/lang/String;Ljava/lang/String;)Lsh/repost/client/test/TestDefaultValueGenerators;
+
+  public static sh.repost.client.test.TestDefaultValueGenerators sequence(java.util.List<java.time.Instant>, java.util.List<java.lang.String>, java.util.List<java.lang.String>);
+    descriptor: (Ljava/util/List;Ljava/util/List;Ljava/util/List;)Lsh/repost/client/test/TestDefaultValueGenerators;
+
+  public static sh.repost.client.test.TestDefaultValueGenerators failing(java.lang.RuntimeException);
+    descriptor: (Ljava/lang/RuntimeException;)Lsh/repost/client/test/TestDefaultValueGenerators;
+
+  public java.time.Instant now();
+    descriptor: ()Ljava/time/Instant;
+
+  public java.lang.String uuid();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String cuid();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.test.TestIdempotencyKeyGenerator implements sh.repost.client.IdempotencyKeyGenerator {
+  public static sh.repost.client.test.TestIdempotencyKeyGenerator fixed(java.lang.String);
+    descriptor: (Ljava/lang/String;)Lsh/repost/client/test/TestIdempotencyKeyGenerator;
+
+  public static sh.repost.client.test.TestIdempotencyKeyGenerator sequence(java.lang.String...);
+    descriptor: ([Ljava/lang/String;)Lsh/repost/client/test/TestIdempotencyKeyGenerator;
+
+  public static sh.repost.client.test.TestIdempotencyKeyGenerator failing(java.lang.RuntimeException);
+    descriptor: (Ljava/lang/RuntimeException;)Lsh/repost/client/test/TestIdempotencyKeyGenerator;
+
+  public java.lang.String generate();
+    descriptor: ()Ljava/lang/String;
+
+  public java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+
+public final class sh.repost.client.test.WeightedByteBarrier {
+  public sh.repost.client.test.WeightedByteBarrier();
+    descriptor: ()V
+
+  public synchronized java.util.concurrent.CompletionStage<java.lang.Void> arrive(long);
+    descriptor: (J)Ljava/util/concurrent/CompletionStage;
+
+  public boolean releaseOne();
+    descriptor: ()Z
+
+  public int releaseAll();
+    descriptor: ()I
+
+  public synchronized int getWaitingCount();
+    descriptor: ()I
+
+  public synchronized long getWaitingBytes();
+    descriptor: ()J
+}

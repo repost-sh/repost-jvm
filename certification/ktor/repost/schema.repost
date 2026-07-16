@@ -1,0 +1,29 @@
+generator javaSdk {
+  language       = "java"
+  output         = "../build/generated/repost/java/source"
+  resourceOutput = "../build/generated/repost/java/resource"
+  packageName    = "cert.generated.java"
+  clientName     = "JavaClient"
+}
+
+generator kotlinSdk {
+  language       = "kotlin"
+  output         = "../build/generated/repost/kotlin/source"
+  resourceOutput = "../build/generated/repost/kotlin/resource"
+  packageName    = "cert.generated.kotlin"
+  clientName     = "KotlinClient"
+}
+
+type Book {
+  created
+}
+
+model Book {
+  title String
+}
+
+event BookCreated {
+  type      @type(Book.created)
+  data      Book
+  timestamp DateTime
+}
