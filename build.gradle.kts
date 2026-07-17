@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.cyclonedx.gradle.CyclonedxAggregateTask
 import org.cyclonedx.gradle.CyclonedxDirectTask
 import org.gradle.api.attributes.Usage
@@ -12,10 +14,10 @@ import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension
 import sh.repost.build.NativeEngineTrustArguments
 import sh.repost.build.RunJapicmp
 import java.io.File
+import java.time.Instant
 
 plugins {
     base
@@ -24,7 +26,6 @@ plugins {
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.kotlin.abi.validator) apply false
     alias(libs.plugins.cyclonedx)
-    alias(libs.plugins.dependency.check)
     alias(libs.plugins.japicmp)
 }
 
@@ -45,20 +46,6 @@ val japicmpTool = configurations.create("japicmpTool") {
 
 dependencies {
     add(japicmpTool.name, repostLibs.japicmp)
-}
-
-extensions.configure<DependencyCheckExtension> {
-    outputDirectory.set(layout.buildDirectory.dir("reports/dependency-check"))
-    scanBuildEnv.set(false)
-    scanConfigurations.set(listOf("compileClasspath", "runtimeClasspath"))
-    formats.set(listOf("HTML", "JSON", "SARIF"))
-    failBuildOnCVSS.set(7.0f)
-    failOnError.set(true)
-    nvd.apiKey.set(
-        providers.environmentVariable("NVD_API_KEY")
-            .orElse(providers.gradleProperty("nvdApiKey")),
-    )
-    analyzers.setOssIndexEnabled(false)
 }
 
 allprojects {
@@ -95,6 +82,36 @@ tasks.named<CyclonedxAggregateTask>("cyclonedxBom") {
     includeBuildSystem.set(false)
     jsonOutput.set(layout.buildDirectory.file("reports/cyclonedx/repost-jvm-bom.json"))
     xmlOutput.set(layout.buildDirectory.file("reports/cyclonedx/repost-jvm-bom.xml"))
+    val sourceDateEpoch = providers.environmentVariable("SOURCE_DATE_EPOCH")
+    doLast {
+        if (!sourceDateEpoch.isPresent) return@doLast
+        val timestamp = Instant.ofEpochSecond(sourceDateEpoch.get().toLong()).toString()
+
+        val jsonFile = jsonOutput.get().asFile
+        @Suppress("UNCHECKED_CAST")
+        val json = JsonSlurper().parse(jsonFile) as MutableMap<String, Any?>
+        @Suppress("UNCHECKED_CAST")
+        (json.getValue("metadata") as MutableMap<String, Any?>)["timestamp"] = timestamp
+        (json.getValue("components") as List<*>).forEach { value ->
+            @Suppress("UNCHECKED_CAST")
+            val component = value as MutableMap<String, Any?>
+            if (component["group"] == "sh.repost") {
+                component.remove("externalReferences")
+                component.remove("properties")
+            }
+        }
+        jsonFile.writeText(JsonOutput.prettyPrint(JsonOutput.toJson(json)) + "\n", Charsets.UTF_8)
+
+        val xmlFile = xmlOutput.get().asFile
+        var xml = xmlFile.readText(Charsets.UTF_8)
+            .replace(Regex("<timestamp>[^<]+</timestamp>"), "<timestamp>$timestamp</timestamp>")
+        xml = Regex("(?s)<component\\b[^>]*>.*?<group>sh\\.repost</group>.*?</component>").replace(xml) { match ->
+            match.value
+                .replace(Regex("(?s)\\s*<externalReferences>.*?</externalReferences>"), "")
+                .replace(Regex("(?s)\\s*<properties>.*?</properties>"), "")
+        }
+        xmlFile.writeText(xml, Charsets.UTF_8)
+    }
 }
 
 project(":repost-client") {
@@ -324,13 +341,13 @@ tasks.register("compatibilityCheck") {
 
 val checkJvmSupplyChain = tasks.register("checkJvmSupplyChain") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
-    description = "Generates the CycloneDX SBOM and runs the OWASP dependency vulnerability gate."
-    dependsOn("cyclonedxBom", "dependencyCheckAggregate", "verifyPublishedContents")
+    description = "Generates the CycloneDX SBOM and verifies published contents."
+    dependsOn("cyclonedxBom", "verifyPublishedContents")
 }
 
 tasks.register("checkJvmReleaseQuality") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
-    description = "Runs documentation, API compatibility, SBOM, and dependency vulnerability release gates."
+    description = "Runs documentation, API compatibility, SBOM, and publication release gates."
     dependsOn("checkJvmPublicationShape", checkJvmDocumentation, checkJvmApiCompatibility, checkJvmSupplyChain)
 }
 

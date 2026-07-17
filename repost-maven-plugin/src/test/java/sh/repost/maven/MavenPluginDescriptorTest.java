@@ -29,7 +29,7 @@ final class MavenPluginDescriptorTest {
         Element plugin = document.getDocumentElement();
         assertEquals("sh.repost", text(plugin, "groupId"));
         assertEquals("repost-maven-plugin", text(plugin, "artifactId"));
-        assertEquals("1.0.0", text(plugin, "version"));
+        assertEquals(System.getProperty("repost.test.version", "1.0.0"), text(plugin, "version"));
         assertEquals("repost", text(plugin, "goalPrefix"));
         assertEquals("11", text(plugin, "requiredJavaVersion"));
         assertEquals("3.9.0", text(plugin, "requiredMavenVersion"));

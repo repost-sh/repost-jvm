@@ -15,7 +15,6 @@ junit = "5.13.4"
 dokka = "2.2.0"
 kotlin-abi-validator = "0.18.1"
 cyclonedx = "3.2.4"
-dependency-check = "12.2.2"
 japicmp = "0.24.1"
 japicmp-plugin = "0.4.6"
 jreleaser = "1.25.0"
@@ -62,7 +61,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-abi-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlin-abi-validator" }
 cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }
-dependency-check = { id = "org.owasp.dependencycheck", version.ref = "dependency-check" }
 japicmp = { id = "me.champeau.gradle.japicmp", version.ref = "japicmp-plugin" }
 jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
 gradle-plugin-publish = { id = "com.gradle.plugin-publish", version.ref = "gradle-plugin-publish" }

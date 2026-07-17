@@ -196,7 +196,7 @@ final class TestFixturesContractTest {
     }
 
     @Test
-    void rawNullAndCancellationScriptsRemainDeterministicAndNonretryable() {
+    void rawNullAndCancellationScriptsRemainDeterministicAndNonretryable() throws Exception {
         StubTransport nullStage = new StubTransport().enqueueNullStage();
         try (RuntimeTestHarness harness = RuntimeTestHarness.builder(schema(), event())
                 .transport(nullStage)
@@ -225,6 +225,10 @@ final class TestFixturesContractTest {
             sh.repost.client.SendOperation operation = harness.sendEmpty();
             assertTrue(pending.awaitRequestCount(1, Duration.ofSeconds(2)));
             assertTrue(operation.toCompletableFuture().cancel(false));
+            long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(2);
+            while (!controlled.isDone() && System.nanoTime() < deadline) {
+                Thread.sleep(1L);
+            }
             assertTrue(controlled.isDone());
             assertTrue(controlled.isCancelled());
         }

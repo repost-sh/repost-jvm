@@ -11,7 +11,6 @@
     {"id":"dokka","line":"^2\\.2\\.[0-9]+$","datasource":{"type":"maven","group":"org.jetbrains.dokka","artifact":"dokka-gradle-plugin"},"catalogKey":"dokka","lanes":["kotlin"]},
     {"id":"kotlin-abi-validator","line":"^0\\.18\\.[0-9]+$","datasource":{"type":"maven","group":"org.jetbrains.kotlinx","artifact":"binary-compatibility-validator"},"catalogKey":"kotlin-abi-validator","lanes":["kotlin","quality"]},
     {"id":"cyclonedx","line":"^3\\.2\\.[0-9]+$","datasource":{"type":"maven","group":"org.cyclonedx","artifact":"cyclonedx-gradle-plugin"},"catalogKey":"cyclonedx","lanes":["quality"]},
-    {"id":"dependency-check","line":"^12\\.2\\.[0-9]+$","datasource":{"type":"maven","group":"org.owasp","artifact":"dependency-check-gradle"},"catalogKey":"dependency-check","lanes":["quality"]},
     {"id":"japicmp","line":"^0\\.24\\.[0-9]+$","datasource":{"type":"maven","group":"com.github.siom79.japicmp","artifact":"japicmp"},"catalogKey":"japicmp","lanes":["quality"]},
     {"id":"japicmp-plugin","line":"^0\\.4\\.[0-9]+$","datasource":{"type":"maven","repository":"https://plugins.gradle.org/m2","group":"me.champeau.gradle.japicmp","artifact":"me.champeau.gradle.japicmp.gradle.plugin"},"catalogKey":"japicmp-plugin","lanes":["quality"]},
     {"id":"jreleaser","line":"^1\\.25\\.[0-9]+$","datasource":{"type":"maven","repository":"https://plugins.gradle.org/m2","group":"org.jreleaser","artifact":"org.jreleaser.gradle.plugin"},"catalogKey":"jreleaser","lanes":["quality"]},

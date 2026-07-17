@@ -24,6 +24,7 @@ public final class RepostHelpMojo extends AbstractMojo {
     }
 
     static String render(boolean detailed, String selectedGoal) throws MojoExecutionException {
+        String version = MavenPluginVersion.current();
         if (selectedGoal != null
             && !selectedGoal.isEmpty()
             && !"generate".equals(selectedGoal)
@@ -31,7 +32,7 @@ public final class RepostHelpMojo extends AbstractMojo {
             throw new MojoExecutionException("Unknown Repost Maven goal: " + selectedGoal);
         }
         if (!detailed) {
-            return "Repost Maven Plugin 1.0.0\n" +
+            return "Repost Maven Plugin " + version + "\n" +
                 "Goals: repost:generate (generate-sources), repost:check (verify)\n" +
                 "Run repost:help -Ddetail for configuration, ownership, and dependency guidance.";
         }
@@ -39,15 +40,15 @@ public final class RepostHelpMojo extends AbstractMojo {
             ? "Goals: repost:generate (generate-sources), repost:check (verify)"
             : "Goal: repost:" + selectedGoal +
                 ("generate".equals(selectedGoal) ? " (generate-sources)" : " (verify)");
-        return "Repost Maven Plugin 1.0.0\n" + heading + "\n\n" +
+        return "Repost Maven Plugin " + version + "\n" + heading + "\n\n" +
             "Required Java consumer dependencies:\n" +
-            "BOM coordinate: sh.repost:repost-bom:1.0.0\n" +
+            "BOM coordinate: sh.repost:repost-bom:" + version + "\n" +
             "<dependencyManagement>\n" +
             "  <dependencies>\n" +
             "    <dependency>\n" +
             "      <groupId>sh.repost</groupId>\n" +
             "      <artifactId>repost-bom</artifactId>\n" +
-            "      <version>1.0.0</version>\n" +
+            "      <version>" + version + "</version>\n" +
             "      <type>pom</type>\n" +
             "      <scope>import</scope>\n" +
             "    </dependency>\n" +

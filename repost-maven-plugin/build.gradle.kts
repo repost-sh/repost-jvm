@@ -1,4 +1,17 @@
 import org.gradle.api.GradleException
+import org.gradle.api.tasks.testing.Test
+import org.gradle.language.jvm.tasks.ProcessResources
+import org.apache.tools.ant.filters.ReplaceTokens
+
+tasks.named<ProcessResources>("processResources") {
+    val repostVersion = providers.gradleProperty("repostVersion").get()
+    inputs.property("repostVersion", repostVersion)
+    filter<ReplaceTokens>("tokens" to mapOf("repostVersion" to repostVersion))
+}
+
+tasks.withType<Test>().configureEach {
+    systemProperty("repost.test.version", providers.gradleProperty("repostVersion").get())
+}
 
 val pluginDescriptor = tasks.register("pluginDescriptor") {
     group = "verification"

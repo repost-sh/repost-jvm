@@ -329,7 +329,15 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
                 when (spec.kind) {
                     JvmModuleKind.PLATFORM -> from(project.components.getByName("javaPlatform"))
                     JvmModuleKind.NATIVE_DISTRIBUTION -> Unit
-                    else -> from(project.components.getByName("java"))
+                    else -> {
+                        from(project.components.getByName("java"))
+                        if (spec.kind == JvmModuleKind.KOTLIN_LIBRARY) {
+                            val publication = this
+                            project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+                                publication.artifact(project.tasks.named("kotlinSourcesJar"))
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -397,7 +405,9 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
         project.extensions.configure<JavaPluginExtension> {
             toolchain.languageVersion.set(JavaLanguageVersion.of(21))
             if (spec.publishedCoordinate != null && spec.kind != JvmModuleKind.INTERNAL_ENGINE) {
-                withSourcesJar()
+                if (spec.kind != JvmModuleKind.KOTLIN_LIBRARY) {
+                    withSourcesJar()
+                }
                 withJavadocJar()
             }
         }
@@ -638,12 +648,19 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
             .filter { it.publishedCoordinate != null && it.javaRelease != null }
             .flatMap { spec ->
                 val project = root.project(":${spec.name}")
-                listOf("jar", "sourcesJar", "javadocJar").map { project.tasks.named(it, Jar::class.java) }
+                val sourcesTask = if (spec.kind == JvmModuleKind.KOTLIN_LIBRARY) {
+                    "kotlinSourcesJar"
+                } else {
+                    "sourcesJar"
+                }
+                listOf("jar", sourcesTask, "javadocJar").map {
+                    project.tasks.named(it, AbstractArchiveTask::class.java)
+                }
             }
         val pomTasks = root.subprojects.flatMap { project ->
             project.tasks.withType(GenerateMavenPom::class.java).toList()
         }
-        releaseFiles.from(archiveTasks.map { it.flatMap(Jar::getArchiveFile) })
+        releaseFiles.from(archiveTasks.map { it.flatMap(AbstractArchiveTask::getArchiveFile) })
         releaseFiles.from(pomTasks.map(GenerateMavenPom::getDestination))
         releaseFiles.from(
             root.layout.buildDirectory.file("reports/cyclonedx/repost-jvm-bom.json"),

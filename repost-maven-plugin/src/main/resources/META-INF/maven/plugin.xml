@@ -4,7 +4,7 @@
   <description>Generates and checks Repost Java and Kotlin SDK sources.</description>
   <groupId>sh.repost</groupId>
   <artifactId>repost-maven-plugin</artifactId>
-  <version>1.0.0</version>
+  <version>@repostVersion@</version>
   <goalPrefix>repost</goalPrefix>
   <isolatedRealm>false</isolatedRealm>
   <inheritedByDefault>true</inheritedByDefault>
