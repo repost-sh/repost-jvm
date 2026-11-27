@@ -16,7 +16,6 @@ import java.util.Set;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
@@ -28,7 +27,7 @@ import sh.repost.buildplugin.internal.NativeEngineTrust;
 
 /** Shared Maven configuration and execution path for Repost generation goals. */
 abstract class AbstractRepostMojo extends AbstractMojo {
-    @Component
+    // Injected by the descriptor's <requirement> (META-INF/maven/plugin.xml).
     private RepositorySystem repositorySystem;
 
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true, required = true)
@@ -49,7 +48,7 @@ abstract class AbstractRepostMojo extends AbstractMojo {
     @Parameter(property = "repost.environmentInputs")
     private Map<String, String> environmentInputs;
 
-    @Parameter(property = "repost.engineVersion", defaultValue = "0.9.0")
+    @Parameter(property = "repost.engineVersion", defaultValue = "0.11.3")
     private String engineVersion;
 
     @Parameter(property = "repost.executionTimeout", defaultValue = "PT5M")
@@ -290,7 +289,7 @@ abstract class AbstractRepostMojo extends AbstractMojo {
 
         Path executable = engineExecutable;
         if (executable == null) {
-            executable = resolveEngine(engineVersion == null ? "0.9.0" : engineVersion);
+            executable = resolveEngine(engineVersion == null ? "0.11.3" : engineVersion);
         }
         Map<String, String> environment = environmentInputs == null
             ? Collections.emptyMap()
@@ -307,7 +306,7 @@ abstract class AbstractRepostMojo extends AbstractMojo {
         return new BuildPluginEngine.Request(
             executable,
             "1.0.0",
-            engineVersion == null ? "0.9.0" : engineVersion,
+            engineVersion == null ? "0.11.3" : engineVersion,
             "1.0.0",
             canonicalSchema.toString(),
             requests,
@@ -396,7 +395,7 @@ abstract class AbstractRepostMojo extends AbstractMojo {
         return project;
     }
 
-    private static void validateJavaTarget(MavenProject project) throws MojoExecutionException {
+    private void validateJavaTarget(MavenProject project) throws MojoExecutionException {
         String target = effectiveProperty(
             project,
             "maven.compiler.release",
@@ -450,9 +449,10 @@ abstract class AbstractRepostMojo extends AbstractMojo {
         }
     }
 
-    private static String effectiveProperty(MavenProject project, String name, String fallback) {
-        if (project.getProjectBuildingRequest() != null) {
-            String userValue = project.getProjectBuildingRequest().getUserProperties().getProperty(name);
+    /** A property as the build sees it: {@code -D} on the command line wins over the POM. */
+    private String effectiveProperty(MavenProject project, String name, String fallback) {
+        if (repositorySession != null) {
+            String userValue = repositorySession.getUserProperties().get(name);
             if (userValue != null) {
                 return userValue;
             }
@@ -546,6 +546,10 @@ abstract class AbstractRepostMojo extends AbstractMojo {
 
     final void setProject(MavenProject value) {
         project = Objects.requireNonNull(value, "project");
+    }
+
+    final void setRepositorySession(RepositorySystemSession value) {
+        repositorySession = Objects.requireNonNull(value, "repositorySession");
     }
 
     final void setEngineExecutable(Path value) {

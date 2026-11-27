@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21-jre@sha256:d7051a45dd955e4d5d1db4d3f4269fe13d1c6dff8cc6b7ef89fc8577b96c1982
 ARG WILDFLY_URL
 ARG WILDFLY_SHA1
 ARG WILDFLY_DIRECTORY

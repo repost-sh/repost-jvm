@@ -187,13 +187,6 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
                 root.layout.buildDirectory.dir("native-smoke").get().asFile.absolutePath,
             )
         }
-        root.tasks.register<WriteGradleCompatibilityMatrix>("writeGradleCompatibilityMatrix") {
-            group = LifecycleBasePlugin.VERIFICATION_GROUP
-            description = "Writes the approved Gradle and paired Kotlin CI lanes from compatibility-matrix.toml."
-            compatibilityMatrix.set(root.layout.projectDirectory.file("compatibility-matrix.toml"))
-            githubOutput.set(root.layout.buildDirectory.file("compatibility/gradle-matrix.env"))
-        }
-
         val publicationShape = root.tasks.register<CheckJvmPublicationShape>("checkJvmPublicationShape") {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
             description = "Checks generated POM metadata and the complete Maven publication artifact inventory."

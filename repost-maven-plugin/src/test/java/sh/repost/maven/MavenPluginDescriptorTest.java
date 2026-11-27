@@ -80,7 +80,7 @@ final class MavenPluginDescriptorTest {
         Element configuration = (Element) descriptor.getElementsByTagName("configuration").item(0);
         assertEquals("${project.basedir}/repost/schema.repost",
             defaultValue(configuration, "schemaFile"));
-        assertEquals("0.9.0", defaultValue(configuration, "engineVersion"));
+        assertEquals("0.11.3", defaultValue(configuration, "engineVersion"));
         assertEquals("PT5M", defaultValue(configuration, "executionTimeout"));
         assertEquals("GENERATE", defaultValue(configuration, "schemaMode"));
         assertEquals("AUTO", defaultValue(configuration, "integration"));

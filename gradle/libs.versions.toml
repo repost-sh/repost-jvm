@@ -1,6 +1,6 @@
 [versions]
 runtime = "1.0.0"
-engine = "0.9.0"
+engine = "0.11.3"
 build-jdk = "21"
 java-core = "11"
 java-integration = "17"

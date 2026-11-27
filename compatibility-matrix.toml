@@ -11,7 +11,7 @@ eol_review_due_on = "2026-08-13"
 [family]
 group = "sh.repost"
 runtime_version = "1.0.0"
-engine_version = "0.9.0"
+engine_version = "0.11.3"
 descriptor_version = 2
 
 [java]

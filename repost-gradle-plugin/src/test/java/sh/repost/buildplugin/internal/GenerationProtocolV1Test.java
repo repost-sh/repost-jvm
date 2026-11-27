@@ -20,7 +20,7 @@ final class GenerationProtocolV1Test {
         environment.put("ALPHA", "quoted \"value\"");
         GenerationProtocolV1.Request request = new GenerationProtocolV1.Request(
             "1.0.0",
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             "/workspace/repost/schema.repost",
             Collections.singletonList(new GenerationProtocolV1.GeneratorRequest(
@@ -36,7 +36,7 @@ final class GenerationProtocolV1Test {
         );
 
         assertEquals(
-            "{\"protocolVersion\":1,\"pluginVersion\":\"1.0.0\",\"engineVersion\":\"0.9.0\"," +
+            "{\"protocolVersion\":1,\"pluginVersion\":\"1.0.0\",\"engineVersion\":\"0.11.3\"," +
                 "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2," +
                 "\"schemaPath\":\"/workspace/repost/schema.repost\",\"generators\":[{" +
                 "\"generatorName\":\"javaSdk\",\"sourceOutputDirectory\":\"/workspace/generated/java\"," +
@@ -52,7 +52,7 @@ final class GenerationProtocolV1Test {
         GenerationProtocolV1.Response response = GenerationProtocolV1.readResponse(
             validResponseJson().getBytes(StandardCharsets.UTF_8)
         );
-        assertEquals("0.9.0", response.getEngineVersion());
+        assertEquals("0.11.3", response.getEngineVersion());
         assertEquals("0123456789abcdef", response.getGenerators().get(0).getGeneratorId());
         assertEquals("GENERATED", response.getDiagnostics().get(0).getCode());
         assertEquals(9, response.getDiagnostics().get(0).getSource().getEndByte());
@@ -104,7 +104,7 @@ final class GenerationProtocolV1Test {
     }
 
     private static String validResponseJson() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2,\"generators\":[{" +
             "\"generatorName\":\"javaSdk\",\"generatorId\":\"0123456789abcdef\"," +
             "\"sourceRoot\":\"/workspace/generated/java\",\"resourceRoot\":\"/workspace/generated/resources\"," +

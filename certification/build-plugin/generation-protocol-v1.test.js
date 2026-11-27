@@ -59,7 +59,7 @@ function validate(root, schema, value, location = "$") {
 const request = {
   protocolVersion: 1,
   pluginVersion: "1.0.0",
-  engineVersion: "0.9.0",
+  engineVersion: "0.11.3",
   runtimeVersion: "1.0.0",
   descriptorVersion: 2,
   schemaPath: "/workspace/repost/schema.repost",
@@ -77,7 +77,7 @@ const request = {
 
 const response = {
   protocolVersion: 1,
-  engineVersion: "0.9.0",
+  engineVersion: "0.11.3",
   runtimeVersion: "1.0.0",
   descriptorVersion: 2,
   generators: [{

@@ -37,7 +37,7 @@ final class GeneratedOutputVerifierParityTest {
         return "{\n"
             + "  \"formatVersion\": 2,\n"
             + "  \"language\": \"java\",\n"
-            + "  \"engineVersion\": \"0.9.0\",\n"
+            + "  \"engineVersion\": \"0.11.3\",\n"
             + "  \"generator\": \"javaSdk\",\n"
             + "  \"outputKind\": \"" + outputKind + "\",\n"
             + "  \"generatorId\": \"0123456789abcdef\",\n"

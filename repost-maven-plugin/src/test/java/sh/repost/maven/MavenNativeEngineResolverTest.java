@@ -48,7 +48,7 @@ final class MavenNativeEngineResolverTest {
         ) -> {
             assertEquals("Mac OS X", osName);
             assertEquals("aarch64", architectureName);
-            assertEquals("0.9.0", version);
+            assertEquals("0.11.3", version);
             assertEquals(archive, resolvedArchive);
             assertArrayEquals("manifest".getBytes(StandardCharsets.UTF_8), manifestBytes);
             assertArrayEquals("signature".getBytes(StandardCharsets.UTF_8), signatureBytes);
@@ -60,7 +60,7 @@ final class MavenNativeEngineResolverTest {
         Path resolved = MavenNativeEngineResolver.resolve(
             "Mac OS X",
             "aarch64",
-            "0.9.0",
+            "0.11.3",
             source,
             Collections.<PublicKey>emptyList(),
             cache,
@@ -69,9 +69,9 @@ final class MavenNativeEngineResolverTest {
 
         assertEquals(executable, resolved);
         assertEquals(List.of(
-            "sh.repost:repost-schema-engine:zip:macos-aarch64:0.9.0",
-            "sh.repost:repost-schema-engine:json:checksums:0.9.0",
-            "sh.repost:repost-schema-engine:sig:checksums:0.9.0"
+            "sh.repost:repost-schema-engine:zip:macos-aarch64:0.11.3",
+            "sh.repost:repost-schema-engine:json:checksums:0.11.3",
+            "sh.repost:repost-schema-engine:sig:checksums:0.11.3"
         ), requested);
     }
 

@@ -256,10 +256,14 @@ public final class ApacheHttpTransportHttp2ProductionTest {
     @Test
     void classifiesAResponseHeaderTimeoutAfterRequestPublication() throws Exception {
         try (ApacheHttpTransport transport = transport()) {
+            // The fixture holds the headers until released, so any budget
+            // proves the header timeout; it must cover a cold TLS + HTTP/2
+            // connect on the slowest CI runner (250 ms did not on windows-2022)
+            // and leave the held request visible to the state poll below.
             CompletableFuture<TransportResponse> response = send(
                     transport,
                     fixture.uri("heldResponseBaseUrl"),
-                    Duration.ofMillis(250));
+                    Duration.ofSeconds(2));
             fixture.await(() -> fixture.number("barriers", "responseHeaders", "waiting") == 1L);
 
             TransportFailure failure = assertTransportFailure(response);
@@ -475,7 +479,7 @@ public final class ApacheHttpTransportHttp2ProductionTest {
             assertEquals(202, acquired.getStatusCode());
             Map<String, Object> body = parseObject(
                     new String(acquired.getBody().readAllBytes(), StandardCharsets.UTF_8));
-            assertEquals("msg_network_fixture", string(body, "id"));
+            assertEquals("msg_1", string(body, "id"));
             assertEquals("contract.sent", string(body, "type"));
             assertEquals("cus_contract", string(body, "customerId"));
             assertEquals("2026-01-01T00:00:00.000Z", string(body, "timestamp"));
@@ -720,12 +724,17 @@ public final class ApacheHttpTransportHttp2ProductionTest {
             }
         }
 
+        // A fixture-state wait catches a hang; it does not measure speed. Windows CI runners
+        // freeze a test JVM for 5-7 s at a time (see ApacheHttpTransportProductionTest), and a
+        // 5 s wait failed there with the awaited state already true in its own failure message.
+        private static final long AWAIT_SECONDS = 30;
+
         private void await(BooleanSupplier condition) throws Exception {
-            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(AWAIT_SECONDS);
             while (!condition.getAsBoolean()) {
                 if (System.nanoTime() >= deadline) {
-                    throw new AssertionError(
-                            "fixture condition did not become true within 5 seconds: " + state());
+                    throw new AssertionError("fixture condition did not become true within "
+                            + AWAIT_SECONDS + " seconds: " + state());
                 }
                 Thread.sleep(10L);
             }

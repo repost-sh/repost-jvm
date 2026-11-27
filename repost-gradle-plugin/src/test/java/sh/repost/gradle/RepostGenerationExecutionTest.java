@@ -50,7 +50,7 @@ final class RepostGenerationExecutionTest {
         BuildPluginEngine.Request request = task.createEngineRequest();
 
         assertEquals("1.0.0", request.getPluginVersion());
-        assertEquals("0.9.0", request.getEngineVersion());
+        assertEquals("0.11.3", request.getEngineVersion());
         assertEquals("1.0.0", request.getRuntimeVersion());
         assertEquals(
             project.file("repost/schema.repost").toPath().toAbsolutePath().normalize().toString(),

@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.DateTimeException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
@@ -27,6 +30,9 @@ public final class ResponseParser {
     private static final int MAX_MEMBERS_PER_OBJECT = 16;
     private static final int MAX_NESTING_DEPTH = 32;
     private static final int MAX_EXPANSION_RATIO = 100;
+    /** RFC 3339 date-time, resolved strictly so an impossible calendar date is rejected, not clamped. */
+    private static final DateTimeFormatter RFC3339 =
+            DateTimeFormatter.ISO_OFFSET_DATE_TIME.withResolverStyle(ResolverStyle.STRICT);
     private static final JsonFactory JSON_FACTORY = new JsonFactoryBuilder()
             .recyclerPool(JsonRecyclerPools.nonRecyclingPool())
             .disable(JsonFactory.Feature.CANONICALIZE_FIELD_NAMES)
@@ -94,6 +100,39 @@ public final class ResponseParser {
             String expectedType,
             String expectedCustomerId,
             String expectedTimestamp) {
+        return parse(response, expectedType, expectedCustomerId, expectedTimestamp, false);
+    }
+
+    /**
+     * Reads a 409 the way a 2xx is read: on the Send log shape a duplicate
+     * idempotency key answers 409 with the original message id, an accepted
+     * replay rather than a conflict. Only {@code id} is required; type and
+     * customer are the sent envelope's. The timestamp is the body's own when
+     * it carries one that is valid RFC 3339 (the accepted message's original
+     * timestamp), else the envelope's; a stray value is ignored rather than
+     * demoting the replay to a conflict. A PROTOCOL failure means the 409 is
+     * not that answer.
+     *
+     * @param response acquired 409 response
+     * @param expectedType serialized request event type
+     * @param expectedCustomerId serialized request customer identifier
+     * @param expectedTimestamp serialized request timestamp
+     * @return closed parse result
+     */
+    public static Result parseDuplicate(
+            TransportResponse response,
+            String expectedType,
+            String expectedCustomerId,
+            String expectedTimestamp) {
+        return parse(response, expectedType, expectedCustomerId, expectedTimestamp, true);
+    }
+
+    private static Result parse(
+            TransportResponse response,
+            String expectedType,
+            String expectedCustomerId,
+            String expectedTimestamp,
+            boolean duplicate) {
         Objects.requireNonNull(response, "response");
         Objects.requireNonNull(expectedType, "expectedType");
         Objects.requireNonNull(expectedCustomerId, "expectedCustomerId");
@@ -115,7 +154,7 @@ public final class ResponseParser {
                     decoded,
                     MAX_DOCUMENT_BYTES,
                     "gzip".equals(contentEncoding) ? raw : null);
-            return parseJson(document, expectedType, expectedCustomerId, expectedTimestamp);
+            return parseJson(document, expectedType, expectedCustomerId, expectedTimestamp, duplicate);
         } catch (LimitExceededException | StreamConstraintsException exception) {
             return failed(Result.Failure.LIMIT);
         } catch (IOException | RuntimeException exception) {
@@ -127,7 +166,8 @@ public final class ResponseParser {
             InputStream input,
             String expectedType,
             String expectedCustomerId,
-            String expectedTimestamp) throws IOException {
+            String expectedTimestamp,
+            boolean duplicate) throws IOException {
         try (JsonParser parser = JSON_FACTORY.createParser(input)) {
             if (parser.nextToken() != JsonToken.START_OBJECT) {
                 return failed(Result.Failure.PROTOCOL);
@@ -157,7 +197,7 @@ public final class ResponseParser {
                     continue;
                 }
                 if (token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
-                    if (depth == 1 && isRequiredField(topLevelField)) {
+                    if (depth == 1 && !duplicate && isRequiredField(topLevelField)) {
                         return failed(Result.Failure.PROTOCOL);
                     }
                     if (depth == MAX_NESTING_DEPTH) {
@@ -198,11 +238,25 @@ public final class ResponseParser {
                     }
                     continue;
                 }
-                if (depth == 1 && isRequiredField(topLevelField)) {
+                if (depth == 1 && !duplicate && isRequiredField(topLevelField)) {
                     return failed(Result.Failure.PROTOCOL);
                 }
             }
 
+            Instant originalTimestamp = null;
+            if (duplicate) {
+                // The duplicate answer names the message and, when the accept
+                // path recovered it, the message's own timestamp; type and
+                // customer are the sent envelope's identity. A timestamp that
+                // is not RFC 3339 is ignored rather than demoting the replay
+                // to a conflict.
+                if (timestamp != null) {
+                    originalTimestamp = parseRfc3339(timestamp);
+                }
+                type = expectedType;
+                customerId = expectedCustomerId;
+                timestamp = expectedTimestamp;
+            }
             if (id == null || !expectedType.equals(type)
                     || !expectedCustomerId.equals(customerId)
                     || !expectedTimestamp.equals(timestamp)) {
@@ -214,12 +268,21 @@ public final class ResponseParser {
                         .id(id)
                         .type(type)
                         .customerId(customerId)
-                        .timestamp(parsedTimestamp)
+                        .timestamp(originalTimestamp != null ? originalTimestamp : parsedTimestamp)
                         .build();
                 return new Result(sendResult, null);
             } catch (DateTimeException | IllegalArgumentException exception) {
                 return failed(Result.Failure.PROTOCOL);
             }
+        }
+    }
+
+    /** RFC 3339 date-time with any fraction and a Z or numeric offset; null when not one. */
+    private static Instant parseRfc3339(String value) {
+        try {
+            return OffsetDateTime.parse(value, RFC3339).toInstant();
+        } catch (DateTimeException exception) {
+            return null;
         }
     }
 

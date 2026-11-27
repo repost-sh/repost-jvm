@@ -26,7 +26,7 @@ public abstract class RepostSdkExtension {
         getSchemaFile().convention(layout.getProjectDirectory().file("repost/schema.repost"));
         getEnvironmentInputs().convention(java.util.Collections.emptyMap());
         getIntegration().convention(RepostIntegration.AUTO);
-        getEngineVersion().convention("0.9.0");
+        getEngineVersion().convention("0.11.3");
         getExecutionTimeout().convention(Duration.ofMinutes(5));
 
         generators = objects.domainObjectContainer(

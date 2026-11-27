@@ -45,7 +45,7 @@ import sh.repost.client.error.RepostValidationException;
 /** Descriptor-driven serializer used by generated clients. */
 public final class Serializer {
     /** Maximum emitted UTF-8 request body size. */
-    public static final int MAX_REQUEST_BYTES = 1_048_576;
+    public static final int MAX_REQUEST_BYTES = 262_144; // 256 KiB publish request cap (server answers 413 above it)
     /** Maximum model, list, and JSON nesting depth. */
     public static final int MAX_DEPTH = 100;
     /** Maximum aggregate node count visited during validation. */

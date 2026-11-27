@@ -78,7 +78,7 @@ final class MavenIncrementalStateTest {
         return new BuildPluginEngine.Request(
             temporary.resolve("engine"),
             "1.0.0",
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             schema.toString(),
             List.of(generator),
@@ -108,7 +108,7 @@ final class MavenIncrementalStateTest {
         return "{\n"
             + "  \"formatVersion\": 2,\n"
             + "  \"language\": \"java\",\n"
-            + "  \"engineVersion\": \"0.9.0\",\n"
+            + "  \"engineVersion\": \"0.11.3\",\n"
             + "  \"generator\": \"javaSdk\",\n"
             + "  \"outputKind\": \"" + outputKind + "\",\n"
             + "  \"generatorId\": \"0123456789abcdef\",\n"

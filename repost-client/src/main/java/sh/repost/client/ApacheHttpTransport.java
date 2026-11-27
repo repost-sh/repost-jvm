@@ -443,7 +443,18 @@ final class ApacheHttpTransport implements Transport, AutoCloseable {
                     @Override
                     public void cancelled() {
                         clear(proxyPassword);
-                        result.cancel(false);
+                        // The engine invokes cancelled() both for caller aborts
+                        // and when the connection dies mid-exchange (e.g. an
+                        // abrupt close mid-body). Mirroring it into
+                        // result.cancel would surface a bare
+                        // CancellationException the runtime cannot classify;
+                        // a mid-exchange drop is a retryable IO failure.
+                        result.completeExceptionally(TransportFailure.of(
+                                RepostErrorCode.IO,
+                                producer.wasBodyStarted()
+                                        ? RequestCommitState.COMMITTED
+                                        : RequestCommitState.NOT_COMMITTED,
+                                RepostFailureReason.CONNECTION_CLOSED));
                     }
                 });
         } catch (RuntimeException executionFailure) {

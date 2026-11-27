@@ -22,7 +22,7 @@ public final class FakeRepostSchemaEngine {
     public static void main(String[] arguments) throws Exception {
         if (arguments.length == 2 && "capabilities".equals(arguments[0]) && "--json".equals(arguments[1])) {
             System.out.print(
-                "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+                "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
                     "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2}"
             );
             return;
@@ -179,7 +179,7 @@ public final class FakeRepostSchemaEngine {
         return "{\n" +
             "  \"formatVersion\": 2,\n" +
             "  \"language\": \"" + language(generator.name) + "\",\n" +
-            "  \"engineVersion\": \"0.9.0\",\n" +
+            "  \"engineVersion\": \"0.11.3\",\n" +
             "  \"generator\": \"" + generator.name + "\",\n" +
             "  \"outputKind\": \"" + kind + "\",\n" +
             "  \"generatorId\": \"" + id + "\",\n" +
@@ -206,7 +206,7 @@ public final class FakeRepostSchemaEngine {
 
     private static void response(List<Result> results, String diagnostics) {
         StringBuilder output = new StringBuilder(
-            "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+            "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
                 "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2,\"generators\":["
         );
         for (int index = 0; index < results.size(); index++) {

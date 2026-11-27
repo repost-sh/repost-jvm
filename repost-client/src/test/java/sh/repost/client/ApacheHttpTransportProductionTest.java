@@ -44,6 +44,13 @@ import sh.repost.internal.apache.org.apache.hc.core5.http.message.BasicHttpReque
 import sh.repost.internal.apache.org.apache.hc.core5.http.nio.DataStreamChannel;
 
 public final class ApacheHttpTransportProductionTest {
+    // These exchanges check routing and bytes, not speed: their bounds catch a hang. Windows CI
+    // runners freeze a test JVM for 5-7 s at a time (seen as matching outliers across this class
+    // and the gradle-plugin tests), so each bound outlasts such a freeze and the test's own wait
+    // outlasts the transport's, which then fails with its labelled error rather than a bare timeout.
+    private static final Duration HANG_CONNECT = Duration.ofSeconds(10);
+    private static final Duration HANG_ATTEMPT = Duration.ofSeconds(30);
+    private static final long HANG_WAIT_SECONDS = 60;
     @Test
     void defaultRuntimeOwnsTheProductionHttpTransport() {
         RepostRuntime runtime = RepostRuntime.createForTesting(
@@ -236,7 +243,7 @@ public final class ApacheHttpTransportProductionTest {
             try {
                 SendOperation operation = send(runtime);
                 peer.await();
-                SendResult result = operation.get(5, TimeUnit.SECONDS);
+                SendResult result = operation.get(HANG_WAIT_SECONDS, TimeUnit.SECONDS);
                 assertEquals("msg_gzip_limit", result.getId());
             } finally {
                 runtime.close();
@@ -263,6 +270,34 @@ public final class ApacheHttpTransportProductionTest {
     }
 
     @Test
+    void productionRuntimeRetriesAMidBodyConnectionDrop() throws Exception {
+        // The engine invokes cancelled() (not failed()) when the connection
+        // dies mid-body. Mirroring that into a bare future cancellation used
+        // to surface as terminal IO with no retry; it must retry like any IO
+        // failure (sdk/go/operation_response.go contract).
+        try (MidBodyDropPeer peer = new MidBodyDropPeer()) {
+            RepostRuntime runtime = RepostRuntime.create(ClientOptions.builder()
+                    .apiKey("test-key")
+                    .baseUri(peer.baseUri())
+                    .defaultValueGenerators(DefaultValueGenerators.fixed(
+                            Instant.parse("2026-01-01T00:00:00Z"),
+                            "12345678-1234-4234-9234-123456789abc",
+                            "abcdefghijklmnopqrstuvwx"))
+                    .maxAttempts(2)
+                    .build());
+            try {
+                SendOperation operation = send(runtime);
+                peer.await();
+                SendResult result = operation.get(HANG_WAIT_SECONDS, TimeUnit.SECONDS);
+                assertEquals("msg_retry", result.getId());
+                assertEquals(2, peer.hits.get());
+            } finally {
+                runtime.close();
+            }
+        }
+    }
+
+    @Test
     void productionPathRoutesOnlyThroughThePreparedBorrowedDnsSnapshot() throws Exception {
         try (SingleExchangePeer peer = new SingleExchangePeer(200, "", new byte[0]);
                 ApacheHttpTransport transport = new ApacheHttpTransport(
@@ -285,12 +320,12 @@ public final class ApacheHttpTransportProductionTest {
                             TransportHeaderField.of("Idempotency-Key", "msg_dns_route")),
                     ByteBuffer.wrap(new byte[] {'{', '}'}),
                     1,
-                    Duration.ofSeconds(2),
-                    Duration.ofSeconds(5));
+                    HANG_CONNECT,
+                    HANG_ATTEMPT);
 
             try (TransportResponse response = transport.execute(request)
                     .toCompletableFuture()
-                    .get(5, TimeUnit.SECONDS)) {
+                    .get(HANG_WAIT_SECONDS, TimeUnit.SECONDS)) {
                 assertEquals(200, response.getStatusCode());
             }
             peer.await();
@@ -468,11 +503,11 @@ public final class ApacheHttpTransportProductionTest {
                                 TransportHeaderField.of("Idempotency-Key", "msg_test")),
                         ByteBuffer.wrap(new byte[] {'{', '}'}),
                         1,
-                        Duration.ofSeconds(2),
-                        Duration.ofSeconds(5));
+                        HANG_CONNECT,
+                        HANG_ATTEMPT);
                 try (TransportResponse response = transport.execute(request)
                         .toCompletableFuture()
-                        .get(5, TimeUnit.SECONDS)) {
+                        .get(HANG_WAIT_SECONDS, TimeUnit.SECONDS)) {
                     assertEquals(status, response.getStatusCode());
                     assertArrayEquals(
                             bodyDiscarded ? new byte[0] : responseBody,
@@ -709,12 +744,12 @@ public final class ApacheHttpTransportProductionTest {
         }
 
         private void await() throws Exception {
-            result.get(5, TimeUnit.SECONDS);
+            result.get(HANG_WAIT_SECONDS, TimeUnit.SECONDS);
         }
 
         private void serve(int status, String headers, byte[] body, boolean responseMayReset) {
             try {
-                server.setSoTimeout(5_000);
+                server.setSoTimeout((int) HANG_ATTEMPT.toMillis());
                 servePrimary(server.accept(), status, headers, body, responseMayReset);
                 server.setSoTimeout(500);
                 try (Socket unexpected = server.accept()) {
@@ -736,7 +771,7 @@ public final class ApacheHttpTransportProductionTest {
                 boolean responseMayReset)
                 throws IOException {
             try (Socket owned = socket) {
-                owned.setSoTimeout(5_000);
+                owned.setSoTimeout((int) HANG_ATTEMPT.toMillis());
                 InputStream input = owned.getInputStream();
                 String requestHeaders = readHeaders(input);
                 String requestLine = requestHeaders.substring(0, requestHeaders.indexOf("\r\n"));
@@ -777,6 +812,85 @@ public final class ApacheHttpTransportProductionTest {
                         throw reset;
                     }
                 }
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            server.close();
+            executor.shutdownNow();
+            try {
+                if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                    throw new AssertionError("scenario peer did not terminate");
+                }
+            } catch (InterruptedException interrupted) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError("interrupted while closing scenario peer", interrupted);
+            }
+        }
+    }
+
+    /** Peer that closes mid-body on the first connection and answers fully on the second. */
+    private static final class MidBodyDropPeer implements AutoCloseable {
+        private static final byte[] ACCEPTED_BODY = ("{\"id\":\"msg_retry\",\"type\":\"contract.sent\","
+                + "\"customerId\":\"customer_dns_contract\",\"timestamp\":\"2026-01-01T00:00:00.000Z\"}")
+                .getBytes(StandardCharsets.US_ASCII);
+
+        private final ServerSocket server = new ServerSocket();
+        private final ExecutorService executor = Executors.newSingleThreadExecutor();
+        private final AtomicInteger hits = new AtomicInteger();
+        private final Future<?> result;
+
+        private MidBodyDropPeer() throws IOException {
+            server.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 0));
+            result = executor.submit(this::serve);
+        }
+
+        private String baseUri() {
+            return "http://127.0.0.1:" + server.getLocalPort();
+        }
+
+        private void await() throws Exception {
+            result.get(10, TimeUnit.SECONDS);
+        }
+
+        private void serve() {
+            try {
+                server.setSoTimeout(5_000);
+                try (Socket socket = server.accept()) {
+                    readRequest(socket);
+                    // Promise 200 bytes, deliver a prefix, and close: a mid-body drop.
+                    socket.getOutputStream().write(("HTTP/1.1 202 Accepted\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: 200\r\n"
+                            + "Connection: close\r\n\r\n"
+                            + "{\"id\":\"msg_retry\",\"type\":\"contract.sent\"").getBytes(StandardCharsets.US_ASCII));
+                    socket.getOutputStream().flush();
+                }
+                server.setSoTimeout(5_000);
+                try (Socket socket = server.accept()) {
+                    readRequest(socket);
+                    socket.getOutputStream().write(("HTTP/1.1 202 Accepted\r\n"
+                            + "Content-Type: application/json\r\n"
+                            + "Content-Length: " + ACCEPTED_BODY.length + "\r\n"
+                            + "Connection: close\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+                    socket.getOutputStream().write(ACCEPTED_BODY);
+                    socket.getOutputStream().flush();
+                }
+            } catch (IOException failure) {
+                throw new AssertionError("scenario peer failed", failure);
+            }
+        }
+
+        private void readRequest(Socket socket) throws IOException {
+            try {
+                socket.setSoTimeout(5_000);
+                InputStream input = socket.getInputStream();
+                int requestLength = contentLength(readHeaders(input));
+                assertEquals(requestLength, input.readNBytes(requestLength).length);
+                hits.incrementAndGet();
+            } catch (IOException failure) {
+                throw new AssertionError("scenario peer failed to read the request", failure);
             }
         }
 

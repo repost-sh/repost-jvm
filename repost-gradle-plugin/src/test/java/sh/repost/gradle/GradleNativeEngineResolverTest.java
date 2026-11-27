@@ -19,16 +19,16 @@ final class GradleNativeEngineResolverTest {
 
     @Test
     void selectsExactlyTheResolvedClassifierManifestAndSignature() throws Exception {
-        Path archive = write("repost-schema-engine-0.9.0-macos-aarch64.zip", "archive");
-        Path manifest = write("repost-schema-engine-0.9.0-checksums.json", "manifest");
-        Path signature = write("repost-schema-engine-0.9.0-checksums.sig", "signature");
+        Path archive = write("repost-schema-engine-0.11.3-macos-aarch64.zip", "archive");
+        Path manifest = write("repost-schema-engine-0.11.3-checksums.json", "manifest");
+        Path signature = write("repost-schema-engine-0.11.3-checksums.sig", "signature");
         Path executable = write("prepared-engine", "engine");
         Path cache = temporaryDirectory.resolve("cache");
 
         Path actual = GradleNativeEngineResolver.resolve(
             "Mac OS X",
             "aarch64",
-            "0.9.0",
+            "0.11.3",
             Arrays.asList(signature, archive, manifest),
             Collections.<PublicKey>emptyList(),
             cache,
@@ -46,9 +46,9 @@ final class GradleNativeEngineResolverTest {
 
     @Test
     void rejectsAnyExtraResolvedArtifactBeforePreparation() throws Exception {
-        Path archive = write("repost-schema-engine-0.9.0-macos-aarch64.zip", "archive");
-        Path manifest = write("repost-schema-engine-0.9.0-checksums.json", "manifest");
-        Path signature = write("repost-schema-engine-0.9.0-checksums.sig", "signature");
+        Path archive = write("repost-schema-engine-0.11.3-macos-aarch64.zip", "archive");
+        Path manifest = write("repost-schema-engine-0.11.3-checksums.json", "manifest");
+        Path signature = write("repost-schema-engine-0.11.3-checksums.sig", "signature");
         Path extra = write("unexpected.txt", "extra");
 
         GradleNativeEngineResolver.ResolutionException failure = assertThrows(
@@ -56,7 +56,7 @@ final class GradleNativeEngineResolverTest {
             () -> GradleNativeEngineResolver.resolve(
                 "Mac OS X",
                 "aarch64",
-                "0.9.0",
+                "0.11.3",
                 Arrays.asList(archive, manifest, signature, extra),
                 Collections.<PublicKey>emptyList(),
                 temporaryDirectory.resolve("cache"),
@@ -75,7 +75,7 @@ final class GradleNativeEngineResolverTest {
             () -> GradleNativeEngineResolver.resolve(
                 "Mac OS X",
                 "aarch64",
-                "0.9.0",
+                "0.11.3",
                 Collections.emptyList(),
                 Collections.<PublicKey>emptyList(),
                 temporaryDirectory.resolve("cache"),
@@ -87,9 +87,9 @@ final class GradleNativeEngineResolverTest {
 
         assertEquals(
             "could not resolve native engine artifacts: " +
-                "sh.repost:repost-schema-engine:0.9.0:macos-aarch64@zip, " +
-                "sh.repost:repost-schema-engine:0.9.0:checksums@json, " +
-                "sh.repost:repost-schema-engine:0.9.0:checksums@sig from the Gradle cache while offline; " +
+                "sh.repost:repost-schema-engine:0.11.3:macos-aarch64@zip, " +
+                "sh.repost:repost-schema-engine:0.11.3:checksums@json, " +
+                "sh.repost:repost-schema-engine:0.11.3:checksums@sig from the Gradle cache while offline; " +
                 "run Gradle without --offline once to populate them",
             failure.getMessage()
         );

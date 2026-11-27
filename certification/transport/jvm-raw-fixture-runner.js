@@ -571,7 +571,10 @@ async function runGroup(groupId, classesDirectory, keyStore) {
       controls,
       barriers,
       observedCounters: state.observedCounters,
-      state,
+      state: "CLOSED",
+      endpointIds: [...required.requiredEndpointIds],
+      assetIds: [...required.requiredAssetIds],
+      capabilities: [...required.requiredCapabilities],
       terminalAssertions: [...required.terminalAssertions],
     };
   } catch (error) {

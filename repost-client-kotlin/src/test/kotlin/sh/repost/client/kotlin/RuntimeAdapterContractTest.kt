@@ -47,6 +47,9 @@ import sh.repost.client.descriptor.ModelDescriptor
 import sh.repost.client.descriptor.SchemaDescriptor
 import sh.repost.client.error.RepostException
 
+/** Upper bound for an event another thread signals; never slept in full on a healthy run. */
+private const val EVENT_WAIT_SECONDS = 10L
+
 class RuntimeAdapterContractTest {
     @Test
     fun `Java and Kotlin success vectors have identical wire input result and outcome`() {
@@ -103,7 +106,7 @@ class RuntimeAdapterContractTest {
         try {
             val operation = send(runtime)
             val deferred = async(start = CoroutineStart.UNDISPATCHED) { operation.awaitRepost() }
-            assertTrue(started.await(2, TimeUnit.SECONDS))
+            assertTrue(started.await(EVENT_WAIT_SECONDS, TimeUnit.SECONDS))
 
             deferred.cancel(CancellationException("caller-cancelled"))
             val observed = try {
@@ -115,8 +118,44 @@ class RuntimeAdapterContractTest {
 
             assertEquals("caller-cancelled", observed.message)
             assertTrue(operation.isCancelled)
-            assertTrue(pending.isCancelled)
+            assertTransportCancelled(pending)
             assertCancelledOutcome(operation.outcome().toCompletableFuture().join(), 1, null)
+        } finally {
+            runtime.close()
+        }
+    }
+
+    @Test
+    fun `a cancel that lands before the runtime holds the transport future still cancels it`() = runBlocking {
+        val started = CountDownLatch(1)
+        val cancelIssued = CountDownLatch(1)
+        val pending = CompletableFuture<TransportResponse>()
+        val runtime = RepostRuntime.create(options(Transport {
+            started.countDown()
+            // Hold the future back until the cancel is in: the gap a loaded
+            // runner opens by itself. The cancel interrupts this worker, which
+            // must not end the hold early.
+            var released = false
+            while (!released) {
+                try {
+                    released = cancelIssued.await(EVENT_WAIT_SECONDS, TimeUnit.SECONDS)
+                    check(released) { "the test never issued its cancel" }
+                } catch (_: InterruptedException) {
+                    // Keep holding.
+                }
+            }
+            pending
+        }))
+        try {
+            val operation = send(runtime)
+            val deferred = async(start = CoroutineStart.UNDISPATCHED) { operation.awaitRepost() }
+            assertTrue(started.await(EVENT_WAIT_SECONDS, TimeUnit.SECONDS))
+
+            deferred.cancel(CancellationException("caller-cancelled"))
+            cancelIssued.countDown()
+
+            assertTrue(operation.isCancelled)
+            assertTransportCancelled(pending)
         } finally {
             runtime.close()
         }
@@ -135,7 +174,7 @@ class RuntimeAdapterContractTest {
         try {
             val operation = send(runtime)
             val deferred = scope.async(start = CoroutineStart.UNDISPATCHED) { operation.awaitRepost() }
-            assertTrue(started.await(2, TimeUnit.SECONDS))
+            assertTrue(started.await(EVENT_WAIT_SECONDS, TimeUnit.SECONDS))
 
             parent.cancel(CancellationException("scope-cancelled"))
             val observed = try {
@@ -147,7 +186,7 @@ class RuntimeAdapterContractTest {
 
             assertEquals("scope-cancelled", observed.message)
             assertTrue(operation.isCancelled)
-            assertTrue(pending.isCancelled)
+            assertTransportCancelled(pending)
         } finally {
             scope.cancel()
             runtime.close()
@@ -181,7 +220,7 @@ class RuntimeAdapterContractTest {
         try {
             val operation = send(runtime)
             val deferred = async(start = CoroutineStart.UNDISPATCHED) { operation.awaitRepost() }
-            assertTrue(retryScheduled.await(2, TimeUnit.SECONDS))
+            assertTrue(retryScheduled.await(EVENT_WAIT_SECONDS, TimeUnit.SECONDS))
 
             deferred.cancel(CancellationException("backoff-cancelled"))
             try {
@@ -266,6 +305,18 @@ class RuntimeAdapterContractTest {
         EMPTY_MODEL,
         SendOptions.defaults(),
     )
+
+    /**
+     * The transport signals `started` from inside `send`, before the runtime has
+     * the future it returns. A cancel that lands in that gap finds no attempt to
+     * cancel; the worker cancels the future when it attaches it, on its own
+     * thread (RepostRuntime.attachAttempt). So the cancellation is awaited, not
+     * read at once: asserting `isCancelled` right after the cancel failed on a
+     * loaded runner (Test / JVM, 2026-09-20).
+     */
+    private fun assertTransportCancelled(pending: CompletableFuture<TransportResponse>) {
+        assertThrows(CancellationException::class.java) { pending.get(EVENT_WAIT_SECONDS, TimeUnit.SECONDS) }
+    }
 
     private fun assertCancelledOutcome(outcome: SendOutcome, attempts: Int, status: Int?) {
         assertEquals(RepostErrorCode.CANCELLED, outcome.errorCode)

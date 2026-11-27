@@ -54,13 +54,13 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.Platform.resolve("Linux", "amd64");
         byte[] executable = "native-engine".getBytes(StandardCharsets.UTF_8);
         Path archive = temporary.resolve("engine.zip");
-        Files.write(archive, archive("repost-schema-engine-0.9.0", executable, false));
+        Files.write(archive, archive("repost-schema-engine-0.11.3", executable, false));
         byte[] manifest = manifest(platform, executable, Files.readAllBytes(archive));
         KeyPair signingKey = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
         NativeEngineDistribution.PreparedEngine prepared = NativeEngineDistribution.prepare(
             platform,
-            "0.9.0",
+            "0.11.3",
             archive,
             manifest,
             sign(manifest, signingKey),
@@ -76,7 +76,7 @@ final class NativeEngineDistributionTest {
 
         NativeEngineDistribution.PreparedEngine repeated = NativeEngineDistribution.prepare(
             platform,
-            "0.9.0",
+            "0.11.3",
             archive,
             manifest,
             sign(manifest, signingKey),
@@ -94,14 +94,14 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.Platform.resolve("Linux", "amd64");
         byte[] executable = "shared-native-engine".getBytes(StandardCharsets.UTF_8);
         Path archive = temporary.resolve("shared-engine.zip");
-        Files.write(archive, archive("repost-schema-engine-0.9.0", executable, false));
+        Files.write(archive, archive("repost-schema-engine-0.11.3", executable, false));
         byte[] manifest = manifest(platform, executable, Files.readAllBytes(archive));
         KeyPair signingKey = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
         NativeEngineArtifacts.Prepared prepared = NativeEngineArtifacts.prepare(
             "Linux",
             "amd64",
-            "0.9.0",
+            "0.11.3",
             archive,
             manifest,
             sign(manifest, signingKey),
@@ -119,7 +119,7 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.Platform.resolve("Linux", "amd64");
         byte[] executable = "native-engine".getBytes(StandardCharsets.UTF_8);
         Path archive = temporary.resolve("rotated-key.zip");
-        Files.write(archive, archive("repost-schema-engine-0.9.0", executable, false));
+        Files.write(archive, archive("repost-schema-engine-0.11.3", executable, false));
         byte[] manifest = manifest(platform, executable, Files.readAllBytes(archive));
         KeyPair signingKey = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         PublicKey retiredAlgorithm = new PublicKey() {
@@ -141,7 +141,7 @@ final class NativeEngineDistributionTest {
 
         NativeEngineDistribution.PreparedEngine prepared = NativeEngineDistribution.prepare(
             platform,
-            "0.9.0",
+            "0.11.3",
             archive,
             manifest,
             sign(manifest, signingKey),
@@ -161,7 +161,7 @@ final class NativeEngineDistributionTest {
         KeyPair wrongKey = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
         Path validArchive = temporary.resolve("valid.zip");
-        Files.write(validArchive, archive("repost-schema-engine-0.9.0", executable, false));
+        Files.write(validArchive, archive("repost-schema-engine-0.11.3", executable, false));
         byte[] validManifest = manifest(platform, executable, Files.readAllBytes(validArchive));
         assertRejected(platform, validArchive, validManifest, sign(validManifest, wrongKey), signingKey);
 
@@ -171,11 +171,11 @@ final class NativeEngineDistributionTest {
         assertRejected(platform, validArchive, wrongTriple, sign(wrongTriple, signingKey), signingKey);
 
         Path extraArchive = temporary.resolve("extra.zip");
-        Files.write(extraArchive, archive("repost-schema-engine-0.9.0", executable, true));
+        Files.write(extraArchive, archive("repost-schema-engine-0.11.3", executable, true));
         byte[] extraManifest = manifest(platform, executable, Files.readAllBytes(extraArchive));
         assertRejected(platform, extraArchive, extraManifest, sign(extraManifest, signingKey), signingKey);
 
-        assertFalse(Files.exists(temporary.resolve("rejected-cache/0.9.0/linux-x86_64")));
+        assertFalse(Files.exists(temporary.resolve("rejected-cache/0.11.3/linux-x86_64")));
     }
 
     @Test
@@ -184,7 +184,7 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.Platform.resolve("Linux", "amd64");
         byte[] executable = "native-engine".getBytes(StandardCharsets.UTF_8);
         Path archive = temporary.resolve("parallel.zip");
-        Files.write(archive, archive("repost-schema-engine-0.9.0", executable, false));
+        Files.write(archive, archive("repost-schema-engine-0.11.3", executable, false));
         byte[] manifest = manifest(platform, executable, Files.readAllBytes(archive));
         KeyPair signingKey = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         byte[] signature = sign(manifest, signingKey);
@@ -196,7 +196,7 @@ final class NativeEngineDistributionTest {
                 start.await();
                 return NativeEngineDistribution.prepare(
                     platform,
-                    "0.9.0",
+                    "0.11.3",
                     archive,
                     manifest,
                     signature,
@@ -220,14 +220,14 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.Platform.resolve("Linux", "amd64");
         byte[] executable = "native-engine".getBytes(StandardCharsets.UTF_8);
         Path archive = temporary.resolve("linked-cache.zip");
-        Files.write(archive, archive("repost-schema-engine-0.9.0", executable, false));
+        Files.write(archive, archive("repost-schema-engine-0.11.3", executable, false));
         byte[] manifest = manifest(platform, executable, Files.readAllBytes(archive));
         KeyPair signingKey = KeyPairGenerator.getInstance("RSA").generateKeyPair();
         byte[] signature = sign(manifest, signingKey);
         Path trustedCache = temporary.resolve("trusted-cache");
         Path prepared = NativeEngineDistribution.prepare(
             platform,
-            "0.9.0",
+            "0.11.3",
             archive,
             manifest,
             signature,
@@ -235,7 +235,7 @@ final class NativeEngineDistributionTest {
             trustedCache
         ).executable();
         Path linkedCache = temporary.resolve("linked-cache-root");
-        Path versionRoot = linkedCache.resolve("0.9.0");
+        Path versionRoot = linkedCache.resolve("0.11.3");
         Files.createDirectories(versionRoot);
         Files.createSymbolicLink(versionRoot.resolve("linux-x86_64"), prepared.getParent());
 
@@ -243,7 +243,7 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.DistributionException.class,
             () -> NativeEngineDistribution.prepare(
                 platform,
-                "0.9.0",
+                "0.11.3",
                 archive,
                 manifest,
                 signature,
@@ -264,7 +264,7 @@ final class NativeEngineDistributionTest {
             NativeEngineDistribution.DistributionException.class,
             () -> NativeEngineDistribution.prepare(
                 platform,
-                "0.9.0",
+                "0.11.3",
                 archive,
                 manifest,
                 signature,
@@ -313,7 +313,7 @@ final class NativeEngineDistributionTest {
         byte[] executable,
         byte[] archive
     ) {
-        String json = "{\"formatVersion\":1,\"engineVersion\":\"0.9.0\",\"archives\":[{"
+        String json = "{\"formatVersion\":1,\"engineVersion\":\"0.11.3\",\"archives\":[{"
             + "\"classifier\":\"" + platform.classifier() + "\","
             + "\"os\":\"" + platform.os() + "\","
             + "\"architecture\":\"" + platform.architecture() + "\","

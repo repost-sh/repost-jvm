@@ -70,7 +70,7 @@ public final class RepostHelpMojo extends AbstractMojo {
             "  resourceOutputDirectory=${project.build.directory}/generated-resources/repost/<generator-id>\n" +
             "  environmentInputs={} (declare as <environmentInputs><NAME>value</NAME></environmentInputs>)\n" +
             "  integration=AUTO (accepted: AUTO, NONE, SPRING_BOOT, CDI)\n" +
-            "  engineVersion=0.9.0\n" +
+            "  engineVersion=0.11.3\n" +
             "  executionTimeout=PT5M\n" +
             "  checkAgainst=(unset)\n\n" +
             "Environment inputs:\n" +

@@ -47,7 +47,10 @@ final class BoundedApacheResponseConsumer
             complete(InputStream.nullInputStream());
             return;
         }
-        entityConsumer = response.getCode() >= 200 && response.getCode() <= 299
+        // A 409 is read like an accepted body: on the Send log shape a
+        // duplicate idempotency key answers 409 with the original message id.
+        int code = response.getCode();
+        entityConsumer = (code >= 200 && code <= 299) || code == 409
                 ? successConsumer : discardConsumer;
         entityConsumer.streamStart(entityDetails, new FutureCallback<InputStream>() {
             @Override

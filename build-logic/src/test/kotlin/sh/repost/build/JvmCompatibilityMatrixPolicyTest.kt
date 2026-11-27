@@ -6,42 +6,6 @@ import org.junit.jupiter.api.Test
 
 class JvmCompatibilityMatrixPolicyTest {
     @Test
-    fun `selects only the approved Gradle and paired Kotlin execution lanes`() {
-        val selection = JvmCompatibilityMatrixPolicy.gradleExecutionMatrix(
-            """
-            [build_tools]
-            gradle_wrapper = "8.12.1"
-            gradle_current_8 = "8.14.5"
-            gradle_current_9 = "9.6.0"
-            gradle_kotlin_current = "9.5.0"
-
-            [[paired_kotlin_gradle]]
-            kotlin = "2.1.21"
-            gradle = "8.12.1"
-
-            [[paired_kotlin_gradle]]
-            kotlin = "2.4.0"
-            gradle = "9.5.0"
-            """.trimIndent(),
-        )
-
-        assertEquals(listOf("8.12.1", "8.14.5", "9.6.0"), selection.javaGradle)
-        assertEquals(
-            listOf(
-                JvmCompatibilityMatrixPolicy.KotlinGradlePair("2.1.21", "8.12.1"),
-                JvmCompatibilityMatrixPolicy.KotlinGradlePair("2.4.0", "9.5.0"),
-            ),
-            selection.kotlinGradle,
-        )
-        assertEquals(
-            "java_gradle=[\"8.12.1\",\"8.14.5\",\"9.6.0\"]\n" +
-                "kotlin_gradle=[{\"kotlin\":\"2.1.21\",\"gradle\":\"8.12.1\"}," +
-                "{\"kotlin\":\"2.4.0\",\"gradle\":\"9.5.0\"}]",
-            selection.githubOutputs(),
-        )
-    }
-
-    @Test
     fun `rejects deferred adapters and broad certification surfaces`() {
         val violations = JvmCompatibilityMatrixPolicy.violations(
             """

@@ -19,7 +19,7 @@ final class RepostHelpMojoTest {
         assertTrue(help.contains("schemaMode=GENERATE (accepted: GENERATE, AGGREGATE_ONLY)"));
         assertTrue(help.contains("environmentInputs={} (declare as <environmentInputs><NAME>value</NAME>"));
         assertTrue(help.contains("integration=AUTO (accepted: AUTO, NONE, SPRING_BOOT, CDI)"));
-        assertTrue(help.contains("engineVersion=0.9.0"));
+        assertTrue(help.contains("engineVersion=0.11.3"));
         assertTrue(help.contains("executionTimeout=PT5M"));
         assertTrue(help.contains("checkAgainst=(unset)"));
         assertTrue(help.contains("declared dependency registry resources"));

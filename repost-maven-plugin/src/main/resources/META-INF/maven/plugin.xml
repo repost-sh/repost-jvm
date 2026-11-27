@@ -127,7 +127,7 @@
         <schemaFile implementation="java.io.File" default-value="${project.basedir}/repost/schema.repost">${repost.schemaFile}</schemaFile>
         <generators implementation="java.util.List">${repost.generators}</generators>
         <environmentInputs implementation="java.util.Map">${repost.environmentInputs}</environmentInputs>
-        <engineVersion implementation="java.lang.String" default-value="0.9.0">${repost.engineVersion}</engineVersion>
+        <engineVersion implementation="java.lang.String" default-value="0.11.3">${repost.engineVersion}</engineVersion>
         <executionTimeout implementation="java.lang.String" default-value="PT5M">${repost.executionTimeout}</executionTimeout>
         <schemaMode implementation="java.lang.String" default-value="GENERATE">${repost.schemaMode}</schemaMode>
         <integration implementation="java.lang.String" default-value="AUTO">${repost.integration}</integration>
@@ -258,7 +258,7 @@
         <schemaFile implementation="java.io.File" default-value="${project.basedir}/repost/schema.repost">${repost.schemaFile}</schemaFile>
         <generators implementation="java.util.List">${repost.generators}</generators>
         <environmentInputs implementation="java.util.Map">${repost.environmentInputs}</environmentInputs>
-        <engineVersion implementation="java.lang.String" default-value="0.9.0">${repost.engineVersion}</engineVersion>
+        <engineVersion implementation="java.lang.String" default-value="0.11.3">${repost.engineVersion}</engineVersion>
         <executionTimeout implementation="java.lang.String" default-value="PT5M">${repost.executionTimeout}</executionTimeout>
         <schemaMode implementation="java.lang.String" default-value="GENERATE">${repost.schemaMode}</schemaMode>
         <integration implementation="java.lang.String" default-value="AUTO">${repost.integration}</integration>

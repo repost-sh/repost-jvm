@@ -70,17 +70,17 @@ class NativeEngineReleasePolicyTest {
                 StandardCharsets.UTF_8,
             )
             Files.writeString(
-                archives.resolve("repost-schema-engine-0.9.0-${target.classifier}.zip"),
+                archives.resolve("repost-schema-engine-0.11.3-${target.classifier}.zip"),
                 "archive:${target.classifier}",
                 StandardCharsets.UTF_8,
             )
         }
 
-        val manifest = NativeEngineReleasePolicy.manifest("0.9.0", inputs, archives)
+        val manifest = NativeEngineReleasePolicy.manifest("0.11.3", inputs, archives)
 
         assertTrue(manifest.endsWith("\n"))
         assertEquals(5, Regex("\\\"classifier\\\"").findAll(manifest).count())
-        assertTrue(manifest.startsWith("{\"formatVersion\":1,\"engineVersion\":\"0.9.0\",\"archives\":["))
+        assertTrue(manifest.startsWith("{\"formatVersion\":1,\"engineVersion\":\"0.11.3\",\"archives\":["))
         assertTrue(manifest.contains("\"rustTarget\":\"x86_64-unknown-linux-musl\""))
         assertTrue(manifest.contains("\"libcStrategy\":\"static-musl\""))
         assertTrue(manifest.contains(Regex("\"archiveSha256\":\"sha256:[0-9a-f]{64}\"")))
@@ -94,7 +94,7 @@ class NativeEngineReleasePolicyTest {
         Files.createDirectories(archives)
 
         val failure = assertThrows(IllegalArgumentException::class.java) {
-            NativeEngineReleasePolicy.manifest("0.9.0", inputs, archives)
+            NativeEngineReleasePolicy.manifest("0.11.3", inputs, archives)
         }
 
         assertTrue(failure.message!!.contains("linux-x86_64"))

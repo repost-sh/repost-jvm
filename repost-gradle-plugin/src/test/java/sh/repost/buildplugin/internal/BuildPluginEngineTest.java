@@ -55,7 +55,7 @@ final class BuildPluginEngineTest {
     @Test
     void rejectsGenerationResponseSkewAndUnexpectedOutputRoots() {
         for (String response : List.of(
-            validGenerationResponse().replace("\"engineVersion\":\"0.9.0\"", "\"engineVersion\":\"0.9.1\""),
+            validGenerationResponse().replace("\"engineVersion\":\"0.11.3\"", "\"engineVersion\":\"0.10.1\""),
             validGenerationResponse().replace("\"runtimeVersion\":\"1.0.0\"", "\"runtimeVersion\":\"2.0.0\""),
             validGenerationResponse().replace("/workspace/build/generated/java", "/remote/redirected/source")
         )) {
@@ -184,7 +184,7 @@ final class BuildPluginEngineTest {
         return new BuildPluginEngine.Request(
             Path.of("/opt/repost/repost-schema-engine"),
             "1.0.0",
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             "/workspace/repost/schema.repost",
             Collections.singletonList(new BuildPluginEngine.Generator(
@@ -206,7 +206,7 @@ final class BuildPluginEngineTest {
         return new BuildPluginEngine.Request(
             Path.of("/opt/repost/repost-schema-engine"),
             "1.0.0",
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             "/workspace/repost/schema.repost",
             Collections.singletonList(new BuildPluginEngine.Generator(
@@ -261,7 +261,7 @@ final class BuildPluginEngineTest {
         return "{\n" +
             "  \"formatVersion\": 2,\n" +
             "  \"language\": \"java\",\n" +
-            "  \"engineVersion\": \"0.9.0\",\n" +
+            "  \"engineVersion\": \"0.11.3\",\n" +
             "  \"generator\": \"javaSdk\",\n" +
             "  \"outputKind\": \"" + outputKind + "\",\n" +
             "  \"generatorId\": \"0123456789abcdef\",\n" +
@@ -299,12 +299,12 @@ final class BuildPluginEngineTest {
     }
 
     private static String validCapabilities() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2}";
     }
 
     private static String validGenerationResponse() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2,\"generators\":[{" +
             "\"generatorName\":\"javaSdk\",\"generatorId\":\"0123456789abcdef\"," +
             "\"sourceRoot\":\"/workspace/build/generated/java\"," +
@@ -314,7 +314,7 @@ final class BuildPluginEngineTest {
     }
 
     private static String errorGenerationResponse() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2," +
             "\"generators\":[],\"diagnostics\":[{\"severity\":\"ERROR\"," +
             "\"code\":\"TARGET_COLLISION\",\"message\":\"duplicate generated client FQCN; " +
@@ -322,7 +322,7 @@ final class BuildPluginEngineTest {
     }
 
     private static String generationResponse(Path source, Path resource, String sourceHash) {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2,\"generators\":[{" +
             "\"generatorName\":\"javaSdk\",\"generatorId\":\"0123456789abcdef\"," +
             "\"sourceRoot\":\"" + json(source) + "\"," +

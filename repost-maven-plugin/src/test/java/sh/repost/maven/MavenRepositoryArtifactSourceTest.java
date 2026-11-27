@@ -39,7 +39,7 @@ final class MavenRepositoryArtifactSourceTest {
         Path actual = source.resolve(new MavenNativeEngineResolver.Coordinate(
             "zip",
             "linux-x86_64",
-            "0.9.0"
+            "0.11.3"
         ));
 
         assertEquals(resolved, actual);
@@ -47,7 +47,7 @@ final class MavenRepositoryArtifactSourceTest {
         assertEquals("repost-schema-engine", captured.get().getArtifact().getArtifactId());
         assertEquals("zip", captured.get().getArtifact().getExtension());
         assertEquals("linux-x86_64", captured.get().getArtifact().getClassifier());
-        assertEquals("0.9.0", captured.get().getArtifact().getVersion());
+        assertEquals("0.11.3", captured.get().getArtifact().getVersion());
         assertEquals(
             temporaryDirectory.resolve("repository/.repost/native-engine"),
             source.cacheRoot()
@@ -71,13 +71,13 @@ final class MavenRepositoryArtifactSourceTest {
             () -> source.resolve(new MavenNativeEngineResolver.Coordinate(
                 "json",
                 "checksums",
-                "0.9.0"
+                "0.11.3"
             ))
         );
 
         assertEquals(
             "could not resolve native engine artifact " +
-                "sh.repost:repost-schema-engine:json:checksums:0.9.0 from the Maven cache while offline; " +
+                "sh.repost:repost-schema-engine:json:checksums:0.11.3 from the Maven cache while offline; " +
                 "run Maven online once to populate this coordinate",
             failure.getMessage()
         );

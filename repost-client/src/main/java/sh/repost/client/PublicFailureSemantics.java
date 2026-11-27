@@ -71,8 +71,11 @@ final class PublicFailureSemantics {
             RepostCauseCategory cause,
             int attempts,
             Integer status) {
+        // A 2xx, or the 409 that carries the original message id: the Send
+        // log shape's accepted idempotent replay (spec 2026-09-16 §9).
         require(reason == null && cause == null && attempts >= 1
-                        && status != null && status >= 200 && status <= 299,
+                        && status != null
+                        && ((status >= 200 && status <= 299) || status == 409),
                 "accepted outcome has inconsistent fields");
     }
 

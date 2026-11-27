@@ -104,6 +104,93 @@ final class ResponseParserContractTest {
         }
     }
 
+    @Test
+    void readsTheOriginalTimestampFromTheDuplicateAnswer() {
+        String[][] carried = {
+            {"\"2025-12-31T23:59:59.500Z\"", "2025-12-31T23:59:59.500Z"},
+            {"\"2025-12-31T23:59:59Z\"", "2025-12-31T23:59:59Z"},
+            {"\"2025-12-31T23:59:59.123456789+02:00\"", "2025-12-31T21:59:59.123456789Z"},
+        };
+        for (String[] pair : carried) {
+            TransportResponse response = TransportResponse.of(
+                    409,
+                    headers("application/json"),
+                    new ByteArrayInputStream(
+                            ("{\"error\":\"duplicate\",\"id\":\"msg_original\",\"timestamp\":" + pair[0] + "}")
+                                    .getBytes(UTF_8)));
+            try {
+                ResponseParser.Result parsed =
+                        ResponseParser.parseDuplicate(response, TYPE, CUSTOMER, TIMESTAMP);
+                SendResult result = parsed.getSendResult();
+                assertNotNull(result, pair[0]);
+                assertEquals("msg_original", result.getId());
+                assertEquals(Instant.parse(pair[1]), result.getTimestamp(), pair[0]);
+            } finally {
+                response.close();
+            }
+        }
+    }
+
+    @Test
+    void aStrayTimestampOnTheDuplicateAnswerKeepsTheEnvelopeTimestamp() {
+        for (String stray : Arrays.asList(
+                "\"not-a-time\"", "\"2025-13-01T00:00:00Z\"", "\"2025-02-30T00:00:00Z\"",
+                "\"2025-12-31T24:00:00Z\"", "\"2025-12-31 23:59:59Z\"", "\"\"", "17", "null",
+                "{\"iso\":\"2025-12-31T23:59:59Z\"}", "[]")) {
+            TransportResponse response = TransportResponse.of(
+                    409,
+                    headers("application/json"),
+                    new ByteArrayInputStream(
+                            ("{\"id\":\"msg_original\",\"timestamp\":" + stray + "}").getBytes(UTF_8)));
+            try {
+                ResponseParser.Result parsed =
+                        ResponseParser.parseDuplicate(response, TYPE, CUSTOMER, TIMESTAMP);
+                SendResult result = parsed.getSendResult();
+                assertNotNull(result, stray);
+                assertNull(parsed.getFailure(), stray);
+                assertEquals("msg_original", result.getId());
+                assertEquals(Instant.parse(TIMESTAMP), result.getTimestamp(), stray);
+            } finally {
+                response.close();
+            }
+        }
+    }
+
+    @Test
+    void readsTheDuplicateAnswerWithTheSentIdentity() {
+        TransportResponse response = TransportResponse.of(
+                409,
+                headers("application/json"),
+                new ByteArrayInputStream(
+                        "{\"error\":\"duplicate\",\"id\":\"msg_original\"}".getBytes(UTF_8)));
+        try {
+            ResponseParser.Result parsed =
+                    ResponseParser.parseDuplicate(response, TYPE, CUSTOMER, TIMESTAMP);
+            SendResult result = parsed.getSendResult();
+            assertNotNull(result);
+            assertEquals("msg_original", result.getId());
+            assertEquals(TYPE, result.getType());
+            assertEquals(CUSTOMER, result.getCustomerId());
+            assertEquals(Instant.parse(TIMESTAMP), result.getTimestamp());
+        } finally {
+            response.close();
+        }
+
+        for (String body : Arrays.asList(
+                "{\"error\":{\"code\":\"remote\"}}", "{\"id\":\"not-a-message\"}", "[{\"id\":\"msg_1\"}]")) {
+            TransportResponse conflict = TransportResponse.of(
+                    409, headers("application/json"), new ByteArrayInputStream(body.getBytes(UTF_8)));
+            try {
+                ResponseParser.Result parsed =
+                        ResponseParser.parseDuplicate(conflict, TYPE, CUSTOMER, TIMESTAMP);
+                assertNull(parsed.getSendResult(), body);
+                assertEquals(ResponseParser.Result.Failure.PROTOCOL, parsed.getFailure(), body);
+            } finally {
+                conflict.close();
+            }
+        }
+    }
+
     private static List<TransportHeaderField> headers(String contentType) {
         return Collections.singletonList(
                 TransportHeaderField.of("Content-Type", contentType));

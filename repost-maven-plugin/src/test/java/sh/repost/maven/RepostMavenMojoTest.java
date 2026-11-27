@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import sh.repost.buildplugin.internal.BuildPluginEngine;
@@ -50,15 +50,13 @@ final class RepostMavenMojoTest {
     @Test
     void kotlinGenerationRejectsEffectiveCompilerBaselineBelowTwoOne() throws Exception {
         MavenProject project = project();
-        java.util.Properties userProperties = new java.util.Properties();
-        userProperties.setProperty("kotlin.version", "2.0.21");
-        userProperties.setProperty("kotlin.compiler.languageVersion", "2.0");
-        userProperties.setProperty("kotlin.compiler.apiVersion", "2.0");
-        project.setProjectBuildingRequest(
-            new DefaultProjectBuildingRequest().setUserProperties(userProperties)
-        );
+        Map<String, String> userProperties = new LinkedHashMap<>();
+        userProperties.put("kotlin.version", "2.0.21");
+        userProperties.put("kotlin.compiler.languageVersion", "2.0");
+        userProperties.put("kotlin.compiler.apiVersion", "2.0");
         RepostGenerateMojo mojo = new RepostGenerateMojo();
         mojo.setProject(project);
+        mojo.setRepositorySession(new DefaultRepositorySystemSession().setUserProperties(userProperties));
 
         org.apache.maven.plugin.MojoExecutionException failure = assertThrows(
             org.apache.maven.plugin.MojoExecutionException.class,
@@ -258,7 +256,7 @@ final class RepostMavenMojoTest {
 
         mojo.execute();
 
-        assertEquals("0.9.0", requestedVersion.get());
+        assertEquals("0.11.3", requestedVersion.get());
         assertEquals("GENERATE", captured.get().getCheckMode());
     }
 

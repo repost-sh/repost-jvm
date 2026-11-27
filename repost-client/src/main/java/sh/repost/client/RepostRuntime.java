@@ -58,7 +58,8 @@ public final class RepostRuntime implements AutoCloseable {
             .withResolverStyle(ResolverStyle.STRICT)
             .withZone(ZoneOffset.UTC);
     private static final long CLOSE_BUDGET_NANOS = TimeUnit.SECONDS.toNanos(5L);
-    private static final long REQUEST_SERIALIZATION_WORKSPACE = Serializer.MAX_REQUEST_BYTES;
+    // The serialization workspace stays 1 MiB (shared weighted-budget contract) even though the publish request cap is Serializer.MAX_REQUEST_BYTES (256 KiB).
+    private static final long REQUEST_SERIALIZATION_WORKSPACE = 1_048_576L;
     private static final long RESPONSE_WORKSPACE = 1_048_576L;
     private static final long JSON_PARSER_SCRATCH_RESERVATION = 262_144L;
     private static final long INITIAL_BYTE_RESERVATION = REQUEST_SERIALIZATION_WORKSPACE
@@ -1379,6 +1380,14 @@ public final class RepostRuntime implements AutoCloseable {
             return;
         }
 
+        // Send log shape: a duplicate idempotency key answers 409 with the
+        // original message id, an accepted replay read with the 2xx limits.
+        // Any other 409 body keeps the conflict path below.
+        ResponseParser.Result duplicate = status == 409 && !invalidHeaders
+                ? ResponseParser.parseDuplicate(
+                        response, context.eventType, context.customerId, context.timestamp)
+                : null;
+
         boolean responseOwned =
                 context.settlement.releaseResponse(attemptGeneration, response);
         closeResponseSafely(response);
@@ -1386,6 +1395,27 @@ public final class RepostRuntime implements AutoCloseable {
             return;
         }
         if (!context.settlement.finishAttempt(attemptGeneration)) {
+            return;
+        }
+
+        if (duplicate != null && duplicate.getSendResult() != null) {
+            context.unresolved = true;
+            context.settlement.recordEvidence(
+                    context.attemptCount, context.idempotencyKey, true, status);
+            context.settlement.succeed(
+                    duplicate.getSendResult(),
+                    SendOutcome.accepted(
+                            context.settlement.operationId(),
+                            context.attemptCount,
+                            context.idempotencyKey,
+                            status));
+            return;
+        }
+        if (duplicate != null && duplicate.getFailure() == ResponseParser.Result.Failure.LIMIT) {
+            context.unresolved = true;
+            context.settlement.recordEvidence(
+                    context.attemptCount, context.idempotencyKey, true, status);
+            failHttp(context, RepostErrorCode.RESPONSE_TOO_LARGE, DeliveryState.POSSIBLY_SENT, status, false);
             return;
         }
 

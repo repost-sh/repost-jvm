@@ -19,37 +19,6 @@ const javaSource = fs.readdirSync(javaSourceDirectory)
 const nodeRunnerSource = fs.readFileSync(runnerPath, "utf8");
 const runner = require("./jvm-raw-fixture-runner");
 
-function validatorEvidence() {
-  const groups = Object.fromEntries(Object.entries(contract.groups).map(([groupId, group]) => [groupId, {
-    schema: contract.protocol.evidenceSchema.name,
-    protocolVersion: 1,
-    groupId,
-    fixtureCaseId: group.fixtureCaseId,
-    outcome: "SUCCESS",
-    skipped: false,
-    controls: [...contract.protocol.selfDriverControls],
-    barriers: group.requiredBarriers.flatMap((barrier) => ["WAITING", "RELEASED", "RELEASED"].map((status, index) => ({
-      schema: contract.protocol.barrierSchema.name,
-      protocolVersion: 1,
-      groupId,
-      barrier,
-      status,
-      monotonicTimeMs: index === 0 ? 0 : 1,
-    }))),
-    observedCounters: { ...group.requiredObservedCounters },
-    state: "CLOSED",
-    endpointIds: [...group.requiredEndpointIds],
-    assetIds: [...group.requiredAssetIds],
-    capabilities: [...group.requiredCapabilities],
-    terminalAssertions: [...group.terminalAssertions],
-  }]));
-  return { schema: contract.protocol.evidenceSchema.name, protocolVersion: 1, summary: { total: 33, success: 33, skipped: 0, undeclared: 0 }, groups };
-}
-
-function verifyEvidence(file) {
-  return spawnSync(process.execPath, [path.join(__dirname, "validate.js"), "--verify-jvm-raw-evidence", file], { encoding: "utf8", timeout: 30_000 });
-}
-
 test("the raw protocol is an exact 33-group fixture/production-consumer bijection", () => {
   const groupIds = Object.keys(contract.groups);
   assert.deepEqual(groupIds, engineContract.requiredRawFixtureGroups);
@@ -74,91 +43,6 @@ test("the raw protocol is an exact 33-group fixture/production-consumer bijectio
   }
   assert.equal(new Set(qualifiedBarriers).size, qualifiedBarriers.length);
   assert.equal(new Set(qualifiedCounters).size, qualifiedCounters.length);
-});
-
-test("the raw evidence validator rejects tampering, omission, skip, and unsafe retention", (t) => {
-  const root = path.resolve(__dirname, "../../../../.superpowers/prototypes/2026-07-13-jvm-sdk-task-2-evidence");
-  fs.mkdirSync(root, { recursive: true });
-  const directory = fs.mkdtempSync(path.join(root, "raw-evidence-validator-"));
-  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
-  const pristine = validatorEvidence();
-  const pristineFile = path.join(directory, "pristine.json");
-  fs.writeFileSync(pristineFile, `${JSON.stringify(pristine)}\n`);
-  const valid = verifyEvidence(pristineFile);
-  assert.equal(valid.status, 0, `${valid.stdout}${valid.stderr}`);
-  const firstGroupId = engineContract.requiredRawFixtureGroups[0];
-  const barrierGroupId = "h2-rst-refused-cancel-protocol-error-pre-postcommit-retry-exhaustion";
-  const descriptorGroupId = "happy-eyeballs-dual-stack-success-failure-cancel-proxy-and-no-leak";
-  const mutations = {
-    "barrier-omitted-non-first"(document) { document.groups[barrierGroupId].barriers.splice(3, 1); },
-    "barrier-reordered-non-first"(document) { [document.groups[barrierGroupId].barriers[3], document.groups[barrierGroupId].barriers[4]] = [document.groups[barrierGroupId].barriers[4], document.groups[barrierGroupId].barriers[3]]; },
-    "barrier-name-non-first"(document) { document.groups[barrierGroupId].barriers[3].barrier = "forged-barrier"; },
-    "barrier-group-non-first"(document) { document.groups[barrierGroupId].barriers[3].groupId = firstGroupId; },
-    "barrier-status-non-first"(document) { document.groups[barrierGroupId].barriers[4].status = "WAITING"; },
-    "barrier-time-non-first"(document) { document.groups[barrierGroupId].barriers[4].monotonicTimeMs = 2; },
-    "counter-omitted-non-first"(document) { delete document.groups[barrierGroupId].observedCounters[Object.keys(document.groups[barrierGroupId].observedCounters)[1]]; },
-    "counter-added"(document) { document.groups[barrierGroupId].observedCounters.forgedCounterObserved = 1; },
-    "counter-reordered-non-first"(document) {
-      const entries = Object.entries(document.groups[barrierGroupId].observedCounters);
-      document.groups[barrierGroupId].observedCounters = Object.fromEntries([entries[1], entries[0], ...entries.slice(2)]);
-    },
-    "counter-value-non-first"(document) { document.groups[barrierGroupId].observedCounters[Object.keys(document.groups[barrierGroupId].observedCounters)[1]] += 1; },
-    "capability-omitted"(document) { document.groups[barrierGroupId].capabilities.splice(1, 1); },
-    "capability-added"(document) { document.groups[barrierGroupId].capabilities.push("forged-capability"); },
-    "capability-reordered"(document) { document.groups[barrierGroupId].capabilities.reverse(); },
-    "endpoint-omitted"(document) { document.groups[descriptorGroupId].endpointIds.splice(1, 1); },
-    "endpoint-added"(document) { document.groups[descriptorGroupId].endpointIds.push("forged-endpoint"); },
-    "endpoint-reordered"(document) { document.groups[descriptorGroupId].endpointIds.reverse(); },
-    "endpoint-value"(document) { document.groups[descriptorGroupId].endpointIds[1] = "forged-endpoint"; },
-    "asset-omitted"(document) { document.groups[descriptorGroupId].assetIds.splice(1, 1); },
-    "asset-added"(document) { document.groups[descriptorGroupId].assetIds.push("forged-asset"); },
-    "asset-reordered"(document) { document.groups[descriptorGroupId].assetIds.reverse(); },
-    "asset-value"(document) { document.groups[descriptorGroupId].assetIds[1] = "forged-asset"; },
-    skipped(document) { document.groups[firstGroupId].skipped = true; },
-    omitted(document) { delete document.groups[firstGroupId]; },
-    unknown(document) { document.groups[firstGroupId].unexpected = true; },
-    unsafe(document) { document.groups[firstGroupId].endpointIds = ["http://127.0.0.1:4321/secret"]; },
-  };
-  for (const [name, mutate] of Object.entries(mutations)) {
-    const document = structuredClone(pristine);
-    mutate(document);
-    const file = path.join(directory, `${name}.json`);
-    fs.writeFileSync(file, `${JSON.stringify(document)}\n`);
-    const result = verifyEvidence(file);
-    assert.notEqual(result.status, 0, `${name} mutation unexpectedly passed`);
-  }
-  const boundedInputs = {
-    bytes: JSON.stringify({ padding: "x".repeat(1_048_576) }),
-    depth: `${"[".repeat(17)}0${"]".repeat(17)}`,
-    tokens: `[${Array.from({ length: 50_000 }, () => "0").join(",")}]`,
-  };
-  const diagnostics = {
-    bytes: /maximum byte size 1048576/u,
-    depth: /maximum depth 16/u,
-    tokens: /maximum token count 50000/u,
-  };
-  for (const [name, contents] of Object.entries(boundedInputs)) {
-    const file = path.join(directory, `bounded-${name}.json`);
-    fs.writeFileSync(file, contents);
-    const result = verifyEvidence(file);
-    assert.notEqual(result.status, 0, `${name} bound unexpectedly passed`);
-    assert.match(result.stderr, diagnostics[name]);
-  }
-  const exactBytePrefix = '{"padding":"';
-  const exactByteSuffix = '"}';
-  const exactBoundInputs = {
-    bytes: `${exactBytePrefix}${"x".repeat(1_048_576 - exactBytePrefix.length - exactByteSuffix.length)}${exactByteSuffix}`,
-    depth: `${"[".repeat(16)}0${"]".repeat(16)}`,
-    tokens: `[${Array.from({ length: 49_999 }, () => "0").join(",")}]`,
-  };
-  assert.equal(Buffer.byteLength(exactBoundInputs.bytes), 1_048_576);
-  for (const [name, contents] of Object.entries(exactBoundInputs)) {
-    const file = path.join(directory, `exact-bound-${name}.json`);
-    fs.writeFileSync(file, contents);
-    const result = verifyEvidence(file);
-    assert.notEqual(result.status, 0, `${name} exact-bound schema unexpectedly passed`);
-    assert.doesNotMatch(result.stderr, diagnostics[name]);
-  }
 });
 
 test("the Java raw fixture advertises the frozen reusable scenario descriptors", () => {

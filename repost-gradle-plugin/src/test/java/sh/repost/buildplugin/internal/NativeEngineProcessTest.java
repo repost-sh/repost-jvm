@@ -35,7 +35,7 @@ final class NativeEngineProcessTest {
             starter
         );
 
-        assertEquals("0.9.0", response.getEngineVersion());
+        assertEquals("0.11.3", response.getEngineVersion());
         assertEquals(4, starter.command.size());
         assertEquals(
             Path.of("/opt/repost/repost-schema-engine").toAbsolutePath().normalize().toString(),
@@ -55,7 +55,7 @@ final class NativeEngineProcessTest {
 
         NativeEngineProcess.verifyCapabilities(
             Path.of("/opt/repost/repost-schema-engine"),
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             Duration.ofSeconds(5),
             starter
@@ -75,7 +75,7 @@ final class NativeEngineProcessTest {
     void rejectsEveryCapabilitiesVersionSkewBeforeGeneration() {
         for (String skewed : List.of(
             validCapabilities().replace("\"protocolVersion\":1", "\"protocolVersion\":2"),
-            validCapabilities().replace("\"engineVersion\":\"0.9.0\"", "\"engineVersion\":\"0.9.1\""),
+            validCapabilities().replace("\"engineVersion\":\"0.11.3\"", "\"engineVersion\":\"0.10.1\""),
             validCapabilities().replace("\"runtimeVersion\":\"1.0.0\"", "\"runtimeVersion\":\"2.0.0\""),
             validCapabilities().replace("\"descriptorVersion\":2", "\"descriptorVersion\":3")
         )) {
@@ -83,7 +83,7 @@ final class NativeEngineProcessTest {
                 NativeEngineProcess.EngineProcessException.class,
                 () -> NativeEngineProcess.verifyCapabilities(
                     Path.of("/opt/repost/repost-schema-engine"),
-                    "0.9.0",
+                    "0.11.3",
                     "1.0.0",
                     Duration.ofSeconds(5),
                     new CapabilityStarter(skewed, 0)
@@ -150,7 +150,7 @@ final class NativeEngineProcessTest {
     void deletesAnIncompleteRequestWhenCanonicalEncodingFails() throws java.io.IOException {
         GenerationProtocolV1.Request invalid = new GenerationProtocolV1.Request(
             "1.0.0",
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             "invalid-\ud800-path",
             requestGenerators(),
@@ -190,7 +190,7 @@ final class NativeEngineProcessTest {
     private static GenerationProtocolV1.Request request() {
         return new GenerationProtocolV1.Request(
             "1.0.0",
-            "0.9.0",
+            "0.11.3",
             "1.0.0",
             "/workspace/repost/schema.repost",
             requestGenerators(),
@@ -211,13 +211,13 @@ final class NativeEngineProcessTest {
     }
 
     private static String validResponse() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2," +
             "\"generators\":[],\"diagnostics\":[]}";
     }
 
     private static String errorResponse() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2," +
             "\"generators\":[],\"diagnostics\":[{\"severity\":\"ERROR\"," +
             "\"code\":\"TARGET_COLLISION\",\"message\":\"duplicate generated client FQCN; " +
@@ -225,7 +225,7 @@ final class NativeEngineProcessTest {
     }
 
     private static String validCapabilities() {
-        return "{\"protocolVersion\":1,\"engineVersion\":\"0.9.0\"," +
+        return "{\"protocolVersion\":1,\"engineVersion\":\"0.11.3\"," +
             "\"runtimeVersion\":\"1.0.0\",\"descriptorVersion\":2}";
     }
 

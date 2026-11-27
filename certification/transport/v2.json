@@ -47,7 +47,7 @@
     "retryBaseMs": 250,
     "retryMaxMs": 60000,
     "retryAfterMaxMs": 60000,
-    "requestLimitBytes": 1048576,
+    "requestLimitBytes": 262144,
     "responseCompressedLimitBytes": 1048576,
     "responseDecompressedLimitBytes": 1048576,
     "expansionRatioLimit": 100,
@@ -144,7 +144,7 @@
       "User-Agent",
       "Idempotency-Key"
     ],
-    "outboundFramingRule": "Content-Length is exactly one canonical decimal field equal to actual serialized body bytes 0 or 1..1048576, with no leading zero except the single value 0; never send Transfer-Encoding or chunked framing; H1 is exactly POST origin-form HTTP/1.1 followed by one Host containing the canonical authority with every explicit input port preserved including default ports, one Content-Length, the five outboundRequiredHeaderOrder fields in that order, then zero or one target-authorized traceparent, with no Connection, Expect, Upgrade, TE, duplicate, or extra field; H2 pseudo-fields are exactly :method POST, :scheme, :authority with the canonical authority, :path with the origin-form target in that order, followed by one Content-Length, the five required fields in order, then zero or one target-authorized traceparent, with no regular Host, connection-specific, TE, duplicate, or extra field",
+    "outboundFramingRule": "Content-Length is exactly one canonical decimal field equal to actual serialized body bytes 0 or 1..262144, with no leading zero except the single value 0; never send Transfer-Encoding or chunked framing; H1 is exactly POST origin-form HTTP/1.1 followed by one Host containing the canonical authority with every explicit input port preserved including default ports, one Content-Length, the five outboundRequiredHeaderOrder fields in that order, then zero or one target-authorized traceparent, with no Connection, Expect, Upgrade, TE, duplicate, or extra field; H2 pseudo-fields are exactly :method POST, :scheme, :authority with the canonical authority, :path with the origin-form target in that order, followed by one Content-Length, the five required fields in order, then zero or one target-authorized traceparent, with no regular Host, connection-specific, TE, duplicate, or extra field",
     "successResponseFieldOrder": [
       "id",
       "type",
@@ -1465,6 +1465,12 @@
         "wireBytes": 90,
         "decodedBytes": 90
       },
+      "duplicateIdentity": {
+        "kind": "base64",
+        "data": "eyJlcnJvciI6ImR1cGxpY2F0ZSIsImlkIjoibXNnXzEifQ==",
+        "wireBytes": 34,
+        "decodedBytes": 34
+      },
       "corruptGzipTrailer": {
         "kind": "base64",
         "data": "H4sIAAAAAAAAEzXLsQqAIBRG4Xf5Z42rQ4Nv0N7UImISDmZ0r0NE7x4GwRm/cyOvcCi8eQMFuY4Eh1h3OUOUgdMuUIiNpZZ0Tt3Gxv4HfcklsYRywMGSHTUZTWYmcl8DES14XpGKHJtoAAP/",
@@ -1684,7 +1690,7 @@
         "order-a": {
           "entries": [
             [
-              "é",
+              "\u00e9",
               3
             ],
             [
@@ -1710,7 +1716,7 @@
               1
             ],
             [
-              "é",
+              "\u00e9",
               3
             ]
           ],
@@ -1724,7 +1730,7 @@
           "syntheticInvalidKey": "unpaired-high-surrogate-after-json-parse"
         }
       },
-      "canonicalPayloadUtf8": "{\"raw\":{\"a\":1,\"z\":2,\"é\":3}}",
+      "canonicalPayloadUtf8": "{\"raw\":{\"a\":1,\"z\":2,\"\u00e9\":3}}",
       "canonicalPayloadSha256": "e4a769171ab246cfc8ea90134e7e24585a05754200e084852165038acfcf2402",
       "validKeyOrderRule": "unsigned UTF-8 byte lexicographic order, no Unicode normalization",
       "invalidKeyIssuePath": "$.raw[{*}]",
@@ -5303,9 +5309,9 @@
     },
     {
       "scenarioId": "concurrency-weighted-byte-contention-and-reuse",
-      "description": "One operation atomically reserves the portable 2359296-byte request, response, and parser-scratch set and converts request workspace to an exact retained 1 MiB request. A concurrent operation cannot acquire another complete set from the 4 MiB minimum and fails before observer/configuration/hooks/serialization/network with OVERLOADED/NOT_SENT and no partial byte acquisition. Releasing the held operation and then admitting an exact-1 MiB request plus exact-1 MiB response proves response/parser reservations have no post-publication rejection and all permits are reusable.",
+      "description": "Two operations each atomically reserve the portable 2359296-byte request, response, and parser-scratch set and convert their request workspace to an exact retained 256 KiB request (the publish cap), leaving 1048576 bytes of the 4 MiB minimum. A third concurrent operation cannot acquire another complete set and fails before observer/configuration/hooks/serialization/network with OVERLOADED/NOT_SENT and no partial byte acquisition. Releasing both held operations and then admitting an exact-256 KiB request plus exact-1 MiB response proves response/parser reservations have no post-publication rejection and all permits are reusable.",
       "runtime": {
-        "maxInFlight": 2,
+        "maxInFlight": 3,
         "maxBufferedBytes": 4194304
       },
       "operations": [
@@ -5317,13 +5323,38 @@
           "options": {
             "idempotencyKey": "idem_buffer_held"
           },
-          "requestBytes": 1048576,
+          "requestBytes": 262144,
           "fixtureScript": [
             {
               "action": "hold",
               "attempt": 1,
               "phase": "beforeRequestBytes",
               "barrier": "buffer-held"
+            },
+            {
+              "action": "respond",
+              "attempt": 1,
+              "status": 202,
+              "bodyKind": "valid",
+              "responseBytes": 104
+            }
+          ]
+        },
+        {
+          "operationId": "op-buffer-held-2",
+          "input": {
+            "profile": "valid"
+          },
+          "options": {
+            "idempotencyKey": "idem_buffer_held_2"
+          },
+          "requestBytes": 262144,
+          "fixtureScript": [
+            {
+              "action": "hold",
+              "attempt": 1,
+              "phase": "beforeRequestBytes",
+              "barrier": "buffer-held-2"
             },
             {
               "action": "respond",
@@ -5342,7 +5373,7 @@
           "options": {
             "idempotencyKey": "idem_buffer_overflow"
           },
-          "requestBytes": 1048576,
+          "requestBytes": 262144,
           "fixtureScript": [
             {
               "action": "respond",
@@ -5361,7 +5392,7 @@
           "options": {
             "idempotencyKey": "idem_buffer_probe"
           },
-          "requestBytes": 1048576,
+          "requestBytes": 262144,
           "fixtureScript": [
             {
               "action": "respond",
@@ -5382,6 +5413,15 @@
           "action": "awaitBarrier",
           "operationId": "op-buffer-held",
           "barrier": "buffer-held"
+        },
+        {
+          "action": "start",
+          "operationId": "op-buffer-held-2"
+        },
+        {
+          "action": "awaitBarrier",
+          "operationId": "op-buffer-held-2",
+          "barrier": "buffer-held-2"
         },
         {
           "action": "checkpoint",
@@ -5408,6 +5448,14 @@
           "operationId": "op-buffer-held"
         },
         {
+          "action": "release",
+          "barrier": "buffer-held-2"
+        },
+        {
+          "action": "awaitTerminal",
+          "operationId": "op-buffer-held-2"
+        },
+        {
           "action": "start",
           "operationId": "op-buffer-probe"
         },
@@ -5426,20 +5474,29 @@
           "operation:op-buffer-held:reservation.acquire:reserved=1",
           "operation:op-buffer-held:observer.start",
           "barrier:buffer-held:reached:operation=op-buffer-held:inFlight=1",
-          "checkpoint:bytes-retained:state=OPEN:inFlight=1:queuedWaiters=0",
-          "operation:op-buffer-overflow:permit.acquire:inFlight=2",
-          "operation:op-buffer-overflow:reservation.acquire:reserved=2",
-          "operation:op-buffer-overflow:permit.release:inFlight=1",
+          "operation:op-buffer-held-2:permit.acquire:inFlight=2",
+          "operation:op-buffer-held-2:reservation.acquire:reserved=2",
+          "operation:op-buffer-held-2:observer.start",
+          "barrier:buffer-held-2:reached:operation=op-buffer-held-2:inFlight=2",
+          "checkpoint:bytes-retained:state=OPEN:inFlight=2:queuedWaiters=0",
+          "operation:op-buffer-overflow:permit.acquire:inFlight=3",
+          "operation:op-buffer-overflow:reservation.acquire:reserved=3",
+          "operation:op-buffer-overflow:permit.release:inFlight=2",
           "operation:op-buffer-overflow:primary.complete:OVERLOADED:NOT_SENT",
           "operation:op-buffer-overflow:outcome.complete:OVERLOADED:NOT_SENT",
-          "operation:op-buffer-overflow:reservation.release:reserved=1",
+          "operation:op-buffer-overflow:reservation.release:reserved=2",
           "operation:op-buffer-overflow:terminal:OVERLOADED:NOT_SENT:attempts=0",
-          "checkpoint:byte-overflow-rejected:state=OPEN:inFlight=1:queuedWaiters=0",
-          "operation:op-buffer-held:permit.release:inFlight=0",
+          "checkpoint:byte-overflow-rejected:state=OPEN:inFlight=2:queuedWaiters=0",
+          "operation:op-buffer-held:permit.release:inFlight=1",
           "operation:op-buffer-held:primary.complete:OK:ACCEPTED",
           "operation:op-buffer-held:outcome.complete:OK:ACCEPTED",
-          "operation:op-buffer-held:reservation.release:reserved=0",
+          "operation:op-buffer-held:reservation.release:reserved=1",
           "operation:op-buffer-held:terminal:OK:ACCEPTED:attempts=1",
+          "operation:op-buffer-held-2:permit.release:inFlight=0",
+          "operation:op-buffer-held-2:primary.complete:OK:ACCEPTED",
+          "operation:op-buffer-held-2:outcome.complete:OK:ACCEPTED",
+          "operation:op-buffer-held-2:reservation.release:reserved=0",
+          "operation:op-buffer-held-2:terminal:OK:ACCEPTED:attempts=1",
           "operation:op-buffer-probe:permit.acquire:inFlight=1",
           "operation:op-buffer-probe:reservation.acquire:reserved=1",
           "operation:op-buffer-probe:observer.start",
@@ -5454,24 +5511,24 @@
           {
             "name": "bytes-retained",
             "state": "OPEN",
-            "inFlight": 1,
-            "completionReservations": 1,
+            "inFlight": 2,
+            "completionReservations": 2,
             "activeTerminalOperation": null,
             "queuedTerminalTasks": 0,
-            "currentBufferedBytes": 2359296,
+            "currentBufferedBytes": 3145728,
             "queuedWaiters": 0,
-            "totalPermitAcquires": 1,
+            "totalPermitAcquires": 2,
             "totalPermitRejects": 0,
             "totalPermitReleases": 0,
-            "totalByteAcquires": 3,
+            "totalByteAcquires": 6,
             "totalByteRejects": 0,
             "totalByteReleases": 0,
             "deadlineCallbacks": 0,
             "terminalDispatches": 0,
             "ghostWorkAttempts": 0,
             "diagnostics": {
-              "inFlightOperations": 1,
-              "bufferedBytes": 2359296,
+              "inFlightOperations": 2,
+              "bufferedBytes": 3145728,
               "concurrencyOverloadRejections": 0,
               "requestByteOverloadRejections": 0,
               "responseByteOverloadRejections": 0,
@@ -5487,24 +5544,24 @@
           {
             "name": "byte-overflow-rejected",
             "state": "OPEN",
-            "inFlight": 1,
-            "completionReservations": 1,
+            "inFlight": 2,
+            "completionReservations": 2,
             "activeTerminalOperation": null,
             "queuedTerminalTasks": 0,
-            "currentBufferedBytes": 2359296,
+            "currentBufferedBytes": 3145728,
             "queuedWaiters": 0,
-            "totalPermitAcquires": 2,
+            "totalPermitAcquires": 3,
             "totalPermitRejects": 0,
             "totalPermitReleases": 1,
-            "totalByteAcquires": 3,
+            "totalByteAcquires": 6,
             "totalByteRejects": 1,
             "totalByteReleases": 0,
             "deadlineCallbacks": 0,
             "terminalDispatches": 0,
             "ghostWorkAttempts": 0,
             "diagnostics": {
-              "inFlightOperations": 1,
-              "bufferedBytes": 2359296,
+              "inFlightOperations": 2,
+              "bufferedBytes": 3145728,
               "concurrencyOverloadRejections": 0,
               "requestByteOverloadRejections": 1,
               "responseByteOverloadRejections": 0,
@@ -5526,12 +5583,12 @@
             "queuedTerminalTasks": 0,
             "currentBufferedBytes": 0,
             "queuedWaiters": 0,
-            "totalPermitAcquires": 3,
+            "totalPermitAcquires": 4,
             "totalPermitRejects": 0,
-            "totalPermitReleases": 3,
-            "totalByteAcquires": 6,
+            "totalPermitReleases": 4,
+            "totalByteAcquires": 9,
             "totalByteRejects": 1,
-            "totalByteReleases": 6,
+            "totalByteReleases": 9,
             "deadlineCallbacks": 0,
             "terminalDispatches": 0,
             "ghostWorkAttempts": 0,
@@ -5554,6 +5611,33 @@
         "operations": [
           {
             "operationId": "op-buffer-held",
+            "code": "OK",
+            "delivery": "ACCEPTED",
+            "attemptCount": 1,
+            "completionRoute": "OPERATION_EXECUTION",
+            "sideEffects": {
+              "permitAcquires": 1,
+              "permitRejects": 0,
+              "permitReleases": 1,
+              "observerStarts": 1,
+              "configurationSnapshots": 1,
+              "credentialResolutions": 1,
+              "defaultSnapshots": 1,
+              "idempotencyGenerations": 0,
+              "serializations": 1,
+              "networkAttempts": 1,
+              "byteAcquires": 3,
+              "byteRejects": 0,
+              "byteReleases": 3,
+              "deadlineCallbacks": 0,
+              "terminalDispatches": 0,
+              "ghostWorkAttempts": 0,
+              "reservationAcquires": 1,
+              "reservationReleases": 1
+            }
+          },
+          {
+            "operationId": "op-buffer-held-2",
             "code": "OK",
             "delivery": "ACCEPTED",
             "attemptCount": 1,
@@ -5637,22 +5721,22 @@
         "finalRuntime": {
           "state": "OPEN",
           "inFlight": 0,
-          "maxObservedInFlight": 2,
+          "maxObservedInFlight": 3,
           "completionReservations": 0,
-          "maxObservedCompletionReservations": 2,
+          "maxObservedCompletionReservations": 3,
           "activeTerminalOperation": null,
           "queuedTerminalTasks": 0,
           "currentBufferedBytes": 0,
-          "maxObservedBufferedBytes": 2359296,
+          "maxObservedBufferedBytes": 3932160,
           "queuedWaiters": 0,
-          "totalPermitAcquires": 3,
+          "totalPermitAcquires": 4,
           "totalPermitRejects": 0,
-          "totalPermitReleases": 3,
-          "totalReservationAcquires": 3,
-          "totalReservationReleases": 3,
-          "totalByteAcquires": 6,
+          "totalPermitReleases": 4,
+          "totalReservationAcquires": 4,
+          "totalReservationReleases": 4,
+          "totalByteAcquires": 9,
           "totalByteRejects": 1,
-          "totalByteReleases": 6,
+          "totalByteReleases": 9,
           "deadlineCallbacks": 0,
           "terminalDispatches": 0,
           "ghostWorkAttempts": 0,
@@ -5675,9 +5759,9 @@
     },
     {
       "scenarioId": "concurrency-atomic-runtime-diagnostics-snapshots",
-      "description": "Execute this deterministic barrier schedule 1000 times: one atomic 2359296-byte portable request/response/parser acquisition, a second pre-side-effect full-set rejection, terminalization, and close are each sampled from one immutable RuntimeState; counters are monotonic and no snapshot may combine closed=true with nonzero in-flight or buffered bytes.",
+      "description": "Execute this deterministic barrier schedule 1000 times: two atomic 2359296-byte portable request/response/parser acquisitions each converted to an exact retained 256 KiB request (the publish cap), a third pre-side-effect full-set rejection, terminalization, and close are each observed through runtime diagnostics snapshots that never tear: in-flight and buffered bytes move together, overload counters never decrease, and a closed snapshot never reports retained resources.",
       "runtime": {
-        "maxInFlight": 2,
+        "maxInFlight": 3,
         "maxBufferedBytes": 4194304
       },
       "operations": [
@@ -5689,13 +5773,38 @@
           "options": {
             "idempotencyKey": "idem_snapshot_a"
           },
-          "requestBytes": 1048576,
+          "requestBytes": 262144,
           "fixtureScript": [
             {
               "action": "hold",
               "attempt": 1,
               "phase": "beforeRequestBytes",
               "barrier": "snapshot-a"
+            },
+            {
+              "action": "respond",
+              "attempt": 1,
+              "status": 202,
+              "bodyKind": "valid",
+              "responseBytes": 104
+            }
+          ]
+        },
+        {
+          "operationId": "op-snapshot-a2",
+          "input": {
+            "profile": "valid"
+          },
+          "options": {
+            "idempotencyKey": "idem_snapshot_a_2"
+          },
+          "requestBytes": 262144,
+          "fixtureScript": [
+            {
+              "action": "hold",
+              "attempt": 1,
+              "phase": "beforeRequestBytes",
+              "barrier": "snapshot-a2"
             },
             {
               "action": "respond",
@@ -5737,6 +5846,15 @@
           "barrier": "snapshot-a"
         },
         {
+          "action": "start",
+          "operationId": "op-snapshot-a2"
+        },
+        {
+          "action": "awaitBarrier",
+          "operationId": "op-snapshot-a2",
+          "barrier": "snapshot-a2"
+        },
+        {
           "action": "checkpoint",
           "name": "snapshot-one-acquired"
         },
@@ -5760,6 +5878,10 @@
           "operationId": "op-snapshot-a"
         },
         {
+          "action": "awaitTerminal",
+          "operationId": "op-snapshot-a2"
+        },
+        {
           "action": "checkpoint",
           "name": "snapshot-closed-drained"
         }
@@ -5770,21 +5892,30 @@
           "operation:op-snapshot-a:reservation.acquire:reserved=1",
           "operation:op-snapshot-a:observer.start",
           "barrier:snapshot-a:reached:operation=op-snapshot-a:inFlight=1",
-          "checkpoint:snapshot-one-acquired:state=OPEN:inFlight=1:queuedWaiters=0",
-          "operation:op-snapshot-reject:permit.acquire:inFlight=2",
-          "operation:op-snapshot-reject:reservation.acquire:reserved=2",
-          "operation:op-snapshot-reject:permit.release:inFlight=1",
+          "operation:op-snapshot-a2:permit.acquire:inFlight=2",
+          "operation:op-snapshot-a2:reservation.acquire:reserved=2",
+          "operation:op-snapshot-a2:observer.start",
+          "barrier:snapshot-a2:reached:operation=op-snapshot-a2:inFlight=2",
+          "checkpoint:snapshot-one-acquired:state=OPEN:inFlight=2:queuedWaiters=0",
+          "operation:op-snapshot-reject:permit.acquire:inFlight=3",
+          "operation:op-snapshot-reject:reservation.acquire:reserved=3",
+          "operation:op-snapshot-reject:permit.release:inFlight=2",
           "operation:op-snapshot-reject:primary.complete:OVERLOADED:NOT_SENT",
           "operation:op-snapshot-reject:outcome.complete:OVERLOADED:NOT_SENT",
-          "operation:op-snapshot-reject:reservation.release:reserved=1",
+          "operation:op-snapshot-reject:reservation.release:reserved=2",
           "operation:op-snapshot-reject:terminal:OVERLOADED:NOT_SENT:attempts=0",
-          "checkpoint:snapshot-byte-rejected:state=OPEN:inFlight=1:queuedWaiters=0",
-          "runtime:close.begin:inFlight=1",
-          "operation:op-snapshot-a:permit.release:inFlight=0",
+          "checkpoint:snapshot-byte-rejected:state=OPEN:inFlight=2:queuedWaiters=0",
+          "runtime:close.begin:inFlight=2",
+          "operation:op-snapshot-a:permit.release:inFlight=1",
           "operation:op-snapshot-a:primary.complete:CLOSED:NOT_SENT",
           "operation:op-snapshot-a:outcome.complete:CLOSED:NOT_SENT",
-          "operation:op-snapshot-a:reservation.release:reserved=0",
+          "operation:op-snapshot-a:reservation.release:reserved=1",
           "operation:op-snapshot-a:terminal:CLOSED:NOT_SENT:attempts=1",
+          "operation:op-snapshot-a2:permit.release:inFlight=0",
+          "operation:op-snapshot-a2:primary.complete:CLOSED:NOT_SENT",
+          "operation:op-snapshot-a2:outcome.complete:CLOSED:NOT_SENT",
+          "operation:op-snapshot-a2:reservation.release:reserved=0",
+          "operation:op-snapshot-a2:terminal:CLOSED:NOT_SENT:attempts=1",
           "runtime:close.end:inFlight=0",
           "checkpoint:snapshot-closed-drained:state=CLOSED:inFlight=0:queuedWaiters=0"
         ],
@@ -5792,24 +5923,24 @@
           {
             "name": "snapshot-one-acquired",
             "state": "OPEN",
-            "inFlight": 1,
-            "completionReservations": 1,
+            "inFlight": 2,
+            "completionReservations": 2,
             "activeTerminalOperation": null,
             "queuedTerminalTasks": 0,
-            "currentBufferedBytes": 2359296,
+            "currentBufferedBytes": 3145728,
             "queuedWaiters": 0,
-            "totalPermitAcquires": 1,
+            "totalPermitAcquires": 2,
             "totalPermitRejects": 0,
             "totalPermitReleases": 0,
-            "totalByteAcquires": 3,
+            "totalByteAcquires": 6,
             "totalByteRejects": 0,
             "totalByteReleases": 0,
             "deadlineCallbacks": 0,
             "terminalDispatches": 0,
             "ghostWorkAttempts": 0,
             "diagnostics": {
-              "inFlightOperations": 1,
-              "bufferedBytes": 2359296,
+              "inFlightOperations": 2,
+              "bufferedBytes": 3145728,
               "concurrencyOverloadRejections": 0,
               "requestByteOverloadRejections": 0,
               "responseByteOverloadRejections": 0,
@@ -5825,24 +5956,24 @@
           {
             "name": "snapshot-byte-rejected",
             "state": "OPEN",
-            "inFlight": 1,
-            "completionReservations": 1,
+            "inFlight": 2,
+            "completionReservations": 2,
             "activeTerminalOperation": null,
             "queuedTerminalTasks": 0,
-            "currentBufferedBytes": 2359296,
+            "currentBufferedBytes": 3145728,
             "queuedWaiters": 0,
-            "totalPermitAcquires": 2,
+            "totalPermitAcquires": 3,
             "totalPermitRejects": 0,
             "totalPermitReleases": 1,
-            "totalByteAcquires": 3,
+            "totalByteAcquires": 6,
             "totalByteRejects": 1,
             "totalByteReleases": 0,
             "deadlineCallbacks": 0,
             "terminalDispatches": 0,
             "ghostWorkAttempts": 0,
             "diagnostics": {
-              "inFlightOperations": 1,
-              "bufferedBytes": 2359296,
+              "inFlightOperations": 2,
+              "bufferedBytes": 3145728,
               "concurrencyOverloadRejections": 0,
               "requestByteOverloadRejections": 1,
               "responseByteOverloadRejections": 0,
@@ -5864,14 +5995,14 @@
             "queuedTerminalTasks": 0,
             "currentBufferedBytes": 0,
             "queuedWaiters": 0,
-            "totalPermitAcquires": 2,
+            "totalPermitAcquires": 3,
             "totalPermitRejects": 0,
-            "totalPermitReleases": 2,
-            "totalByteAcquires": 3,
+            "totalPermitReleases": 3,
+            "totalByteAcquires": 6,
             "totalByteRejects": 1,
-            "totalByteReleases": 3,
+            "totalByteReleases": 6,
             "deadlineCallbacks": 0,
-            "terminalDispatches": 1,
+            "terminalDispatches": 2,
             "ghostWorkAttempts": 0,
             "diagnostics": {
               "inFlightOperations": 0,
@@ -5892,6 +6023,33 @@
         "operations": [
           {
             "operationId": "op-snapshot-a",
+            "code": "CLOSED",
+            "delivery": "NOT_SENT",
+            "attemptCount": 1,
+            "completionRoute": "TERMINAL_DISPATCHER",
+            "sideEffects": {
+              "permitAcquires": 1,
+              "permitRejects": 0,
+              "permitReleases": 1,
+              "observerStarts": 1,
+              "configurationSnapshots": 1,
+              "credentialResolutions": 1,
+              "defaultSnapshots": 1,
+              "idempotencyGenerations": 0,
+              "serializations": 1,
+              "networkAttempts": 1,
+              "byteAcquires": 3,
+              "byteRejects": 0,
+              "byteReleases": 3,
+              "deadlineCallbacks": 0,
+              "terminalDispatches": 1,
+              "ghostWorkAttempts": 0,
+              "reservationAcquires": 1,
+              "reservationReleases": 1
+            }
+          },
+          {
+            "operationId": "op-snapshot-a2",
             "code": "CLOSED",
             "delivery": "NOT_SENT",
             "attemptCount": 1,
@@ -5948,24 +6106,24 @@
         "finalRuntime": {
           "state": "CLOSED",
           "inFlight": 0,
-          "maxObservedInFlight": 2,
+          "maxObservedInFlight": 3,
           "completionReservations": 0,
-          "maxObservedCompletionReservations": 2,
+          "maxObservedCompletionReservations": 3,
           "activeTerminalOperation": null,
           "queuedTerminalTasks": 0,
           "currentBufferedBytes": 0,
-          "maxObservedBufferedBytes": 2359296,
+          "maxObservedBufferedBytes": 3932160,
           "queuedWaiters": 0,
-          "totalPermitAcquires": 2,
+          "totalPermitAcquires": 3,
           "totalPermitRejects": 0,
-          "totalPermitReleases": 2,
-          "totalReservationAcquires": 2,
-          "totalReservationReleases": 2,
-          "totalByteAcquires": 3,
+          "totalPermitReleases": 3,
+          "totalReservationAcquires": 3,
+          "totalReservationReleases": 3,
+          "totalByteAcquires": 6,
           "totalByteRejects": 1,
-          "totalByteReleases": 3,
+          "totalByteReleases": 6,
           "deadlineCallbacks": 0,
-          "terminalDispatches": 1,
+          "terminalDispatches": 2,
           "ghostWorkAttempts": 0,
           "diagnostics": {
             "inFlightOperations": 0,
@@ -6854,6 +7012,7 @@
     "network-h2-client-cancellation",
     "network-h2-goaway-metadata",
     "network-http1-fallback",
+    "idempotency-http-409-duplicate-accepted",
     "concurrency-immediate-success-release-and-probe",
     "concurrency-retry-success-release-and-probe",
     "concurrency-exact-capacity-and-overflow",
@@ -19772,7 +19931,7 @@
         "profile": "valid"
       },
       "options": {
-        "idempotencyKey": "idem_é"
+        "idempotencyKey": "idem_\u00e9"
       },
       "script": [
         {
@@ -21898,13 +22057,13 @@
     {
       "caseId": "response-request-cap-inclusive",
       "category": "response",
-      "description": "A serialized request of exactly 1 MiB is sent.",
+      "description": "A serialized request of exactly 256 KiB is sent.",
       "input": {
         "profile": "valid",
         "send": {
           "payload": {
             "$bytes": {
-              "serializedRequestBytes": 1048576
+              "serializedRequestBytes": 262144
             }
           }
         }
@@ -21964,7 +22123,7 @@
         "error": null,
         "delivery": "ACCEPTED",
         "byteTrace": [
-          "request:1048576:accepted",
+          "request:262144:accepted",
           "response-wire:104:accepted",
           "response-decoded:104:accepted"
         ],
@@ -21972,7 +22131,7 @@
         "fixtureTrace": [
           "fixture:attempt:1:accepted",
           "fixture:attempt:1:idempotency:idem_request_cap",
-          "fixture:attempt:1:request-bytes:1048576",
+          "fixture:attempt:1:request-bytes:262144",
           "fixture:attempt:1:response-bytes:104"
         ],
         "result": {
@@ -22031,7 +22190,7 @@
         "send": {
           "payload": {
             "$bytes": {
-              "serializedRequestBytes": 1048577
+              "serializedRequestBytes": 262145
             }
           }
         }
@@ -22094,7 +22253,7 @@
         },
         "delivery": "NOT_SENT",
         "byteTrace": [
-          "request:1048577:rejected"
+          "request:262145:rejected"
         ],
         "redactionTrace": [],
         "fixtureTrace": [],
@@ -30327,7 +30486,7 @@
         "profile": "valid"
       },
       "options": {
-        "userAgent": "badvalue"
+        "userAgent": "bad\u007fvalue"
       },
       "script": [],
       "expected": {
@@ -30405,7 +30564,7 @@
         "profile": "valid"
       },
       "options": {
-        "userAgent": "bad-é"
+        "userAgent": "bad-\u00e9"
       },
       "script": [],
       "expected": {
@@ -30690,7 +30849,7 @@
         "profile": "valid"
       },
       "options": {
-        "apiKey": "clé"
+        "apiKey": "cl\u00e9"
       },
       "script": [],
       "expected": {
@@ -38373,11 +38532,11 @@
         },
         "delivery": "NOT_SENT",
         "byteTrace": [
-          "request:1048577:rejected"
+          "request:262145:rejected"
         ],
         "redactionTrace": [],
         "fixtureTrace": [
-          "fixture:serialization-buffer-peak:1048577"
+          "fixture:serialization-buffer-peak:262145"
         ],
         "result": null,
         "legacyBody": {
@@ -39194,13 +39353,13 @@
     {
       "caseId": "configuration-buffer-budget-minimum-request-response-headroom",
       "category": "configuration",
-      "description": "The 4 MiB minimum weighted runtime budget atomically admits a retained exact-1 MiB request, an exact-1 MiB valid padded-JSON response workspace, and the distinct 256 KiB parser-scratch reservation without self-starvation, hidden acquisition, or leaked permits.",
+      "description": "The 4 MiB minimum weighted runtime budget atomically admits a retained exact-256 KiB request (the publish cap), an exact-1 MiB valid padded-JSON response workspace, and the distinct 256 KiB parser-scratch reservation without self-starvation, hidden acquisition, or leaked permits.",
       "input": {
         "profile": "valid",
         "send": {
           "payload": {
             "$bytes": {
-              "serializedRequestBytes": 1048576
+              "serializedRequestBytes": 262144
             }
           }
         }
@@ -39263,7 +39422,7 @@
         "error": null,
         "delivery": "ACCEPTED",
         "byteTrace": [
-          "request:1048576:accepted",
+          "request:262144:accepted",
           "response-wire:1048576:accepted",
           "response-decoded:1048576:accepted"
         ],
@@ -39271,9 +39430,9 @@
         "fixtureTrace": [
           "fixture:attempt:1:accepted",
           "fixture:attempt:1:idempotency:idem_buffer_minimum_headroom",
-          "fixture:attempt:1:request-bytes:1048576",
+          "fixture:attempt:1:request-bytes:262144",
           "fixture:attempt:1:response-bytes:1048576",
-          "fixture:serialization-buffer-peak:1048576"
+          "fixture:serialization-buffer-peak:262144"
         ],
         "result": {
           "id": "msg_1",
@@ -45299,7 +45458,7 @@
           "attempt": 1,
           "status": 202,
           "headers": {
-            "content-type": "application/jſon"
+            "content-type": "application/j\u017fon"
           },
           "body": {
             "asset": "validIdentity"
@@ -45442,7 +45601,7 @@
           "attempt": 1,
           "status": 202,
           "headers": {
-            "content-type": "application/json; charſet=utf-8"
+            "content-type": "application/json; char\u017fet=utf-8"
           },
           "body": {
             "asset": "validIdentity"
@@ -45585,7 +45744,7 @@
           "attempt": 1,
           "status": 202,
           "headers": {
-            "content-type": "application/json; charset=utK-8"
+            "content-type": "application/json; charset=ut\u212a-8"
           },
           "body": {
             "asset": "validIdentity"
@@ -45729,7 +45888,7 @@
           "status": 202,
           "headers": {
             "content-type": "application/json",
-            "content-encoding": "gziſ"
+            "content-encoding": "gzi\u017f"
           },
           "body": {
             "asset": "validIdentity"
@@ -45874,7 +46033,7 @@
           "status": 202,
           "headers": {
             "content-type": "application/json",
-            "x-repoſt": "value"
+            "x-repo\u017ft": "value"
           },
           "body": {
             "asset": "validIdentity"
@@ -48834,7 +48993,7 @@
           "status": 202,
           "headers": {
             "content-type": "application/json",
-            "x-repost": "value"
+            "x-repost\u007f": "value"
           },
           "body": {
             "asset": "validIdentity"
@@ -49704,7 +49863,7 @@
           "status": 202,
           "headers": {
             "content-type": "application/json",
-            "x-repost": "value"
+            "x-repost": "value\u007f"
           },
           "body": {
             "asset": "validIdentity"
@@ -53732,7 +53891,7 @@
         "profile": "valid"
       },
       "options": {
-        "baseUrl": "https://example.invalid/café"
+        "baseUrl": "https://example.invalid/caf\u00e9"
       },
       "script": [],
       "expected": {
@@ -60549,6 +60708,130 @@
         ]
       },
       "executionMode": "enterprise-network-fixture"
+    },
+    {
+      "caseId": "idempotency-http-409-duplicate-accepted",
+      "category": "idempotency",
+      "description": "HTTP 409 with a message id in the body is an accepted idempotent replay: the runtime returns the original id and does not retry.",
+      "input": {
+        "profile": "valid",
+        "entropy": [
+          0
+        ]
+      },
+      "options": {
+        "baseUrl": "$fixtureBaseUrl",
+        "maxAttempts": 2,
+        "idempotencyKey": "idem_duplicate_409"
+      },
+      "script": [
+        {
+          "actor": "fixture",
+          "action": "respond",
+          "attempt": 1,
+          "status": 409,
+          "headers": {
+            "content-type": "application/json"
+          },
+          "body": {
+            "asset": "duplicateIdentity"
+          }
+        },
+        {
+          "actor": "runner",
+          "action": "drainRuntimeDiagnostics"
+        }
+      ],
+      "expected": {
+        "configurationTrace": [
+          "credential:REPOST_SEND_API_KEY",
+          "base-url:baseUrl",
+          "endpoint-path:/v1/messages",
+          "redirects:false",
+          "snapshot:1"
+        ],
+        "attemptTrace": [
+          "attempt:1:start@0",
+          "attempt:1:commit@0",
+          "attempt:1:response:409@0",
+          "attempt:1:end:accepted@0"
+        ],
+        "commitTrace": [
+          "attempt:1:NOT_SENT@0",
+          "attempt:1:POSSIBLY_SENT@0",
+          "operation:POSSIBLY_SENT@0"
+        ],
+        "scheduleTrace": [],
+        "sideEffectTrace": [
+          "permit.acquire",
+          "configuration.snapshot",
+          "credentials.snapshot",
+          "defaults.snapshot",
+          "idempotency.generate:0",
+          "serialize:1",
+          "network:1",
+          "permit.release"
+        ],
+        "errorTrace": [],
+        "error": null,
+        "delivery": "ACCEPTED",
+        "byteTrace": [
+          "response-wire:36:accepted",
+          "response-decoded:36:accepted"
+        ],
+        "redactionTrace": [],
+        "fixtureTrace": [
+          "fixture:attempt:1:accepted",
+          "fixture:attempt:1:idempotency:idem_duplicate_409",
+          "fixture:attempt:1:response-bytes:36"
+        ],
+        "result": {
+          "id": "msg_1",
+          "type": "contract.sent",
+          "customerId": "cus_contract",
+          "timestamp": "2026-01-01T00:00:00.000Z"
+        },
+        "legacyBody": null,
+        "outcomeEvidence": {
+          "operationId": "op-0001",
+          "primaryKind": "success",
+          "nativeCancelled": false,
+          "settlements": 1,
+          "code": "OK",
+          "delivery": "ACCEPTED",
+          "attemptCount": 1,
+          "httpStatus": 409,
+          "idempotencyKey": "idem_duplicate_409",
+          "noGhostWork": true,
+          "failureReason": null,
+          "remediationKey": null,
+          "causeCategory": null
+        },
+        "primarySurface": "sendOperation",
+        "runtimeDiagnostics": {
+          "inFlightOperations": 0,
+          "bufferedBytes": 0,
+          "concurrencyOverloadRejections": 0,
+          "requestByteOverloadRejections": 0,
+          "responseByteOverloadRejections": 0,
+          "responseHeaderLimitFailures": 0,
+          "executorOverloadRejections": 0,
+          "schedulerOverloadRejections": 0,
+          "responseCloseFailures": 0,
+          "droppedObserverEvents": 0,
+          "observerFailures": 0,
+          "closed": false
+        },
+        "completionRoute": "OPERATION_EXECUTION",
+        "observerCallbackTrace": [],
+        "observerEmissionTrace": [
+          "operation.start|operationId=op-0001",
+          "attempt.start|operationId=op-0001|attempt=1",
+          "attempt.end|operationId=op-0001|attempt=1|durationMs=0|outcome=accepted|code=NONE|failureReason=NONE|delivery=ACCEPTED|statusClass=4xx",
+          "operation.end|operationId=op-0001|durationMs=0|outcome=accepted|code=NONE|failureReason=NONE|delivery=ACCEPTED|attempts=1"
+        ]
+      },
+      "executionMode": "production-http-fixture"
     }
   ]
 }

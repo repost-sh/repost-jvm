@@ -51,7 +51,7 @@ final class RepostSdkExtensionTest {
         RepostSdkExtension extension = project.getExtensions().getByType(RepostSdkExtension.class);
         assertEquals(RepostSchemaMode.GENERATE, extension.getSchemaMode().get());
         assertEquals(RepostIntegration.AUTO, extension.getIntegration().get());
-        assertEquals("0.9.0", extension.getEngineVersion().get());
+        assertEquals("0.11.3", extension.getEngineVersion().get());
         assertEquals(Duration.ofMinutes(5), extension.getExecutionTimeout().get());
         assertEquals(project.file("repost/schema.repost"), extension.getSchemaFile().getAsFile().get());
         assertTrue(extension.getEnvironmentInputs().get().isEmpty());
@@ -96,11 +96,11 @@ final class RepostSdkExtensionTest {
 
         extension.getEngineVersion().set(project.provider(() -> {
             queried.set(true);
-            return "0.9.1";
+            return "0.10.1";
         }));
 
         assertFalse(queried.get());
-        assertEquals("0.9.1", extension.getEngineVersion().get());
+        assertEquals("0.10.1", extension.getEngineVersion().get());
         assertTrue(queried.get());
     }
 
@@ -183,12 +183,12 @@ final class RepostSdkExtensionTest {
         }
         assertEquals(
             Set.of(
-                "sh.repost:repost-schema-engine:0.9.0:" +
+                "sh.repost:repost-schema-engine:0.11.3:" +
                     sh.repost.buildplugin.internal.NativeEngineArtifacts.classifier(
                         System.getProperty("os.name"), System.getProperty("os.arch")
                     ) + "@zip",
-                "sh.repost:repost-schema-engine:0.9.0:checksums@json",
-                "sh.repost:repost-schema-engine:0.9.0:checksums@sig"
+                "sh.repost:repost-schema-engine:0.11.3:checksums@json",
+                "sh.repost:repost-schema-engine:0.11.3:checksums@sig"
             ),
             coordinates
         );
