@@ -1,13 +1,13 @@
 plugins {
     java
     id("io.quarkus")
-    id("sh.repost.sdk") version "1.0.0"
+    id("sh.repost.sdk")
 }
 
 val quarkusVersion = providers.gradleProperty("quarkusVersion").get()
 
 dependencies {
-    implementation(platform("sh.repost:repost-bom:1.0.0"))
+    implementation(platform("sh.repost:repost-bom:${providers.gradleProperty("repostVersion").get()}"))
     implementation("sh.repost:repost-client")
     implementation("sh.repost:repost-client-test")
     implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:$quarkusVersion"))

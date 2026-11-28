@@ -13,8 +13,8 @@ internal data class JvmResolvedDependencyPath(
 )
 
 internal object JvmDependencyGraphPolicy {
-    val resolvedGraphModules: Set<String> = JvmModuleCatalog.modules.values
-        .filter { spec -> spec.publishedCoordinate != null && spec.javaRelease != null }
+    val resolvedGraphModules: Set<String> = JvmModuleCatalog.publishedModules
+        .filter { spec -> spec.javaRelease != null }
         .mapTo(sortedSetOf(), JvmModuleSpec::name)
 
     fun violations(
@@ -124,6 +124,7 @@ internal object JvmDependencyGraphPolicy {
                 "org.jetbrains.kotlin:kotlin-stdlib",
             ),
             "implementation" to setOf("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm"),
+            "classpathPins" to setOf("org.jetbrains.kotlin:kotlin-bom"),
             "compileOnly" to emptySet(),
             "runtimeOnly" to emptySet(),
             "testImplementation" to setOf("org.junit:junit-bom", "org.junit.jupiter:junit-jupiter"),
@@ -161,6 +162,7 @@ internal object JvmDependencyGraphPolicy {
                 "io.micrometer:micrometer-core",
                 "io.opentelemetry:opentelemetry-api",
                 "org.springframework.boot:spring-boot-autoconfigure",
+                "org.springframework.boot:spring-boot-dependencies",
                 "org.springframework.boot:spring-boot-health",
                 "sh.repost:repost-client-micrometer",
                 "sh.repost:repost-client-opentelemetry",
@@ -175,11 +177,11 @@ internal object JvmDependencyGraphPolicy {
                 "io.opentelemetry:opentelemetry-sdk",
                 "io.opentelemetry:opentelemetry-sdk-testing",
                 "org.assertj:assertj-core",
-                "org.junit:junit-bom",
                 "org.junit.jupiter:junit-jupiter",
                 "org.springframework.boot:spring-boot-actuator",
                 "org.springframework.boot:spring-boot-actuator-autoconfigure",
                 "org.springframework.boot:spring-boot-autoconfigure",
+                "org.springframework.boot:spring-boot-dependencies",
                 "org.springframework.boot:spring-boot-health",
                 "org.springframework.boot:spring-boot-test",
                 "org.yaml:snakeyaml",
@@ -189,25 +191,25 @@ internal object JvmDependencyGraphPolicy {
             ),
             "testRuntimeOnly" to setOf("org.junit.platform:junit-platform-launcher"),
             "boot41TestRuntimeClasspath" to setOf(
-                "sh.repost:repost-client-spring-boot-starter",
-                "sh.repost:repost-client-micrometer",
-                "sh.repost:repost-client-opentelemetry",
-                "sh.repost:repost-client-test",
                 "com.fasterxml.jackson.core:jackson-annotations",
                 "io.micrometer:micrometer-core",
                 "io.opentelemetry:opentelemetry-api",
                 "io.opentelemetry:opentelemetry-sdk",
                 "io.opentelemetry:opentelemetry-sdk-testing",
                 "org.assertj:assertj-core",
-                "org.junit:junit-bom",
                 "org.junit.jupiter:junit-jupiter",
                 "org.junit.platform:junit-platform-launcher",
                 "org.springframework.boot:spring-boot-actuator",
                 "org.springframework.boot:spring-boot-actuator-autoconfigure",
                 "org.springframework.boot:spring-boot-autoconfigure",
+                "org.springframework.boot:spring-boot-dependencies",
                 "org.springframework.boot:spring-boot-health",
                 "org.springframework.boot:spring-boot-test",
                 "org.yaml:snakeyaml",
+                "sh.repost:repost-client-micrometer",
+                "sh.repost:repost-client-opentelemetry",
+                "sh.repost:repost-client-spring-boot-starter",
+                "sh.repost:repost-client-test",
             ),
         ),
         "repost-client-cdi" to mapOf(
@@ -385,6 +387,7 @@ internal object JvmDependencyGraphPolicy {
                 "org.jspecify:jspecify",
                 "org.springframework.boot:spring-boot",
                 "org.springframework.boot:spring-boot-autoconfigure",
+                "org.springframework.boot:spring-boot-dependencies",
                 "org.springframework.boot:spring-boot-health",
                 "org.springframework:spring-aop",
                 "org.springframework:spring-beans",

@@ -13,7 +13,6 @@
     <kotlin.compiler.apiVersion>2.1</kotlin.compiler.apiVersion>
     <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <repost.version>1.0.0</repost.version>
   </properties>
   <repositories>
     <repository><id>repost-staged</id><url>${repost.repository}</url></repository>

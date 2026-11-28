@@ -23,6 +23,7 @@ import sh.repost.client.TelemetryOperation;
 import sh.repost.client.TelemetryOperationEnd;
 import sh.repost.client.TelemetryOperationStart;
 import sh.repost.client.TelemetryScope;
+import sh.repost.client.internal.SdkVersion;
 
 /** Live OpenTelemetry bridge with one internal operation span and one child per attempt. */
 public final class OpenTelemetryRepostTelemetry implements RepostTelemetry {
@@ -42,7 +43,7 @@ public final class OpenTelemetryRepostTelemetry implements RepostTelemetry {
     private OpenTelemetryRepostTelemetry(OpenTelemetry openTelemetry) {
         this.tracer = Objects.requireNonNull(openTelemetry, "openTelemetry")
                 .tracerBuilder("sh.repost.client")
-                .setInstrumentationVersion("1.0.0")
+                .setInstrumentationVersion(SdkVersion.VALUE)
                 .build();
     }
 

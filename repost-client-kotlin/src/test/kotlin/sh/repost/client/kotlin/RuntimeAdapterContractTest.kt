@@ -46,6 +46,7 @@ import sh.repost.client.descriptor.EventDescriptor
 import sh.repost.client.descriptor.ModelDescriptor
 import sh.repost.client.descriptor.SchemaDescriptor
 import sh.repost.client.error.RepostException
+import sh.repost.client.internal.SdkVersion
 
 /** Upper bound for an event another thread signals; never slept in full on a healthy run. */
 private const val EVENT_WAIT_SECONDS = 10L
@@ -60,7 +61,7 @@ class RuntimeAdapterContractTest {
         assertEquals("msg_kotlin_adapter", kotlin.result?.id)
         assertEquals(DeliveryState.ACCEPTED, kotlin.outcome.deliveryState)
         assertEquals("Bearer test-key", kotlin.request.headers["authorization"])
-        assertEquals("repost-jvm/1.0.0 parity/1", kotlin.request.headers["user-agent"])
+        assertEquals("repost-jvm/${SdkVersion.VALUE} parity/1", kotlin.request.headers["user-agent"])
         assertEquals(Duration.ofSeconds(2), kotlin.request.connectTimeout)
         assertEquals(Duration.ofSeconds(3), kotlin.request.attemptTimeout)
     }

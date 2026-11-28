@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.jupiter.api.Test;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 final class RepostHelpMojoTest {
     @Test
@@ -14,7 +15,7 @@ final class RepostHelpMojoTest {
 
         assertTrue(help.contains("repost:generate (generate-sources)"));
         assertTrue(help.contains("repost:check (verify)"));
-        assertTrue(help.contains("sh.repost:repost-bom:1.0.0"));
+        assertTrue(help.contains("sh.repost:repost-bom:" + SdkVersion.VALUE));
         assertTrue(help.contains("sh.repost:repost-client-kotlin"));
         assertTrue(help.contains("schemaMode=GENERATE (accepted: GENERATE, AGGREGATE_ONLY)"));
         assertTrue(help.contains("environmentInputs={} (declare as <environmentInputs><NAME>value</NAME>"));

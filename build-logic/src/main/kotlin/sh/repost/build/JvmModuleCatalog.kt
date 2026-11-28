@@ -1,7 +1,6 @@
 package sh.repost.build
 
 internal enum class JvmModuleKind {
-    INTERNAL_ENGINE,
     JAVA_LIBRARY,
     KOTLIN_LIBRARY,
     JAVA_INTEGRATION,
@@ -22,13 +21,15 @@ internal data class JvmModuleSpec(
     val allowedProjectDependencies: Set<String> = emptySet(),
     val gradlePluginId: String? = null,
     val implementedArtifact: Boolean = false,
-)
+) {
+    val published get() = publishedCoordinate != null
+}
 
 internal object JvmModuleCatalog {
     const val GROUP = "sh.repost"
 
     val modules: Map<String, JvmModuleSpec> = listOf(
-        JvmModuleSpec("repost-http-engine", JvmModuleKind.INTERNAL_ENGINE, 11),
+        JvmModuleSpec("repost-http-engine", JvmModuleKind.JAVA_LIBRARY, 11),
         JvmModuleSpec(
             "repost-client",
             JvmModuleKind.JAVA_LIBRARY,
@@ -128,6 +129,11 @@ internal object JvmModuleCatalog {
             allowedProjectDependencies = setOf("repost-client", "repost-client-kotlin", "repost-client-test"),
         ),
     ).associateBy(JvmModuleSpec::name)
+
+    val publishedModules: List<JvmModuleSpec> = modules.values.filter(JvmModuleSpec::published)
+
+    // What a published module's artifacts are built from and carry to consumers.
+    val shippedConfigurations: List<String> = listOf("compileClasspath", "runtimeClasspath")
 
     val publicLibraryModules: Set<String> = publicLibraryNames()
 

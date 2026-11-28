@@ -11,60 +11,51 @@ val boot41TestRuntimeClasspath = configurations.create("boot41TestRuntimeClasspa
     isCanBeResolved = true
 }
 
+// Spring Boot's dependency management decides the versions in each Boot lane,
+// as in a Boot application. The platform sits on compileOnly and the test
+// buckets, so it never reaches the published POM or module metadata.
+val bootTestLibraries = listOf(
+    "org.springframework.boot:spring-boot-autoconfigure",
+    "org.springframework.boot:spring-boot-health",
+    "org.springframework.boot:spring-boot-actuator",
+    "org.springframework.boot:spring-boot-actuator-autoconfigure",
+    "org.springframework.boot:spring-boot-test",
+    "com.fasterxml.jackson.core:jackson-annotations",
+    "org.yaml:snakeyaml",
+    "io.micrometer:micrometer-core",
+    "io.opentelemetry:opentelemetry-api",
+    "io.opentelemetry:opentelemetry-sdk",
+    "io.opentelemetry:opentelemetry-sdk-testing",
+    "org.assertj:assertj-core",
+)
+
 dependencies {
     api(project(":repost-client"))
 
-    compileOnly("org.springframework.boot:spring-boot-autoconfigure:$boot40Version")
-    compileOnly("org.springframework.boot:spring-boot-health:$boot40Version")
-    compileOnly("com.fasterxml.jackson.core:jackson-annotations:2.21")
+    compileOnly(enforcedPlatform("org.springframework.boot:spring-boot-dependencies:$boot40Version"))
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
+    compileOnly("org.springframework.boot:spring-boot-health")
+    compileOnly("com.fasterxml.jackson.core:jackson-annotations")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:$boot40Version")
-    compileOnly(project(":repost-client-micrometer")) {
-        exclude(group = "io.micrometer", module = "micrometer-core")
-    }
+    compileOnly(project(":repost-client-micrometer"))
     compileOnly(project(":repost-client-opentelemetry"))
-    compileOnly("io.micrometer:micrometer-core:1.16.6")
-    compileOnly(libs.opentelemetry.api)
+    compileOnly("io.micrometer:micrometer-core")
+    compileOnly("io.opentelemetry:opentelemetry-api")
 
-    testImplementation("org.springframework.boot:spring-boot-autoconfigure:$boot40Version")
-    testImplementation("org.springframework.boot:spring-boot-health:$boot40Version")
-    testImplementation("org.springframework.boot:spring-boot-actuator:$boot40Version")
-    testImplementation("org.springframework.boot:spring-boot-actuator-autoconfigure:$boot40Version")
-    testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.21")
-    testImplementation("org.springframework.boot:spring-boot-test:$boot40Version")
-    testImplementation("org.yaml:snakeyaml:2.5")
+    testImplementation(enforcedPlatform("org.springframework.boot:spring-boot-dependencies:$boot40Version"))
+    bootTestLibraries.forEach { testImplementation(it) }
     testImplementation(project(":repost-client-test"))
-    testImplementation(project(":repost-client-micrometer")) {
-        exclude(group = "io.micrometer", module = "micrometer-core")
-    }
+    testImplementation(project(":repost-client-micrometer"))
     testImplementation(project(":repost-client-opentelemetry"))
-    testImplementation("io.micrometer:micrometer-core:1.16.6")
-    testImplementation(libs.opentelemetry.api)
-    testImplementation(libs.opentelemetry.sdk)
-    testImplementation(libs.opentelemetry.sdk.testing)
-    testImplementation("org.assertj:assertj-core:3.27.7")
-    testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    add(boot41TestRuntimeClasspath.name, enforcedPlatform("org.springframework.boot:spring-boot-dependencies:$boot41Version"))
+    bootTestLibraries.forEach { add(boot41TestRuntimeClasspath.name, it) }
     add(boot41TestRuntimeClasspath.name, project(":" + project.name))
-    add(boot41TestRuntimeClasspath.name, "org.springframework.boot:spring-boot-autoconfigure:$boot41Version")
-    add(boot41TestRuntimeClasspath.name, "org.springframework.boot:spring-boot-health:$boot41Version")
-    add(boot41TestRuntimeClasspath.name, "org.springframework.boot:spring-boot-actuator:$boot41Version")
-    add(boot41TestRuntimeClasspath.name, "org.springframework.boot:spring-boot-actuator-autoconfigure:$boot41Version")
-    add(boot41TestRuntimeClasspath.name, "org.springframework.boot:spring-boot-test:$boot41Version")
     add(boot41TestRuntimeClasspath.name, project(":repost-client-test"))
-    add(boot41TestRuntimeClasspath.name, project(":repost-client-micrometer")) {
-        exclude(group = "io.micrometer", module = "micrometer-core")
-    }
+    add(boot41TestRuntimeClasspath.name, project(":repost-client-micrometer"))
     add(boot41TestRuntimeClasspath.name, project(":repost-client-opentelemetry"))
-    add(boot41TestRuntimeClasspath.name, "io.micrometer:micrometer-core:1.16.6")
-    add(boot41TestRuntimeClasspath.name, libs.opentelemetry.api)
-    add(boot41TestRuntimeClasspath.name, libs.opentelemetry.sdk)
-    add(boot41TestRuntimeClasspath.name, libs.opentelemetry.sdk.testing)
-    add(boot41TestRuntimeClasspath.name, "com.fasterxml.jackson.core:jackson-annotations:2.21")
-    add(boot41TestRuntimeClasspath.name, "org.yaml:snakeyaml:2.5")
-    add(boot41TestRuntimeClasspath.name, "org.assertj:assertj-core:3.27.7")
-    add(boot41TestRuntimeClasspath.name, platform(libs.junit.bom))
     add(boot41TestRuntimeClasspath.name, libs.junit.jupiter)
     add(boot41TestRuntimeClasspath.name, "org.junit.platform:junit-platform-launcher")
 }

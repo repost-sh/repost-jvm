@@ -22,9 +22,9 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <dependency><groupId>sh.repost</groupId><artifactId>repost-client-spring-boot-starter</artifactId><version>1.0.0</version></dependency>
-    <dependency><groupId>sh.repost</groupId><artifactId>repost-client-micrometer</artifactId><version>1.0.0</version></dependency>
-    <dependency><groupId>sh.repost</groupId><artifactId>repost-client-opentelemetry</artifactId><version>1.0.0</version></dependency>
+    <dependency><groupId>sh.repost</groupId><artifactId>repost-client-spring-boot-starter</artifactId><version>${repost.version}</version></dependency>
+    <dependency><groupId>sh.repost</groupId><artifactId>repost-client-micrometer</artifactId><version>${repost.version}</version></dependency>
+    <dependency><groupId>sh.repost</groupId><artifactId>repost-client-opentelemetry</artifactId><version>${repost.version}</version></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-actuator</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-autoconfigure</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-health</artifactId></dependency>

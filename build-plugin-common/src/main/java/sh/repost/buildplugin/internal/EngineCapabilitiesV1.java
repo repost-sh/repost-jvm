@@ -7,8 +7,6 @@ import java.util.Map;
 
 /** Closed native schema-engine compatibility handshake. */
 final class EngineCapabilitiesV1 {
-    private static final long PROTOCOL_VERSION = 1L;
-    private static final long DESCRIPTOR_VERSION = 2L;
     private static final List<String> FIELDS = Arrays.asList(
         "protocolVersion",
         "engineVersion",
@@ -34,7 +32,7 @@ final class EngineCapabilitiesV1 {
         if (!new ArrayList<>(root.keySet()).equals(FIELDS)) {
             throw new CapabilityException("schema engine capabilities are malformed");
         }
-        if (!Long.valueOf(PROTOCOL_VERSION).equals(root.get("protocolVersion"))) {
+        if (!Long.valueOf(GenerationProtocolV1.PROTOCOL_VERSION).equals(root.get("protocolVersion"))) {
             throw new CapabilityException("schema engine protocol version does not match the plugin");
         }
         if (!expectedEngineVersion.equals(root.get("engineVersion"))) {
@@ -43,7 +41,7 @@ final class EngineCapabilitiesV1 {
         if (!expectedRuntimeVersion.equals(root.get("runtimeVersion"))) {
             throw new CapabilityException("schema engine runtime version does not match the project runtime");
         }
-        if (!Long.valueOf(DESCRIPTOR_VERSION).equals(root.get("descriptorVersion"))) {
+        if (!Long.valueOf(GenerationProtocolV1.DESCRIPTOR_VERSION).equals(root.get("descriptorVersion"))) {
             throw new CapabilityException("schema engine descriptor version does not match the runtime");
         }
     }

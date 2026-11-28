@@ -21,6 +21,8 @@ import java.util.TreeMap;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import sh.repost.buildplugin.internal.BuildPluginEngine;
+import sh.repost.buildplugin.internal.GenerationProtocolV1;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 /** Hash-only Maven incremental state; no raw environment or secret value is persisted. */
 final class MavenIncrementalState {
@@ -39,11 +41,11 @@ final class MavenIncrementalState {
         Set<Path> dependencyArtifacts
     ) {
         MessageDigest digest = sha256();
-        hash(digest, "plugin", "1.0.0");
+        hash(digest, "plugin", SdkVersion.VALUE);
         hash(digest, "engine", request.getEngineVersion());
-        hash(digest, "protocol", "1");
-        hash(digest, "runtime", "1.0.0");
-        hash(digest, "descriptor", "2");
+        hash(digest, "protocol", Integer.toString(GenerationProtocolV1.PROTOCOL_VERSION));
+        hash(digest, "runtime", GenerationProtocolV1.RUNTIME_VERSION);
+        hash(digest, "descriptor", Integer.toString(GenerationProtocolV1.DESCRIPTOR_VERSION));
         hash(digest, "schemaMode", schemaMode);
         hash(digest, "integration", integration);
         try {
@@ -79,9 +81,9 @@ final class MavenIncrementalState {
         Set<Path> dependencyArtifacts
     ) {
         MessageDigest digest = sha256();
-        hash(digest, "plugin", "1.0.0");
-        hash(digest, "runtime", "1.0.0");
-        hash(digest, "descriptor", "2");
+        hash(digest, "plugin", SdkVersion.VALUE);
+        hash(digest, "runtime", GenerationProtocolV1.RUNTIME_VERSION);
+        hash(digest, "descriptor", Integer.toString(GenerationProtocolV1.DESCRIPTOR_VERSION));
         hash(digest, "schemaMode", schemaMode);
         hash(digest, "integration", integration);
         List<String> hashes = new ArrayList<>();

@@ -56,17 +56,21 @@ class OwnedVersionLiteralPolicyTest {
     }
 
     @Test
-    fun `does not treat the runtime family version as a framework or tool literal`() {
-        assertTrue(
+    fun `does not treat the family's engine version as a framework or tool literal`() {
+        assertEquals(
+            listOf(
+                "Owned JVM version literal 4.0.7 is duplicated at certification/build.gradle.kts:2; " +
+                    "consume compatibility-matrix.toml instead",
+            ),
             OwnedVersionLiteralPolicy.violations(
                 """
                 [family]
-                runtime_version = "1.0.0"
+                engine_version = "9.8.7"
                 [frameworks.spring_boot]
                 versions = ["4.0.7"]
                 """.trimIndent(),
-                mapOf("certification/build.gradle.kts" to "pluginVersion=1.0.0"),
-            ).isEmpty(),
+                mapOf("certification/build.gradle.kts" to "engineVersion=9.8.7\nspringBootVersion=4.0.7"),
+            ),
         )
     }
 }

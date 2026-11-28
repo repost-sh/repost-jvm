@@ -1,4 +1,7 @@
 pluginManagement {
+    plugins {
+        id("sh.repost.sdk") version providers.gradleProperty("repostVersion").get()
+    }
     repositories {
         maven { url = uri(providers.gradleProperty("repostRepository").get()) }
         gradlePluginPortal()

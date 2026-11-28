@@ -33,6 +33,7 @@ import sh.repost.client.TransportResponse;
 import sh.repost.client.descriptor.EventDescriptor;
 import sh.repost.client.descriptor.ModelDescriptor;
 import sh.repost.client.descriptor.SchemaDescriptor;
+import sh.repost.client.internal.SdkVersion;
 import sh.repost.client.test.RuntimeTestHarness;
 import sh.repost.client.test.StubTransport;
 
@@ -78,9 +79,9 @@ final class OpenTelemetryRepostTelemetryContractTest {
             assertEquals(SpanKind.INTERNAL, operation.getKind());
             assertEquals(SpanKind.INTERNAL, attempt.getKind());
             assertEquals("sh.repost.client", operation.getInstrumentationScopeInfo().getName());
-            assertEquals("1.0.0", operation.getInstrumentationScopeInfo().getVersion());
+            assertEquals(SdkVersion.VALUE, operation.getInstrumentationScopeInfo().getVersion());
             assertEquals("sh.repost.client", attempt.getInstrumentationScopeInfo().getName());
-            assertEquals("1.0.0", attempt.getInstrumentationScopeInfo().getVersion());
+            assertEquals(SdkVersion.VALUE, attempt.getInstrumentationScopeInfo().getVersion());
             assertEquals(operation.getSpanId(), attempt.getParentSpanId());
             assertNotEquals(operation.getSpanId(), attempt.getSpanId());
             assertEquals("POST", attempt.getAttributes().get(

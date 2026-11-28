@@ -70,7 +70,7 @@ final class MavenFunctionalMatrixManifestTest {
         assertTrue(workflow.contains("MAVEN_VERSION: ${{ matrix.maven.version }}"));
         assertTrue(workflow.contains("sha512sum --check --strict"));
         assertTrue(workflow.contains(":repost-maven-plugin:check"));
-        assertTrue(workflow.contains("REPOST_VERSION: ${{ needs.versions.outputs.runtime }}"));
+        assertTrue(workflow.contains("REPOST_VERSION: ${{ needs.versions.outputs.sdk_version }}"));
         assertTrue(workflow.contains("sh.repost:repost-maven-plugin:\"$REPOST_VERSION\":help"));
         assertTrue(workflow.contains("-o -B -ntp"));
         assertTrue(workflow.contains("command -v repost"));

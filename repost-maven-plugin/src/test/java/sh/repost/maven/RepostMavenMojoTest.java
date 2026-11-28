@@ -22,6 +22,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import sh.repost.buildplugin.internal.BuildPluginEngine;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 final class RepostMavenMojoTest {
     @TempDir
@@ -267,7 +268,7 @@ final class RepostMavenMojoTest {
         RepostGenerateMojo mojo = new RepostGenerateMojo();
         Path clients = registryJar(temporary.resolve("clients.jar"));
         Map<String, Path> artifacts = new LinkedHashMap<>();
-        artifacts.put("sh.repost:repost-client:1.0.0", emptyJar(temporary.resolve("core.jar")));
+        artifacts.put("sh.repost:repost-client:" + SdkVersion.VALUE, emptyJar(temporary.resolve("core.jar")));
         artifacts.put("com.acme:orders-clients:1.0.0", clients);
         mojo.setProject(project);
         mojo.setSchemaMode("AGGREGATE_ONLY");
@@ -325,7 +326,7 @@ final class RepostMavenMojoTest {
             mojo::execute
         );
 
-        assertTrue(failure.getMessage().contains("must resolve to exactly 1.0.0"));
+        assertTrue(failure.getMessage().contains("must resolve to exactly " + SdkVersion.VALUE));
         assertTrue(failure.getMessage().contains("<artifactId>repost-bom</artifactId>"));
         assertFalse(Files.exists(project.getBasedir().toPath().resolve("target")));
     }
@@ -335,8 +336,8 @@ final class RepostMavenMojoTest {
         MavenProject project = project();
         RepostGenerateMojo mojo = new RepostGenerateMojo();
         Map<String, Path> artifacts = new LinkedHashMap<>();
-        artifacts.put("sh.repost:repost-client:1.0.0", emptyJar(temporary.resolve("kotlin-core.jar")));
-        artifacts.put("sh.repost:repost-client-kotlin:1.0.0",
+        artifacts.put("sh.repost:repost-client:" + SdkVersion.VALUE, emptyJar(temporary.resolve("kotlin-core.jar")));
+        artifacts.put("sh.repost:repost-client-kotlin:" + SdkVersion.VALUE,
             emptyJar(temporary.resolve("kotlin-runtime.jar")));
         artifacts.put("com.acme:kotlin-clients:1.0.0",
             registryJar(temporary.resolve("kotlin-clients.jar"), "kotlin"));
@@ -364,8 +365,8 @@ final class RepostMavenMojoTest {
             "2222222222222222", "fedcba9876543210", "com.acme.billing", "BillingClient"
         );
         Map<String, Path> artifacts = new LinkedHashMap<>();
-        artifacts.put("sh.repost:repost-client:1.0.0", emptyJar(temporary.resolve("spring-core.jar")));
-        artifacts.put("sh.repost:repost-client-spring-boot-starter:1.0.0",
+        artifacts.put("sh.repost:repost-client:" + SdkVersion.VALUE, emptyJar(temporary.resolve("spring-core.jar")));
+        artifacts.put("sh.repost:repost-client-spring-boot-starter:" + SdkVersion.VALUE,
             emptyJar(temporary.resolve("spring-adapter.jar")));
         artifacts.put("com.acme:orders-clients:1.0.0", orders);
         artifacts.put("com.acme:billing-clients:1.0.0", billing);
@@ -515,7 +516,7 @@ final class RepostMavenMojoTest {
         Dependency dependency = new Dependency();
         dependency.setGroupId("sh.repost");
         dependency.setArtifactId(artifactId);
-        dependency.setVersion("1.0.0");
+        dependency.setVersion(SdkVersion.VALUE);
         return dependency;
     }
 }

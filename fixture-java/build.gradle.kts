@@ -6,13 +6,10 @@ val stagedRepository = providers.gradleProperty("repostRepository")
     .orElse(providers.environmentVariable("REPOST_JVM_STAGED_REPOSITORY"))
     .orNull
     ?.let { value -> rootProject.file(if (value.startsWith("file:")) URI(value) else value) }
-val stagedVersion = providers.environmentVariable("REPOST_JVM_VERSION")
-    .orElse(providers.gradleProperty("repostVersion"))
-    .get()
 
 fun stagedArtifact(artifactId: String) = files(
     requireNotNull(stagedRepository)
-        .resolve("sh/repost/$artifactId/$stagedVersion/$artifactId-$stagedVersion.jar")
+        .resolve("sh/repost/$artifactId/$version/$artifactId-$version.jar")
         .also { require(it.isFile) { "missing staged JVM artifact: $it" } },
 )
 

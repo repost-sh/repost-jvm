@@ -7,7 +7,7 @@
   <version>1.0.0</version><packaging>pom</packaging>
   <modules><module>schema-a</module><module>app</module></modules>
   <properties>
-    <maven.compiler.release>17</maven.compiler.release><repost.version>1.0.0</repost.version>
+    <maven.compiler.release>17</maven.compiler.release>
     <app.repost.integration>SPRING_BOOT</app.repost.integration>
   </properties>
   <repositories>

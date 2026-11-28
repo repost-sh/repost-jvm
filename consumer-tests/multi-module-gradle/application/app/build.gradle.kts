@@ -3,7 +3,7 @@ import sh.repost.gradle.RepostSchemaMode
 
 plugins {
     java
-    id("sh.repost.sdk") version "1.0.0"
+    id("sh.repost.sdk")
 }
 
 val selectedIntegration = providers.gradleProperty("repostIntegration").orElse("SPRING_BOOT")
@@ -12,7 +12,7 @@ repostSdk {
     integration.set(selectedIntegration.map(RepostIntegration::valueOf))
 }
 dependencies {
-    implementation(platform("sh.repost:repost-bom:1.0.0"))
+    implementation(platform("sh.repost:repost-bom:${providers.gradleProperty("repostVersion").get()}"))
     implementation(project(":schema-a"))
     if (providers.gradleProperty("includeSchemaB").orElse("true").get().toBoolean()) {
         implementation(project(":schema-b"))

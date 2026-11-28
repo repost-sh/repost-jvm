@@ -1,14 +1,14 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("sh.repost.sdk") version "1.0.0"
+    id("sh.repost.sdk")
 }
 
 group = "com.acme.consumer"
 version = "1.0.0"
 repostSdk.generators.named("kotlinSdk") { enabled.set(false) }
 dependencies {
-    api(platform("sh.repost:repost-bom:1.0.0"))
+    api(platform("sh.repost:repost-bom:${providers.gradleProperty("repostVersion").get()}"))
     api("sh.repost:repost-client")
 }
 java {

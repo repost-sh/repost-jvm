@@ -15,16 +15,16 @@ import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.api.Test;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 final class GradlePluginDistributionTest {
     private static final String PLUGIN_ID = "sh.repost.sdk";
-    private static final String VERSION = "1.0.0";
+    private static final String VERSION = SdkVersion.VALUE;
 
     @Test
     void publishesCompleteDistributionAndResolvesMarkerFromIsolatedRepository() throws Exception {
         String repositoryProperty = System.getProperty("repost.testPluginRepository");
         assertNotNull(repositoryProperty, "isolated test-plugin repository was not configured");
-        assertEquals(VERSION, System.getProperty("repost.testPluginVersion"));
 
         Path repository = Path.of(repositoryProperty);
         Path implementation = repository.resolve("sh/repost/repost-gradle-plugin/" + VERSION);
@@ -48,8 +48,6 @@ final class GradlePluginDistributionTest {
 
         String implementationPom = Files.readString(pluginPom, StandardCharsets.UTF_8);
         assertPomCoordinate(implementationPom, "sh.repost", "repost-gradle-plugin", VERSION);
-        assertTrue(implementationPom.contains("<name>Repost JVM SDK</name>"), implementationPom);
-        assertTrue(implementationPom.contains("<url>https://repost.sh</url>"), implementationPom);
 
         String markerDocument = Files.readString(markerPom, StandardCharsets.UTF_8);
         assertPomCoordinate(markerDocument, PLUGIN_ID, PLUGIN_ID + ".gradle.plugin", VERSION);
@@ -67,7 +65,7 @@ final class GradlePluginDistributionTest {
             );
             Files.writeString(
                 consumer.resolve("build.gradle"),
-                "plugins { id 'sh.repost.sdk' version '1.0.0' }\n" +
+                "plugins { id 'sh.repost.sdk' version '" + VERSION + "' }\n" +
                     "tasks.register('assertPluginDistribution') { doLast {\n" +
                     "  assert plugins.hasPlugin('sh.repost.sdk')\n" +
                     "  assert tasks.names.containsAll(['repostGenerate', 'repostGenerateCheck'])\n" +

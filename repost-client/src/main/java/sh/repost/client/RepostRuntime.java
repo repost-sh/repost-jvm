@@ -44,13 +44,14 @@ import sh.repost.client.error.RepostException;
 import sh.repost.client.error.RepostTransportException;
 import sh.repost.client.internal.DefaultGenerators;
 import sh.repost.client.internal.ResponseParser;
+import sh.repost.client.internal.SdkVersion;
 import sh.repost.client.internal.Serializer;
 import sh.repost.client.internal.UriValidator;
 
 /** One immutable, thread-safe, framework-neutral runtime. */
 public final class RepostRuntime implements AutoCloseable {
     private static final String DEFAULT_BASE_URI = "https://api.repost.sh";
-    private static final String USER_AGENT = "repost-jvm/1.0.0";
+    private static final String USER_AGENT = "repost-jvm/" + SdkVersion.VALUE;
     private static final DateTimeFormatter RETRY_AFTER_DATE = new DateTimeFormatterBuilder()
             .parseCaseSensitive()
             .appendPattern("EEE, dd MMM uuuu HH:mm:ss 'GMT'")

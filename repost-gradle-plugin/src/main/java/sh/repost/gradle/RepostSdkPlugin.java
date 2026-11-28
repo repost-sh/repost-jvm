@@ -18,7 +18,9 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.util.GradleVersion;
+import sh.repost.buildplugin.internal.GenerationProtocolV1;
 import sh.repost.buildplugin.internal.NativeEngineArtifacts;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 /** Public Gradle plugin entry point. */
 public final class RepostSdkPlugin implements Plugin<Project> {
@@ -179,11 +181,11 @@ public final class RepostSdkPlugin implements Plugin<Project> {
         ));
         task.getEnvironmentInputs().set(extension.getEnvironmentInputs());
         task.getIntegration().set(extension.getIntegration());
-        task.getProtocolVersion().convention(1);
-        task.getPluginVersion().convention("1.0.0");
+        task.getProtocolVersion().convention(GenerationProtocolV1.PROTOCOL_VERSION);
+        task.getPluginVersion().convention(SdkVersion.VALUE);
         task.getEngineVersion().set(extension.getEngineVersion());
-        task.getRuntimeVersion().convention("1.0.0");
-        task.getDescriptorVersion().convention(2);
+        task.getRuntimeVersion().convention(GenerationProtocolV1.RUNTIME_VERSION);
+        task.getDescriptorVersion().convention(GenerationProtocolV1.DESCRIPTOR_VERSION);
         task.getOffline().set(project.provider(() -> project.getGradle().getStartParameter().isOffline()));
         task.getExecutionTimeout().set(extension.getExecutionTimeout());
         task.getEngineArtifacts().from(project.provider(() ->

@@ -10,13 +10,10 @@ val stagedRepository = providers.gradleProperty("repostRepository")
     .orElse(providers.environmentVariable("REPOST_JVM_STAGED_REPOSITORY"))
     .orNull
     ?.let { value -> rootProject.file(if (value.startsWith("file:")) URI(value) else value) }
-val stagedVersion = providers.environmentVariable("REPOST_JVM_VERSION")
-    .orElse(providers.gradleProperty("repostVersion"))
-    .get()
 
 fun stagedArtifact(artifactId: String) = files(
     requireNotNull(stagedRepository)
-        .resolve("sh/repost/$artifactId/$stagedVersion/$artifactId-$stagedVersion.jar")
+        .resolve("sh/repost/$artifactId/$version/$artifactId-$version.jar")
         .also { require(it.isFile) { "missing staged JVM artifact: $it" } },
 )
 
@@ -95,53 +92,45 @@ tasks.named<ProcessResources>("processResources") {
     }
 }
 
-if (providers.gradleProperty("repostCompileKotlinGoldens").orNull == "true") {
-    val goldenRoot = rootProject.file("../../repost-rs/repost-schema/schema/tests/kotlin_sdk")
-    val goldenFixtures = goldenRoot.listFiles()
-        .orEmpty()
-        .filter { fixture -> fixture.isDirectory && fixture.resolve("source").isDirectory }
-        .sortedBy { fixture -> fixture.name }
-    val goldenImplementation = configurations.create("goldenImplementation") {
-        isCanBeConsumed = false
-        isCanBeResolved = false
+val goldenRoot = rootProject.file("../../repost-rs/repost-schema/schema/tests/kotlin_sdk")
+val goldenFixtures = goldenRoot.listFiles()
+    .orEmpty()
+    .filter { fixture -> fixture.isDirectory && fixture.resolve("source").isDirectory }
+    .sortedBy { fixture -> fixture.name }
+val goldenCompileTasks = goldenFixtures.map { fixture ->
+    val taskSuffix = fixture.name
+        .split('_')
+        .joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }
+    // The goldens compile against main's compile classpath, so they share its
+    // lock and cannot drift from it.
+    val sourceSet = sourceSets.create("golden$taskSuffix") {
+        java.setSrcDirs(emptyList<String>())
+        resources.setSrcDirs(emptyList<String>())
+        compileClasspath = sourceSets["main"].compileClasspath
     }
-    dependencies.add(goldenImplementation.name, project(":repost-client-kotlin"))
-
-    val goldenCompileTasks = goldenFixtures.map { fixture ->
-        val taskSuffix = fixture.name
-            .split('_')
-            .joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }
-        val sourceSet = sourceSets.create("golden$taskSuffix") {
-            java.setSrcDirs(emptyList<String>())
-            resources.setSrcDirs(emptyList<String>())
-        }
-        extensions.configure<KotlinJvmProjectExtension> {
-            sourceSets.named(sourceSet.name) {
-                kotlin.setSrcDirs(listOf(fixture.resolve("source")))
-            }
-        }
-        configurations.named(sourceSet.implementationConfigurationName) {
-            extendsFrom(goldenImplementation)
-        }
-        tasks.named<KotlinCompile>(sourceSet.getCompileTaskName("kotlin")) {
-            group = LifecycleBasePlugin.VERIFICATION_GROUP
-            description = "Compiles the ${fixture.name} generated Kotlin golden."
-            compilerOptions {
-                moduleName.set("repost-kotlin-golden-${fixture.name}")
-                languageVersion.set(KotlinVersion.KOTLIN_2_1)
-                apiVersion.set(KotlinVersion.KOTLIN_2_1)
-                jvmTarget.set(JvmTarget.JVM_11)
-                allWarningsAsErrors.set(true)
-                freeCompilerArgs.add("-Xexplicit-api=strict")
-            }
+    extensions.configure<KotlinJvmProjectExtension> {
+        sourceSets.named(sourceSet.name) {
+            kotlin.setSrcDirs(listOf(fixture.resolve("source")))
         }
     }
-
-    tasks.register("compileKotlinGoldens") {
+    tasks.named<KotlinCompile>(sourceSet.getCompileTaskName("kotlin")) {
         group = LifecycleBasePlugin.VERIFICATION_GROUP
-        description = "Compiles every generated Kotlin golden against the production client API."
-        dependsOn(goldenCompileTasks)
+        description = "Compiles the ${fixture.name} generated Kotlin golden."
+        compilerOptions {
+            moduleName.set("repost-kotlin-golden-${fixture.name}")
+            languageVersion.set(KotlinVersion.KOTLIN_2_1)
+            apiVersion.set(KotlinVersion.KOTLIN_2_1)
+            jvmTarget.set(JvmTarget.JVM_11)
+            allWarningsAsErrors.set(true)
+            freeCompilerArgs.add("-Xexplicit-api=strict")
+        }
     }
+}
+
+tasks.register("compileKotlinGoldens") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = "Compiles every generated Kotlin golden against the production client API."
+    dependsOn(goldenCompileTasks)
 }
 
 tasks.withType<Test>().configureEach {

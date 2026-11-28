@@ -29,6 +29,7 @@ import org.gradle.testfixtures.internal.ProjectBuilderImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import sh.repost.buildplugin.internal.BuildPluginEngine;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 final class RepostGenerationExecutionTest {
     @TempDir
@@ -49,7 +50,7 @@ final class RepostGenerationExecutionTest {
 
         BuildPluginEngine.Request request = task.createEngineRequest();
 
-        assertEquals("1.0.0", request.getPluginVersion());
+        assertEquals(SdkVersion.VALUE, request.getPluginVersion());
         assertEquals("0.11.3", request.getEngineVersion());
         assertEquals("1.0.0", request.getRuntimeVersion());
         assertEquals(
@@ -111,7 +112,7 @@ final class RepostGenerationExecutionTest {
         project.getDependencies().add("implementation", project.files(dependency.toFile()));
         project.getDependencies().add(
             "implementation",
-            "sh.repost:repost-client-spring-boot-starter:1.0.0"
+            "sh.repost:repost-client-spring-boot-starter:" + SdkVersion.VALUE
         );
         RepostSdkExtension extension = project.getExtensions().getByType(RepostSdkExtension.class);
         extension.getSchemaMode().set(RepostSchemaMode.AGGREGATE_ONLY);

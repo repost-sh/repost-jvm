@@ -1,13 +1,13 @@
 plugins {
     application
     java
-    id("sh.repost.sdk") version "1.0.0"
+    id("sh.repost.sdk")
 }
 
 val micronautVersion = providers.gradleProperty("micronautVersion").get()
 
 dependencies {
-    implementation(platform("sh.repost:repost-bom:1.0.0"))
+    implementation(platform("sh.repost:repost-bom:${providers.gradleProperty("repostVersion").get()}"))
     implementation("sh.repost:repost-client")
     implementation("sh.repost:repost-client-test")
 

@@ -1,10 +1,20 @@
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import org.gradle.plugin.compatibility.compatibility
+
+// Locked like the root build script's classpath; see the comment there.
+buildscript {
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
 
 plugins {
     alias(libs.plugins.gradle.plugin.publish)
@@ -23,21 +33,22 @@ gradlePlugin {
     }
 }
 
-val testPluginRepository = rootProject.layout.buildDirectory.dir("repositories/test-plugin")
-publishing {
-    repositories {
-        maven {
-            name = "testPlugin"
-            url = uri(testPluginRepository)
-        }
-    }
+val testPluginDirectory = rootProject.layout.buildDirectory.dir("repositories/test-plugin")
+val testPluginRepository = publishing.repositories.maven {
+    name = "testPlugin"
+    url = uri(testPluginDirectory)
 }
 
 val cleanTestPluginRepository = tasks.register<Delete>("cleanTestPluginRepository") {
-    delete(testPluginRepository)
+    delete(testPluginDirectory)
 }
-tasks.matching { task -> task.name == "publishAllPublicationsToTestPluginRepository" }
-    .configureEach { dependsOn(cleanTestPluginRepository) }
+// Each publication's write, not only their aggregate, follows the clean: with
+// the configuration cache they run in parallel. maven-publish sets a task's
+// repository after this action runs, so the dependency reads it when the task
+// graph is built.
+tasks.withType<PublishToMavenRepository>().configureEach {
+    dependsOn(provider { if (repository.name == testPluginRepository.name) listOf(cleanTestPluginRepository) else emptyList() })
+}
 
 tasks.named<Test>("test") {
     filter.excludeTestsMatching("sh.repost.gradle.GradlePluginDistributionTest")
@@ -50,19 +61,16 @@ tasks.named<Test>("test") {
 }
 
 val testSourceSet = extensions.getByType<SourceSetContainer>().named("test")
-val distributionTest = tasks.register<Test>("distributionTest") {
+tasks.register<Test>("distributionTest") {
     group = "verification"
     description = "Validates and consumes the complete plugin publication from an isolated repository."
     dependsOn("publishAllPublicationsToTestPluginRepository")
     testClassesDirs = testSourceSet.get().output.classesDirs
     classpath = testSourceSet.get().runtimeClasspath
     filter.includeTestsMatching("sh.repost.gradle.GradlePluginDistributionTest")
-    systemProperty("repost.testPluginRepository", testPluginRepository.get().asFile.absolutePath)
-    systemProperty("repost.testPluginVersion", project.version.toString())
-}
-
-if (version.toString() == "1.0.0") {
-    tasks.named("check") {
-        dependsOn(distributionTest)
-    }
+    // Without the maven-metadata files: each publish stamps them with its time.
+    inputs.files(fileTree(testPluginDirectory) { exclude("**/maven-metadata*") })
+        .withPropertyName("testPluginRepository")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    systemProperty("repost.testPluginRepository", testPluginDirectory.get().asFile.absolutePath)
 }

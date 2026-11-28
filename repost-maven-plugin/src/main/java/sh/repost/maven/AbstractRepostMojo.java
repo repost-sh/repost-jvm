@@ -23,7 +23,9 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 import sh.repost.buildplugin.internal.BuildPluginEngine;
 import sh.repost.buildplugin.internal.BuildPluginRegistry;
+import sh.repost.buildplugin.internal.GenerationProtocolV1;
 import sh.repost.buildplugin.internal.NativeEngineTrust;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 /** Shared Maven configuration and execution path for Repost generation goals. */
 abstract class AbstractRepostMojo extends AbstractMojo {
@@ -305,9 +307,9 @@ abstract class AbstractRepostMojo extends AbstractMojo {
         }
         return new BuildPluginEngine.Request(
             executable,
-            "1.0.0",
+            SdkVersion.VALUE,
             engineVersion == null ? "0.11.3" : engineVersion,
-            "1.0.0",
+            GenerationProtocolV1.RUNTIME_VERSION,
             canonicalSchema.toString(),
             requests,
             environment,

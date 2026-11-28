@@ -129,7 +129,7 @@ final class GeneratedOutputVerifier {
         String generatorId = matching(fields, "generatorId", GENERATOR_ID);
         String schemaHash = matching(fields, "schemaHash", SHA_256);
         string(fields, "runtimeVersion");
-        integer(fields, "descriptorVersion", 2);
+        integer(fields, "descriptorVersion", GenerationProtocolV1.DESCRIPTOR_VERSION);
         string(fields, "clientName");
         string(fields, "regenerateCommand");
         String treeHash = matching(fields, "treeHash", SHA_256);

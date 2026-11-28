@@ -16,8 +16,17 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import sh.repost.build.NativeEngineTrustArguments
 import sh.repost.build.RunJapicmp
+import sh.repost.build.addSdkVersionSource
 import java.io.File
 import java.time.Instant
+
+// The plugins build the published artifacts, so their classpath is locked like
+// every module's (buildscript-gradle.lockfile).
+buildscript {
+    configurations.classpath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
 
 plugins {
     base
@@ -74,6 +83,13 @@ allprojects {
     }
 }
 
+// The SBOM fetches each component's POM outside any configuration, so a build
+// that writes verification metadata through resolveAndLockAll runs it to record
+// those POMs' checksums.
+tasks.named("resolveAndLockAll") {
+    dependsOn(tasks.named("cyclonedxBom"))
+}
+
 tasks.named<CyclonedxAggregateTask>("cyclonedxBom") {
     componentGroup.set(providers.gradleProperty("repostGroup"))
     componentName.set("repost-jvm")
@@ -115,6 +131,8 @@ tasks.named<CyclonedxAggregateTask>("cyclonedxBom") {
 }
 
 project(":repost-client") {
+    addSdkVersionSource("sh.repost.client.internal")
+
     val relocatedEngineSources = project(":repost-http-engine")
         .layout.buildDirectory.dir("vendor/relocated")
 
@@ -158,13 +176,27 @@ project(":repost-client-kotlin") {
         }
     }
 
+    // The workspace fails on version conflicts and kotlinx-coroutines requests
+    // an older Kotlin stdlib, so this build's own classpaths pin the catalog's
+    // versions; never on api or implementation, since a published strict
+    // constraint binds every consumer's resolution.
+    val classpathPins = configurations.create("classpathPins") {
+        isCanBeConsumed = false
+        isCanBeResolved = false
+    }
+    extensions.getByType<JavaPluginExtension>().sourceSets.configureEach {
+        configurations.named(compileClasspathConfigurationName) { extendsFrom(classpathPins) }
+        configurations.named(runtimeClasspathConfigurationName) { extendsFrom(classpathPins) }
+    }
+
     dependencies {
         "api"(platform(repostLibs.kotlin.bom))
         "api"(project(":repost-client"))
         "api"(repostLibs.kotlin.stdlib)
         "implementation"(repostLibs.kotlinx.coroutines.core)
+        add(classpathPins.name, enforcedPlatform(repostLibs.kotlin.bom))
         constraints {
-            add("implementation", "org.jetbrains:annotations") {
+            add(classpathPins.name, "org.jetbrains:annotations") {
                 version {
                     strictly(repostLibs.versions.jetbrains.annotations.get())
                 }
@@ -174,13 +206,22 @@ project(":repost-client-kotlin") {
     }
 }
 
-project(":repost-gradle-plugin") {
-    extensions.configure<JavaPluginExtension> {
+// Both build plugins compile the build-plugin-common sources, and with them the
+// SdkVersion those sources report.
+val buildPluginProjects = listOf(
+    project(":repost-gradle-plugin"),
+    project(":repost-maven-plugin"),
+)
+buildPluginProjects.forEach { pluginProject ->
+    pluginProject.extensions.configure<JavaPluginExtension> {
         sourceSets.named("main") {
-            java.srcDir(rootProject.layout.projectDirectory.dir("build-plugin-common/src/main/java"))
+            java.srcDir(layout.projectDirectory.dir("build-plugin-common/src/main/java"))
         }
     }
+    pluginProject.addSdkVersionSource("sh.repost.buildplugin.internal")
+}
 
+project(":repost-gradle-plugin") {
     dependencies {
         "compileOnly"(repostLibs.kotlin.gradle.plugin) { isTransitive = false }
         "compileOnly"(repostLibs.kotlin.gradle.plugin.api) { isTransitive = false }
@@ -200,11 +241,6 @@ project(":repost-gradle-plugin") {
 }
 
 project(":repost-maven-plugin") {
-    extensions.configure<JavaPluginExtension> {
-        sourceSets.named("main") {
-            java.srcDir(rootProject.layout.projectDirectory.dir("build-plugin-common/src/main/java"))
-        }
-    }
     dependencies {
         "compileOnly"(repostLibs.maven.plugin.api) { isTransitive = false }
         "compileOnly"(repostLibs.maven.core) { isTransitive = false }
@@ -236,12 +272,7 @@ val testNativeEngineSigningKeys = layout.projectDirectory.file(
     "repost-gradle-plugin/src/test/resources/sh/repost/gradle/ephemeral-native-engine-signing-key.pem",
 ).asFile
 val embeddedNativeEngineSigningKeys = nativeEngineSigningKeys.orElse(testNativeEngineSigningKeys)
-val nativeEnginePluginProjects = listOf(
-    project(":repost-gradle-plugin"),
-    project(":repost-maven-plugin"),
-)
-
-nativeEnginePluginProjects.forEach { pluginProject ->
+buildPluginProjects.forEach { pluginProject ->
     pluginProject.tasks.named<ProcessResources>("processResources") {
         from(embeddedNativeEngineSigningKeys) {
             into("META-INF/repost")
@@ -274,7 +305,7 @@ val validateNativeEngineSigningTrust = gradlePluginProject.tasks.register<Test>(
 gradlePluginProject.tasks.named<Test>("test") {
     filter.excludeTestsMatching("sh.repost.gradle.NativeEngineTrustEmbeddingTest")
 }
-nativeEnginePluginProjects.forEach { pluginProject ->
+buildPluginProjects.forEach { pluginProject ->
     pluginProject.tasks.matching { it.name.startsWith("publish") }.configureEach {
         dependsOn(validateNativeEngineSigningTrust)
     }
@@ -353,7 +384,8 @@ tasks.register("checkJvmReleaseQuality") {
 
 tasks.named("check") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
-    description = "Runs the JVM workspace policy and all module checks."
+    description = "Runs the JVM workspace policy, the build logic's tests and all module checks."
     dependsOn("checkJvmWorkspace")
     dependsOn(subprojects.mapNotNull { it.tasks.findByName("check") })
+    dependsOn(gradle.includedBuild("build-logic").task(":test"))
 }

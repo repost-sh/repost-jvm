@@ -1,6 +1,7 @@
 pluginManagement {
     plugins {
         id("org.jetbrains.kotlin.jvm") version providers.gradleProperty("kotlinVersion").get()
+        id("sh.repost.sdk") version providers.gradleProperty("repostVersion").get()
     }
     repositories {
         maven { url = uri(providers.gradleProperty("repostRepository").get()) }

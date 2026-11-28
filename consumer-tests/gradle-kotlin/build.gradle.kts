@@ -4,13 +4,13 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 plugins {
     application
     kotlin("jvm")
-    id("sh.repost.sdk") version "1.0.0"
+    id("sh.repost.sdk")
 }
 
 repostSdk.generators.named("javaSdk") { enabled.set(false) }
 
 dependencies {
-    implementation(platform("sh.repost:repost-bom:1.0.0"))
+    implementation(platform("sh.repost:repost-bom:${providers.gradleProperty("repostVersion").get()}"))
     implementation("sh.repost:repost-client-kotlin")
     implementation("sh.repost:repost-client-test")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")

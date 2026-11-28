@@ -10,8 +10,10 @@ import javax.xml.parsers.DocumentBuilderFactory
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -39,27 +41,61 @@ abstract class CheckJvmSupplyChainInputs : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val verificationMetadata: RegularFileProperty
 
+    // The lockfiles, a tree rooted at the checkout.
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val lockFiles: ConfigurableFileCollection
 
-    @get:Internal
-    abstract val workspaceDirectory: DirectoryProperty
-
     @TaskAction
     fun verify() {
-        val root = workspaceDirectory.get().asFile
-        val locks = lockFiles.files.associate { file ->
-            file.relativeTo(root).invariantSeparatorsPath to file.readText()
-        }
         val failures = JvmSupplyChainPolicy.inputViolations(
             versionCatalog.get().asFile.readText(),
             wrapperProperties.get().asFile.readText(),
             verificationMetadata.get().asFile.readText(),
-            locks,
+            lockFiles.textByRelativePath(),
         )
         check(failures.isEmpty()) { failures.joinToString("\n") }
     }
+}
+
+// Whether the working tree's lockfiles change what the published artifacts are
+// built from, against the lockfiles of a base checkout (the refresh bot's HEAD).
+@DisableCachingByDefault(because = "Comparing lockfiles is cheaper than a cache lookup")
+abstract class DeclareJvmLockfileRelease : DefaultTask() {
+    // The working tree's lockfiles and the base's, each a tree rooted at its checkout.
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val lockFiles: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val baseLockFiles: ConfigurableFileCollection
+
+    // Each published module's lockfile, relative to the checkout.
+    @get:Input
+    abstract val publishedLockFiles: SetProperty<String>
+
+    @get:OutputFile
+    abstract val decision: RegularFileProperty
+
+    @TaskAction
+    fun declare() {
+        val release = JvmLockfileReleasePolicy.decide(
+            base = baseLockFiles.textByRelativePath(),
+            current = lockFiles.textByRelativePath(),
+            publishedLockFiles = publishedLockFiles.get(),
+        )
+        decision.get().asFile.writeText(release.render())
+    }
+}
+
+// Each file's text by its path in its tree, for a collection of rooted file trees.
+internal fun FileCollection.textByRelativePath(): Map<String, String> {
+    val contents = mutableMapOf<String, String>()
+    asFileTree.visit {
+        if (!isDirectory) contents[relativePath.pathString] = file.readText()
+    }
+    return contents
 }
 
 @DisableCachingByDefault(because = "The task validates and hashes materialized publication outputs")
@@ -171,14 +207,10 @@ internal object JvmSupplyChainPolicy {
 
         failures += verificationViolations(verificationMetadata)
         locks.toSortedMap().forEach { (path, contents) ->
-            contents.lineSequence().forEachIndexed { index, raw ->
-                val line = raw.substringBefore('#').trim()
-                if (line.isNotEmpty() && !line.startsWith("empty=")) {
-                    val coordinate = line.substringBefore('=')
-                    val version = coordinate.substringAfterLast(':', missingDelimiterValue = "")
-                    if (version.isEmpty() || isDynamic(version)) {
-                        failures += "Dynamic or missing dependency lock $coordinate at $path:${index + 1}"
-                    }
+            JvmLockfile.entries(contents).forEach { (index, entry) ->
+                val version = entry.coordinate.substringAfterLast(':', missingDelimiterValue = "")
+                if (version.isEmpty() || isDynamic(version)) {
+                    failures += "Dynamic or missing dependency lock ${entry.coordinate} at $path:${index + 1}"
                 }
             }
         }
@@ -255,6 +287,70 @@ internal object JvmSupplyChainPolicy {
     )
 }
 
+// A Gradle lockfile line: one locked module, `group:name:version=configuration,...`.
+internal data class JvmLockEntry(val coordinate: String, val configurations: Set<String>)
+
+internal object JvmLockfile {
+    // The locked modules of a lockfile, indexed by their line; comments and the
+    // `empty=` line lock none.
+    fun entries(contents: String): List<IndexedValue<JvmLockEntry>> =
+        contents.lineSequence().withIndex().mapNotNull { (index, raw) ->
+            val line = raw.substringBefore('#').trim()
+            if (line.isEmpty() || line.startsWith("empty=")) {
+                null
+            } else {
+                IndexedValue(
+                    index,
+                    JvmLockEntry(line.substringBefore('='), line.substringAfter('=', "").split(',').toSet() - ""),
+                )
+            }
+        }.toList()
+}
+
+// The coordinates of the changed lock entries that ship; the release is a patch when there is one.
+internal data class JvmLockfileRelease(val coordinates: List<String>) {
+    fun render(): String {
+        val release = if (coordinates.isEmpty()) "empty" else "patch"
+        val entries = coordinates.joinToString(",\n") { "    \"${it.jsonEscape()}\"" }
+        return "{\n  \"release\": \"$release\",\n  \"coordinates\": [\n$entries\n  ]\n}\n"
+    }
+}
+
+internal object JvmLockfileReleasePolicy {
+    // A published module's lockfile ships the coordinates it locks on a shipped
+    // configuration, so an entry that moves only on a test or certification
+    // classpath changes nothing that ships. A buildscript or settings lock
+    // ships every entry, the plugins that build the artifacts. Conservative:
+    // the root buildscript lock also holds check-only plugins
+    // (kotlin-abi-validator, japicmp), whose updates release the SDK too.
+    fun decide(
+        base: Map<String, String>,
+        current: Map<String, String>,
+        publishedLockFiles: Set<String>,
+    ): JvmLockfileRelease = JvmLockfileRelease(
+        (base.keys + current.keys).flatMap { path ->
+            val ships: (String) -> Boolean = when {
+                path.substringAfterLast('/') in BUILD_LOCKS -> { _ -> true }
+                path in publishedLockFiles -> JvmModuleCatalog.shippedConfigurations::contains
+                else -> { _ -> false }
+            }
+            changed(shippedCoordinates(base[path], ships), shippedCoordinates(current[path], ships))
+        }.distinct().sorted(),
+    )
+
+    // The coordinates a lockfile locks on a configuration that ships.
+    private fun shippedCoordinates(contents: String?, ships: (String) -> Boolean): Set<String> =
+        JvmLockfile.entries(contents.orEmpty())
+            .filter { (_, entry) -> entry.configurations.any(ships) }
+            .mapTo(mutableSetOf()) { (_, entry) -> entry.coordinate }
+
+    private fun changed(before: Set<String>, after: Set<String>): Set<String> = (before - after) + (after - before)
+
+    private val BUILD_LOCKS = setOf("buildscript-gradle.lockfile", "settings-gradle.lockfile")
+}
+
+internal fun String.jsonEscape(): String = replace("\\", "\\\\").replace("\"", "\\\"")
+
 internal object ArtifactHashManifest {
     fun render(root: File, files: Collection<File>): String {
         val subjects = files.sortedBy { it.relativeTo(root).invariantSeparatorsPath }.joinToString(",\n") { file ->
@@ -276,6 +372,4 @@ internal object ArtifactHashManifest {
         }
         return digest.digest().joinToString("") { "%02x".format(it) }
     }
-
-    private fun String.jsonEscape(): String = replace("\\", "\\\\").replace("\"", "\\\"")
 }

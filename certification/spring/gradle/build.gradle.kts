@@ -7,12 +7,13 @@ java {
 }
 
 val bootVersion = providers.gradleProperty("bootVersion").get()
+val repostVersion = providers.gradleProperty("repostVersion").get()
 
 dependencies {
     implementation(enforcedPlatform("org.springframework.boot:spring-boot-dependencies:$bootVersion"))
-    implementation("sh.repost:repost-client-spring-boot-starter:1.0.0")
-    implementation("sh.repost:repost-client-micrometer:1.0.0")
-    implementation("sh.repost:repost-client-opentelemetry:1.0.0")
+    implementation("sh.repost:repost-client-spring-boot-starter:$repostVersion")
+    implementation("sh.repost:repost-client-micrometer:$repostVersion")
+    implementation("sh.repost:repost-client-opentelemetry:$repostVersion")
     implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-health")

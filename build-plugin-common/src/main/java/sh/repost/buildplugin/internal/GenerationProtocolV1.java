@@ -12,12 +12,20 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /** Shared closed JSON protocol used by the Repost Maven and Gradle plugins. */
-final class GenerationProtocolV1 {
+public final class GenerationProtocolV1 {
     /** Maximum captured stdout accepted from the schema engine. */
     static final int MAX_RESPONSE_BYTES = 1_048_576;
 
-    private static final int PROTOCOL_VERSION = 1;
-    private static final int DESCRIPTOR_VERSION = 2;
+    /** The version of this protocol, which the engine's capabilities and responses repeat. */
+    public static final int PROTOCOL_VERSION = 1;
+    /**
+     * The runtime compatibility version: the engine stamps it into every generated
+     * client manifest (JVM_RUNTIME_VERSION in repost-schema), and the plugins accept
+     * only manifests that carry it. Not the SDK release version the plugins report.
+     */
+    public static final String RUNTIME_VERSION = "1.0.0";
+    /** The descriptor version of the clients the engine generates and the plugins accept. */
+    public static final int DESCRIPTOR_VERSION = 2;
     private static final Pattern GENERATOR_ID = Pattern.compile("[0-9a-f]{16}");
     private static final Pattern SHA_256 = Pattern.compile("sha256:[0-9a-f]{64}");
     private static final List<String> RESPONSE_FIELDS = Collections.unmodifiableList(Arrays.asList(

@@ -30,6 +30,7 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 import sh.repost.buildplugin.internal.BuildPluginEngine;
 import sh.repost.buildplugin.internal.BuildPluginRegistry;
+import sh.repost.buildplugin.internal.GenerationProtocolV1;
 import sh.repost.buildplugin.internal.NativeEngineTrust;
 
 /** Shared normalized inputs, deterministic outputs, and local state for Repost generation tasks. */
@@ -330,11 +331,11 @@ public abstract class AbstractRepostGenerationTask extends DefaultTask implement
         if (getSchemaMode().get() != RepostSchemaMode.GENERATE) {
             throw new GradleException("aggregate-only registry generation is not configured");
         }
-        if (getProtocolVersion().get() != 1) {
-            throw new GradleException("Repost generation protocol must equal 1");
+        if (getProtocolVersion().get() != GenerationProtocolV1.PROTOCOL_VERSION) {
+            throw new GradleException("Repost generation protocol must equal " + GenerationProtocolV1.PROTOCOL_VERSION);
         }
-        if (getDescriptorVersion().get() != 2) {
-            throw new GradleException("Repost descriptor version must equal 2");
+        if (getDescriptorVersion().get() != GenerationProtocolV1.DESCRIPTOR_VERSION) {
+            throw new GradleException("Repost descriptor version must equal " + GenerationProtocolV1.DESCRIPTOR_VERSION);
         }
         String checkMode = getCheckMode().get();
         if (!"GENERATE".equals(checkMode) && !"CHECK".equals(checkMode)) {

@@ -6,7 +6,9 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.BasePluginExtension
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
@@ -39,6 +41,7 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
     override fun apply(root: Project) {
         require(root == root.rootProject) { "repost.jvm.workspace must be applied to the root project" }
         root.pluginManager.apply("base")
+        registerResolveAndLockAll(root)
 
         JvmModuleCatalog.modules.values.forEach { spec ->
             val project = root.project(":${spec.name}")
@@ -59,7 +62,7 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
             dependsOn(
                 JvmDependencyGraphPolicy.resolvedGraphModules.map { module ->
                     val moduleProject = root.project(":$module")
-                    val configurations = listOf("compileClasspath", "runtimeClasspath").map {
+                    val configurations = JvmModuleCatalog.shippedConfigurations.map {
                         moduleProject.configurations.getByName(it)
                     }
                     moduleProject.tasks.register<CheckJvmResolvedDependencyGraph>("checkResolvedDependencyGraph") {
@@ -203,11 +206,22 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
             versionCatalog.set(root.layout.projectDirectory.file("gradle/libs.versions.toml"))
             wrapperProperties.set(root.layout.projectDirectory.file("gradle/wrapper/gradle-wrapper.properties"))
             verificationMetadata.set(root.layout.projectDirectory.file("gradle/verification-metadata.xml"))
-            lockFiles.from(root.fileTree(root.layout.projectDirectory) {
-                include("**/gradle.lockfile", "settings-gradle.lockfile")
-                exclude("**/build/**")
-            })
-            workspaceDirectory.set(root.layout.projectDirectory)
+            lockFiles.from(lockfileTree(root.layout.projectDirectory))
+        }
+        root.tasks.register<DeclareJvmLockfileRelease>("declareJvmLockfileRelease") {
+            group = LifecycleBasePlugin.VERIFICATION_GROUP
+            description = "Decides whether the lockfiles change what the published artifacts are built from, " +
+                "against the base checkout in -PrepostLockfileBase."
+            val base = root.layout.dir(root.providers.gradleProperty("repostLockfileBase").map { path -> java.io.File(path) })
+            lockFiles.from(lockfileTree(root.layout.projectDirectory))
+            baseLockFiles.from(base.map(::lockfileTree))
+            publishedLockFiles.set(
+                JvmModuleCatalog.publishedModules.map { spec ->
+                    val module = root.project(":${spec.name}").projectDir.relativeTo(root.projectDir).invariantSeparatorsPath
+                    "$module/gradle.lockfile"
+                },
+            )
+            decision.set(root.layout.buildDirectory.file("reports/supply-chain/lockfile-release.json"))
         }
         val publishedContents = root.tasks.register<VerifyJvmPublishedContents>("verifyPublishedContents") {
             group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -259,7 +273,20 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
         }
     }
 
+    // Unlike the resolution --write-verification-metadata does, this fails on
+    // the first configuration that does not resolve.
+    private fun registerResolveAndLockAll(project: Project) {
+        project.tasks.register("resolveAndLockAll") {
+            description = "Resolves every resolvable configuration, so --write-locks rewrites all of the project's lock state."
+            notCompatibleWithConfigurationCache("Resolves the project's configurations at execution time")
+            doLast {
+                project.configurations.filter { it.isCanBeResolved }.forEach { it.resolve() }
+            }
+        }
+    }
+
     private fun configureModule(project: Project, spec: JvmModuleSpec) {
+        registerResolveAndLockAll(project)
         project.configurations.configureEach {
             if (!isBuildToolConfiguration(name)) {
                 resolutionStrategy.failOnVersionConflict()
@@ -397,7 +424,7 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
     private fun configureJavaModule(project: Project, spec: JvmModuleSpec) {
         project.extensions.configure<JavaPluginExtension> {
             toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-            if (spec.publishedCoordinate != null && spec.kind != JvmModuleKind.INTERNAL_ENGINE) {
+            if (spec.published) {
                 if (spec.kind != JvmModuleKind.KOTLIN_LIBRARY) {
                     withSourcesJar()
                 }
@@ -472,11 +499,7 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
         }
         project.tasks.named("check").configure { dependsOn(classfileCheck) }
 
-        if (
-            spec.publishedCoordinate != null &&
-            spec.kind != JvmModuleKind.KOTLIN_LIBRARY &&
-            spec.kind != JvmModuleKind.INTERNAL_ENGINE
-        ) {
+        if (spec.published && spec.kind != JvmModuleKind.KOTLIN_LIBRARY) {
             val baseline = project.layout.projectDirectory.file("api/${project.name}.api")
             val excludedPackages = listOf(
                 "sh.repost.internal.",
@@ -574,8 +597,7 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
             }
         }
 
-        val expectedPublications = JvmModuleCatalog.modules.values
-            .filter { it.publishedCoordinate != null }
+        val expectedPublications = JvmModuleCatalog.publishedModules
             .flatMap { spec ->
                 if (spec.kind == JvmModuleKind.GRADLE_PLUGIN) {
                     listOf(
@@ -587,8 +609,7 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
                 }
             }
             .sorted()
-        val expectedArtifacts = JvmModuleCatalog.modules.values
-            .filter { spec -> spec.publishedCoordinate != null }
+        val expectedArtifacts = JvmModuleCatalog.publishedModules
             .flatMap { spec ->
                 when {
                     spec.javaRelease != null -> {
@@ -637,8 +658,8 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
         releaseFiles: ConfigurableFileCollection,
         publishedContents: TaskProvider<VerifyJvmPublishedContents>,
     ) {
-        val archiveTasks = JvmModuleCatalog.modules.values
-            .filter { it.publishedCoordinate != null && it.javaRelease != null }
+        val archiveTasks = JvmModuleCatalog.publishedModules
+            .filter { it.javaRelease != null }
             .flatMap { spec ->
                 val project = root.project(":${spec.name}")
                 val sourcesTask = if (spec.kind == JvmModuleKind.KOTLIN_LIBRARY) {
@@ -761,26 +782,19 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
         return messages.sorted()
     }
 
+    // Patterns cover the Kotlin plugin's per-source-set tool configurations; a
+    // bare "kotlin" prefix would also exempt the declarable kotlinScriptDef.
     private fun isBuildToolConfiguration(name: String): Boolean =
-        name.startsWith("dokka") || name == "bcv-rt-jvm-cp" || name in setOf(
-        "apiDependenciesMetadata",
-        "compileOnlyDependenciesMetadata",
-        "implementationDependenciesMetadata",
-        "intransitiveDependenciesMetadata",
-        "kotlinBuildToolsApiClasspath",
-        "kotlinCompilerClasspath",
-        "kotlinCompilerPluginClasspath",
-        "kotlinCompilerPluginClasspathMain",
-        "kotlinCompilerPluginClasspathTest",
-        "kotlinKlibCommonizerClasspath",
-        "kotlinNativeCompilerPluginClasspath",
-        "kotlinScriptDefExtensions",
-        "testApiDependenciesMetadata",
-        "testCompileOnlyDependenciesMetadata",
-        "testImplementationDependenciesMetadata",
-        "testIntransitiveDependenciesMetadata",
-        "testKotlinScriptDefExtensions",
-        )
+        name.startsWith("dokka") || name == "bcv-rt-jvm-cp" ||
+            name.startsWith("kotlinCompilerPluginClasspath") ||
+            name.endsWith("DependenciesMetadata") ||
+            name.endsWith("ScriptDefExtensions") ||
+            name in setOf(
+                "kotlinBuildToolsApiClasspath",
+                "kotlinCompilerClasspath",
+                "kotlinKlibCommonizerClasspath",
+                "kotlinNativeCompilerPluginClasspath",
+            )
 
     private class JvmPomMetadataInputs(project: Project) {
         private val values = JvmPomMetadataProperty.values().associateWith { property ->
@@ -799,4 +813,9 @@ class RepostJvmWorkspacePlugin : Plugin<Project> {
     private companion object {
         const val DOCUMENTATION_SOURCE_KIND = "repostDocumentationSourceKind"
     }
+}
+
+private fun lockfileTree(directory: Directory): FileTree = directory.asFileTree.matching {
+    include("**/gradle.lockfile", "**/buildscript-gradle.lockfile", "settings-gradle.lockfile")
+    exclude("**/build/**")
 }

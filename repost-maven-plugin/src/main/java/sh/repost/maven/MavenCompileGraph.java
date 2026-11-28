@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 /** Closed, testable view of the Maven compile graph used by generation validation. */
 final class MavenCompileGraph {
-    private static final String VERSION = MavenPluginVersion.current();
     private static final String CORE = "sh.repost:repost-client";
     private static final String KOTLIN = "sh.repost:repost-client-kotlin";
     private static final Map<String, String> ADAPTERS = adapters();
@@ -24,7 +24,7 @@ final class MavenCompileGraph {
         + "    <dependency>\n"
         + "      <groupId>sh.repost</groupId>\n"
         + "      <artifactId>repost-bom</artifactId>\n"
-        + "      <version>" + VERSION + "</version>\n"
+        + "      <version>" + SdkVersion.VALUE + "</version>\n"
         + "      <type>pom</type>\n"
         + "      <scope>import</scope>\n"
         + "    </dependency>\n"
@@ -166,9 +166,9 @@ final class MavenCompileGraph {
 
     private void requireVersion(String coordinate) {
         String version = versions.get(coordinate);
-        if (!VERSION.equals(version)) {
+        if (!SdkVersion.VALUE.equals(version)) {
             throw runtimeError(
-                coordinate + " must resolve to exactly " + VERSION + " (found " + version + ")",
+                coordinate + " must resolve to exactly " + SdkVersion.VALUE + " (found " + version + ")",
                 coordinate
             );
         }

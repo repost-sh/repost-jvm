@@ -1,14 +1,14 @@
 plugins {
     application
     id("org.jetbrains.kotlin.jvm")
-    id("sh.repost.sdk") version "1.0.0"
+    id("sh.repost.sdk")
 }
 
 val ktorVersion = providers.gradleProperty("ktorVersion").get()
 val otelVersion = providers.gradleProperty("otelVersion").get()
 
 dependencies {
-    implementation(platform("sh.repost:repost-bom:1.0.0"))
+    implementation(platform("sh.repost:repost-bom:${providers.gradleProperty("repostVersion").get()}"))
     implementation("sh.repost:repost-client-kotlin")
     implementation("sh.repost:repost-client-opentelemetry")
     implementation("sh.repost:repost-client-test")

@@ -1,4 +1,3 @@
-import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -36,17 +35,10 @@ dependencies {
 }
 
 configurations.configureEach {
-    val gradleOwnedKotlinTooling =
-        setOf("kotlinBuildToolsApiClasspath", "kotlinCompilerClasspath")
-    if (GradleVersion.current() < GradleVersion.version("9.0") || name !in gradleOwnedKotlinTooling) {
-        resolutionStrategy.failOnVersionConflict()
-    }
+    resolutionStrategy.failOnVersionConflict()
 }
 
 dependencyLocking {
-    if (GradleVersion.current() >= GradleVersion.version("9.0")) {
-        lockFile.set(layout.projectDirectory.file("gradle-${GradleVersion.current().version}.lockfile"))
-    }
     lockAllConfigurations()
     lockMode.set(LockMode.STRICT)
 }

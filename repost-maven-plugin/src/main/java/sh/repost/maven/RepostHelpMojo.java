@@ -4,6 +4,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 /** Prints the exact Repost Maven generation contract and common-path configuration. */
 @Mojo(name = "help", requiresProject = false, threadSafe = true)
@@ -24,7 +25,7 @@ public final class RepostHelpMojo extends AbstractMojo {
     }
 
     static String render(boolean detailed, String selectedGoal) throws MojoExecutionException {
-        String version = MavenPluginVersion.current();
+        String version = SdkVersion.VALUE;
         if (selectedGoal != null
             && !selectedGoal.isEmpty()
             && !"generate".equals(selectedGoal)

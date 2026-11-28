@@ -4,8 +4,11 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        maven { url = uri(providers.gradleProperty("stagedRepository").get()) }
-        mavenCentral()
+        maven {
+            url = uri(providers.gradleProperty("stagedRepository").get())
+            content { includeGroup("sh.repost") }
+        }
+        mavenCentral { content { excludeGroup("sh.repost") } }
     }
 }
 

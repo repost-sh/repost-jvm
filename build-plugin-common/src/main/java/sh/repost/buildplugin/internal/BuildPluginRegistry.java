@@ -226,9 +226,9 @@ public final class BuildPluginRegistry {
         if (!"java".equals(language) && !"kotlin".equals(language)) {
             throw new IllegalArgumentException(location + ".language is not supported");
         }
-        exactInteger(object.get("descriptorVersion"), 2, location + ".descriptorVersion");
+        exactInteger(object.get("descriptorVersion"), GenerationProtocolV1.DESCRIPTOR_VERSION, location + ".descriptorVersion");
         String runtimeVersion = string(object.get("runtimeVersion"), location + ".runtimeVersion");
-        if (!"1.0.0".equals(runtimeVersion)) {
+        if (!GenerationProtocolV1.RUNTIME_VERSION.equals(runtimeVersion)) {
             throw new IllegalArgumentException(location + " has incompatible runtimeVersion " + runtimeVersion);
         }
         return new Client(
@@ -477,7 +477,7 @@ public final class BuildPluginRegistry {
             field + "\"clientType\": " + json(client.clientType) + ",\n" +
             field + "\"factoryType\": " + json(client.factoryType) + ",\n" +
             field + "\"schemaHash\": " + json(client.schemaHash) + ",\n" +
-            field + "\"descriptorVersion\": 2,\n" +
+            field + "\"descriptorVersion\": " + GenerationProtocolV1.DESCRIPTOR_VERSION + ",\n" +
             field + "\"runtimeVersion\": " + json(client.runtimeVersion) + "\n" +
             prefix + "}\n";
     }

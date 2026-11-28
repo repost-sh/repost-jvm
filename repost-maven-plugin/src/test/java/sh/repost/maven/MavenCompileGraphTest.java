@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
+import sh.repost.buildplugin.internal.SdkVersion;
 
 final class MavenCompileGraphTest {
     @Test
@@ -17,7 +18,7 @@ final class MavenCompileGraphTest {
         Dependency kotlin = new Dependency();
         kotlin.setGroupId("sh.repost");
         kotlin.setArtifactId("repost-client-kotlin");
-        kotlin.setVersion("1.0.0");
+        kotlin.setVersion(SdkVersion.VALUE);
         MavenProject project = new MavenProject();
         MethodHandles.lookup()
             .findVirtual(MavenProject.class, "setArtifacts", MethodType.methodType(void.class, Set.class))
@@ -41,7 +42,7 @@ final class MavenCompileGraphTest {
         public String getScope() { return "compile"; }
         public String getGroupId() { return "sh.repost"; }
         public String getArtifactId() { return artifactId; }
-        public String getVersion() { return "1.0.0"; }
+        public String getVersion() { return SdkVersion.VALUE; }
         public File getFile() { return new File(artifactId + ".jar"); }
     }
 }

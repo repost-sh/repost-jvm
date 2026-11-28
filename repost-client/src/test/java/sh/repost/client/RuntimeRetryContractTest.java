@@ -34,6 +34,7 @@ import sh.repost.client.descriptor.ModelDescriptor;
 import sh.repost.client.descriptor.SchemaDescriptor;
 import sh.repost.client.error.RepostConfigurationException;
 import sh.repost.client.error.RepostException;
+import sh.repost.client.internal.SdkVersion;
 
 final class RuntimeRetryContractTest {
     private static final DefaultValueGenerators GENERATORS = DefaultValueGenerators.fixed(
@@ -90,7 +91,7 @@ final class RuntimeRetryContractTest {
                 assertEquals("Bearer test-key", header(request, "Authorization"));
                 assertEquals("application/json", header(request, "Content-Type"));
                 assertEquals("gzip", header(request, "Accept-Encoding"));
-                assertEquals("repost-jvm/1.0.0", header(request, "User-Agent"));
+                assertEquals("repost-jvm/" + SdkVersion.VALUE, header(request, "User-Agent"));
                 assertEquals(5, request.getHeaderFields().size());
             }
             assertEquals(3, transport.executeCalls.get());
